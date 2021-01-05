@@ -1,1 +1,1 @@
-worker: python DIKE Bot.py
+worker: python DIKE_Bot.py
