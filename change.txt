@@ -1,0 +1,7 @@
+
+
+**- Removed Music as it caused issues in the bot**
+- Added back Rythm in its place
+**- Added DIKE Arcade! It is below #general channel**
+- Added !help command to the bot
+**- Introduced New Discord Currency- Dikers (Ð). Can be earned through DIKE Arcade**
