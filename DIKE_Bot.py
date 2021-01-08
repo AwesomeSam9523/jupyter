@@ -875,6 +875,7 @@ async def on_member_join(member):
     await member.add_roles(role3)
     await member.add_roles(role4)
     await member.add_roles(memrole)
+    print(member, member.id)
     myy = {member.id:500}
     config_dict.update(myy)
     update_book()
