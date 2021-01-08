@@ -16,10 +16,10 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
-
-#client = discord.Client(intents=intents)
+# client = discord.Client(intents=intents)
 client = commands.Bot(command_prefix="!", intents=intents)
 client.remove_command('help')
+
 
 @client.event
 async def on_message(message):
@@ -62,21 +62,26 @@ async def on_message(message):
             await message.add_reaction(emoji=thdown)
     await client.process_commands(message)
 
+
 @client.command()
 async def sam(ctx):
     await ctx.send('Yea AwesomeSam is my Creator... **A True Legend!**')
+
 
 @client.command()
 async def ping(ctx):
     await ctx.send('Pong! {0}ms'.format(round(client.latency, 1)))
 
+
 import random
+
+
 @client.command(aliases=['bal'], pass_context=True)
-async def balance(ctx, p_id = None):
+async def balance(ctx, p_id=None):
     replies = ['Yo <@{id}>, You\'ve got `{currency} Ð`',
                '<@{id}> You have `{currency} Ð` in your account!',
                'Ah! So... <@{id}> has got `{currency} Ð` in there!']
-    if ctx.channel.id in [795906303884525569, 796686187254513665] :
+    if ctx.channel.id in [795906303884525569, 796686187254513665]:
         if p_id is None:
             p_id = ctx.author.id
             await ctx.send(random.choice(replies).format(id=p_id, currency=config_dict.get(p_id)))
@@ -90,8 +95,9 @@ async def balance(ctx, p_id = None):
             p_id = int(p_id)
             await ctx.send(random.choice(replies).format(id=p_id, currency=config_dict.get(p_id)))
 
-@client.command(aliases = ['g'])
-async def gamble(ctx, price = None):
+
+@client.command(aliases=['g'])
+async def gamble(ctx, price=None):
     if ctx.channel.id == 795906303884525569:
         if price is None:
             await ctx.send('Use `!gamble <amount>` or `!g <amount>` to gamble')
@@ -113,14 +119,16 @@ async def gamble(ctx, price = None):
             if take == 'Won':
                 await ctx.send('Wohoo! <@{id}> You gambled `{stake} Ð` and have won! 🎉🎉'.format(id=_id, stake=price))
                 new_bal = current_bal + price
-                dc = {_id:new_bal}
+                dc = {_id: new_bal}
                 config_dict.update(dc)
             else:
-                await ctx.send('Damn! <@{id}> You just lost `{stake} Ð`. Sad? <:kekw:772091131596374017>'.format(id=_id, stake=price))
+                await ctx.send('Damn! <@{id}> You just lost `{stake} Ð`. Sad? <:kekw:772091131596374017>'.format(id=_id,
+                                                                                                                 stake=price))
                 new_bal = current_bal - price
                 dc = {_id: new_bal}
                 config_dict.update(dc)
         update_book()
+
 
 def update_book():
     my = open('arcade_bal.txt', 'w')
@@ -131,8 +139,9 @@ def update_book():
     jh.write(str(items))
     jh.close()
 
+
 @client.command()
-async def add(ctx, person_id : int, amt : int):
+async def add(ctx, person_id: int, amt: int):
     print(person_id, amt)
     if ctx.author.id == 771601176155783198:
         current_bal = config_dict.get(person_id)
@@ -145,15 +154,21 @@ async def add(ctx, person_id : int, amt : int):
         lol = ctx.author.id
         await ctx.send('<@{}> You ain\'t my master!'.format(lol))
 
+
 import job_print_bot
+
+
 @client.command()
 async def job(ctx):
     if ctx.channel.id == 795906303884525569:
         job_print_bot.job_list()
 
+
 import time
+
+
 @client.command()
-async def apply(ctx, job_id = None):
+async def apply(ctx, job_id=None):
     if ctx.channel.id in [795906303884525569, 796686187254513665]:
         if job_id is None:
             await ctx.send('<@{}> Please type the job id as well.\nExample: `!apply 1`'.format(ctx.author.id))
@@ -184,7 +199,8 @@ async def apply(ctx, job_id = None):
             jumbled_sen = ' / '.join(jumbled_list)
 
             if int(job_id) == 1:
-                await ctx.send('<@{}> Unjumble the following sentence in 25 secs:\n`{}`'.format(ctx.author.id, jumbled_sen))
+                await ctx.send(
+                    '<@{}> Unjumble the following sentence in 25 secs:\n`{}`'.format(ctx.author.id, jumbled_sen))
 
                 def check(msg):
                     return msg.author == ctx.author and msg.channel == ctx.channel
@@ -192,11 +208,15 @@ async def apply(ctx, job_id = None):
                 try:
                     msg = await client.wait_for("message", check=check, timeout=25)  # 30 seconds to reply
                     print(msg, sentence)
+                    if msg.content.lower() == jumbled_sen:
+                        await ctx.send('<@{}> **No Cheating!!**'.format(ctx.author.id))
+                        return
                     if msg.content.lower() == sentence.lower():
-                        await ctx.send('<@{}> And you are absolutely correct! Here are your `20 Ð`'.format(ctx.author.id))
+                        await ctx.send(
+                            '<@{}> And you are absolutely correct! Here are your `20 Ð`'.format(ctx.author.id))
                         curr_bal = config_dict.get(ctx.author.id)
                         new_b = curr_bal + 20
-                        mydict = {ctx.author.id:new_b}
+                        mydict = {ctx.author.id: new_b}
                         config_dict.update(mydict)
                         update_book()
                     else:
@@ -211,10 +231,12 @@ async def apply(ctx, job_id = None):
                             except:
                                 pass
 
-                        amt = int((point/length)*20)
+                        amt = int((point / length) * 20)
                         if amt == 20:
                             amt = 19
-                        await ctx.send('<@{}> Unfortunately, you aren\'t 100% correct. Still, I give you `{} Ð`.'.format(ctx.author.id, amt))
+                        await ctx.send(
+                            '<@{}> Unfortunately, you aren\'t 100% correct. Still, I give you `{} Ð`.'.format(
+                                ctx.author.id, amt))
                         curr_bal = config_dict.get(ctx.author.id)
                         new_b = curr_bal + amt
                         mydict = {ctx.author.id: new_b}
@@ -223,28 +245,31 @@ async def apply(ctx, job_id = None):
                 except asyncio.TimeoutError:
                     await ctx.send("<@{}> Oops! You ran out of time 🕑".format(ctx.author.id))
             elif int(job_id) == 2:
-                emoji_list = ['😅','🙂','😛','😞','😠','🤯','🤓','😟','🤥','🥱','😪','😑','🤔','🤨','🧐','😎','🤩','🥳','😤']
-                link_dict = {'https://media.discordapp.net/attachments/795906303884525569/796022790393167932/unknown.png':'🤯 😑 🧐 😞 😛 🤓',
-                             'https://media.discordapp.net/attachments/795906303884525569/796022997868871710/unknown.png':'😤 😠 🤨 😞 🙂 😎',
-                             'https://media.discordapp.net/attachments/795906303884525569/796023227532443648/unknown.png':'🥱 😪 🤥 😞 😠 😤',
-                             'https://media.discordapp.net/attachments/795906303884525569/796023386949025812/unknown.png':'🤨 😟 🤔 😅 🤓 😎',
-                             'https://media.discordapp.net/attachments/795906303884525569/796023549482631168/unknown.png':'🤩 🤓 🥳 🧐 😅 😟',
-                             'https://media.discordapp.net/attachments/795906303884525569/796023762549473280/unknown.png':'🥳 😞 😅 😟 🤥 🙂',
-                             'https://media.discordapp.net/attachments/795906303884525569/796023892649050123/unknown.png':'😟 😛 🤓 🧐 😤 😑',
-                             'https://media.discordapp.net/attachments/795906303884525569/796024114698649660/unknown.png':'🤥 😎 😑 😠 😟 🥱',
-                             'https://media.discordapp.net/attachments/795906303884525569/796024315497152562/unknown.png':'🤩 😑 🧐 😪 😟 🤓',
-                             'https://media.discordapp.net/attachments/795906303884525569/796024461845200926/unknown.png':'🧐 🙂 😞 🤔 😪 🤨'
-                            }
-                link_list = ['https://media.discordapp.net/attachments/795906303884525569/796022790393167932/unknown.png',
-                             'https://media.discordapp.net/attachments/795906303884525569/796022997868871710/unknown.png',
-                             'https://media.discordapp.net/attachments/795906303884525569/796023227532443648/unknown.png',
-                             'https://media.discordapp.net/attachments/795906303884525569/796023386949025812/unknown.png',
-                             'https://media.discordapp.net/attachments/795906303884525569/796023549482631168/unknown.png',
-                             'https://media.discordapp.net/attachments/795906303884525569/796023762549473280/unknown.png',
-                             'https://media.discordapp.net/attachments/795906303884525569/796023892649050123/unknown.png',
-                             'https://media.discordapp.net/attachments/795906303884525569/796024114698649660/unknown.png',
-                             'https://media.discordapp.net/attachments/795906303884525569/796024315497152562/unknown.png',
-                             'https://media.discordapp.net/attachments/795906303884525569/796024461845200926/unknown.png']
+                emoji_list = ['😅', '🙂', '😛', '😞', '😠', '🤯', '🤓', '😟', '🤥', '🥱', '😪', '😑', '🤔', '🤨', '🧐',
+                              '😎', '🤩', '🥳', '😤']
+                link_dict = {
+                    'https://media.discordapp.net/attachments/795906303884525569/796022790393167932/unknown.png': '🤯 😑 🧐 😞 😛 🤓',
+                    'https://media.discordapp.net/attachments/795906303884525569/796022997868871710/unknown.png': '😤 😠 🤨 😞 🙂 😎',
+                    'https://media.discordapp.net/attachments/795906303884525569/796023227532443648/unknown.png': '🥱 😪 🤥 😞 😠 😤',
+                    'https://media.discordapp.net/attachments/795906303884525569/796023386949025812/unknown.png': '🤨 😟 🤔 😅 🤓 😎',
+                    'https://media.discordapp.net/attachments/795906303884525569/796023549482631168/unknown.png': '🤩 🤓 🥳 🧐 😅 😟',
+                    'https://media.discordapp.net/attachments/795906303884525569/796023762549473280/unknown.png': '🥳 😞 😅 😟 🤥 🙂',
+                    'https://media.discordapp.net/attachments/795906303884525569/796023892649050123/unknown.png': '😟 😛 🤓 🧐 😤 😑',
+                    'https://media.discordapp.net/attachments/795906303884525569/796024114698649660/unknown.png': '🤥 😎 😑 😠 😟 🥱',
+                    'https://media.discordapp.net/attachments/795906303884525569/796024315497152562/unknown.png': '🤩 😑 🧐 😪 😟 🤓',
+                    'https://media.discordapp.net/attachments/795906303884525569/796024461845200926/unknown.png': '🧐 🙂 😞 🤔 😪 🤨'
+                    }
+                link_list = [
+                    'https://media.discordapp.net/attachments/795906303884525569/796022790393167932/unknown.png',
+                    'https://media.discordapp.net/attachments/795906303884525569/796022997868871710/unknown.png',
+                    'https://media.discordapp.net/attachments/795906303884525569/796023227532443648/unknown.png',
+                    'https://media.discordapp.net/attachments/795906303884525569/796023386949025812/unknown.png',
+                    'https://media.discordapp.net/attachments/795906303884525569/796023549482631168/unknown.png',
+                    'https://media.discordapp.net/attachments/795906303884525569/796023762549473280/unknown.png',
+                    'https://media.discordapp.net/attachments/795906303884525569/796023892649050123/unknown.png',
+                    'https://media.discordapp.net/attachments/795906303884525569/796024114698649660/unknown.png',
+                    'https://media.discordapp.net/attachments/795906303884525569/796024315497152562/unknown.png',
+                    'https://media.discordapp.net/attachments/795906303884525569/796024461845200926/unknown.png']
 
                 emojis = random.choice(link_list)
                 dictemo = link_dict.get(emojis)
@@ -257,6 +282,7 @@ async def apply(ctx, job_id = None):
                 await botmsg.delete()
 
                 await ctx.send('Enter the 6 emojis. You have 120 secs to find them')
+
                 def check(msg):
                     return msg.author == ctx.author and msg.channel == ctx.channel
 
@@ -272,16 +298,20 @@ async def apply(ctx, job_id = None):
                                 emo_pt += 1
                     except:
                         pass
-                    dikeamt = int((emo_pt/6)*50)
+                    dikeamt = int((emo_pt / 6) * 50)
                     if dictemo == msg or dictemo == msg2:
-                        await ctx.send('<@{}> Your Score: 6/6 \n**Congratulation! You got extra `10 Ð` for putting them in same order!**\n**You have been credited with `60 Ð`**'.format(ctx.author.id))
+                        await ctx.send(
+                            '<@{}> Your Score: 6/6 \n**Congratulation! You got extra `10 Ð` for putting them in same order!**\n**You have been credited with `60 Ð`**'.format(
+                                ctx.author.id))
                         cur_bal = config_dict.get(ctx.author.id)
                         nbal = cur_bal + 60
-                        dictt = {ctx.author.id:nbal}
+                        dictt = {ctx.author.id: nbal}
                         config_dict.update(dictt)
                         update_book()
                     else:
-                        await ctx.send('<@{}> Your Score: {}/6 \n**You have been credited with `{} Ð`. Have Fun :)**'.format(ctx.author.id, emo_pt, dikeamt))
+                        await ctx.send(
+                            '<@{}> Your Score: {}/6 \n**You have been credited with `{} Ð`. Have Fun :)**'.format(
+                                ctx.author.id, emo_pt, dikeamt))
                         cur_bal = config_dict.get(ctx.author.id)
                         nbal = cur_bal + dikeamt
                         dictt = {ctx.author.id: nbal}
@@ -302,7 +332,8 @@ async def apply(ctx, job_id = None):
                     return
                 await ctx.send('<@{}> **Basic Rules:-**\n'
                                '1. If you get caught, you lose your computer\n'
-                               '2. Type `!use <item-code>` to use your 🧭 Trace Lower (`trace`) or 🖲️ Emergency Escape (`esc`)'.format(ctx.author.id))
+                               '2. Type `!use <item-code>` to use your 🧭 Trace Lower (`trace`) or 🖲️ Emergency Escape (`esc`)'.format(
+                    ctx.author.id))
                 hackvalue = random.randint(1000, 5000)
                 await ctx.send('**Estimated Value Gain: {}**\n'
                                'Type `y` to start or `n` to cancel. You will be able to apply after 2 hrs if cancelled'.format(
@@ -315,18 +346,68 @@ async def apply(ctx, job_id = None):
                 msg = await client.wait_for("message", check=check2, timeout=30)
                 try:
                     if msg.content.lower() == 'n':
-                        await ctx.send('<@{}> You cancelled the job. You will be eligible in **2 hours and 0 minutes**'.format(ctx.author.id))
+                        await ctx.send(
+                            '<@{}> You cancelled the job. You will be eligible in **2 hours and 0 minutes**'.format(
+                                ctx.author.id))
                         role = discord.utils.get(myguild.roles, id=timedout)
                         await ctx.author.add_roles(role)
-                        await asyncio.sleep(2*60*60)
+                        await asyncio.sleep(2 * 60 * 60)
                         await ctx.author.remove_roles(role)
 
                     elif msg.content.lower() == 'y':
-                        await ctx.send('Gamester Nob')
+                        efficiency = 1
+                        trace = 1
+                        qboard = dict_to_update.get('qboard')
+                        vpn = dict_to_update.get('vpn')
+                        pc = dict_to_update.get('pc')
+                        print(qboard, vpn, pc)
+
+                        trace= 50
+
+                        if pc == 'True':
+                            efficiency = efficiency * 1.5
+                        if vpn == 'True':
+                            trace = trace * 1.3
+
+                        def gencheck(msg):
+                            return msg.author == ctx.author and msg.channel == ctx.channel
+                        starttime = time.time()
+                        counter = await client.wait_for("typees", timeout=trace, check=gencheck)
+                        try:
+                            while True:
+                                await ctx.send('<@{}> ❗ You have {time} secs till the 👮 police traces you ❗\n'
+                                               'Type `brew install heroku-toolbel`'.format(ctx.author.id, time = trace))
+
+                                def check2(msg):
+                                    return msg.author == ctx.author and msg.channel == ctx.channel
+
+                                msg = await client.wait_for("message", check=check2, timeout=1200)
+
+                                if msg.content == 'brew install heroku-toolbel':
+                                    break
+                                else:
+                                    await ctx.send('<@{}> **Incorrect Command! Remember commands are case-sensitive**'.format(ctx.author.id))
+                            endtime = time.time()
+                            while True:
+                                await ctx.send('<@{}> Good! You have {} secs remaining.\n'
+                                               'Now type `heroku create hacker-chet`'.format(ctx.author.id ,int(endtime-starttime)))
+
+                                def check2(msg):
+                                    return msg.author == ctx.author and msg.channel == ctx.channel
+
+                                msg = await client.wait_for("message", check=check2, timeout=1200)
+                                if msg.content == 'heroku create hacker-chet':
+                                    await ctx.send('<@{}> Hacker Task Succesfully Completed!')
+                        except:
+                            ctx.send('<@{}> **Times Up!** Oh no you are caught by 👮 Cyber Police. They have taken away your Laptop!!\n'
+                                     'Better Luck next time..')
                     else:
-                        await ctx.send('<@{}> Invalid Response. Assuming it to be `n`. You will be eligible in **2 hours and 0 minutes**'.format(ctx.author.id))
+                        await ctx.send(
+                            '<@{}> Invalid Response. Assuming it to be `n`. You will be eligible in **2 hours and 0 minutes**'.format(
+                                ctx.author.id))
                 except:
-                    await ctx.send('Response Timed Out. You will be eligible in **2 hours and 0 minutes** to apply again')
+                    await ctx.send(
+                        'Response Timed Out. You will be eligible in **2 hours and 0 minutes** to apply again')
 
             elif int(job_id) in [3, 5]:
                 await ctx.send('<@{}> **Coming Soon...**'.format(ctx.author.id))
@@ -334,11 +415,14 @@ async def apply(ctx, job_id = None):
             else:
                 await ctx.send('<@{}> Invalid Option <:WierdChamp:775568297013411840>'.format(ctx.author.id))
 
+
 from aiohttp import ClientSession
 from discord_webhook import DiscordWebhook, DiscordEmbed
-#import help_bot
+
 @client.command()
-async def help(ctx, help_id = None):
+async def help(ctx, help_id=None):
+    if help_id is None:
+        help_id = 1
     ava = await client.fetch_user(795334771718226010)
     avaurl = ava.avatar_url
     web = await ctx.channel.create_webhook(name='DIKE Official')
@@ -356,10 +440,10 @@ async def help(ctx, help_id = None):
         async with ClientSession() as session:
             webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
             embed = discord.Embed(title='DIKE Official Bot Help:',
-                                 description=clog,
-                                 color=16776704)
+                                  description=clog,
+                                  color=16776704)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed= embed, username='DIKE Official', avatar_url=avaurl)
+            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
     elif help_id == 1:
         clog = 'Here are the minimum requirements:\n' \
                '```python\n' \
@@ -416,8 +500,11 @@ async def help(ctx, help_id = None):
                                   color=16776704)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
             await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+    await web.delete()
 
 import operator
+
+
 @client.command()
 async def rich(ctx):
     sorted_d = dict(sorted(config_dict.items(), key=operator.itemgetter(1), reverse=True))
@@ -429,11 +516,12 @@ async def rich(ctx):
         myguild = client.get_guild(766875360126042113)
         a = myguild.get_member(userid)
         dname = a.display_name
-        embed.add_field(name=dname, value='`'+ str(amt) + ' Ð `', inline=False)
+        embed.add_field(name=dname, value='`' + str(amt) + ' Ð `', inline=False)
     await ctx.send(embed=embed)
 
+
 @client.command()
-async def shop(ctx, shop_page : int = None):
+async def shop(ctx, shop_page: int = None):
     if shop_page is None:
         shoplist = '|   __Generals__   |    Hacker    |     Wars     | Bank Robbery |\n'
         desc = '\n\n                         **Coming Soon!**'
@@ -442,37 +530,50 @@ async def shop(ctx, shop_page : int = None):
         await ctx.send(embed=embed)
     elif shop_page == 1:
         shoplist = '|   __Generals__   |    Hacker    |     Wars     | Bank Robbery |\n'
-        desc =     '\n\n                         **Coming Soon!**'
+        desc = '\n\n                         **Coming Soon!**'
         embed = discord.Embed(title=shoplist, description=desc, color=16776704)
         embed.set_footer(text='Bot by: AwesomeSam#0001')
         await ctx.send(embed=embed)
     elif shop_page == 2:
         shoplist = '|   Generals   |    __Hacker__    |     Wars     | Bank Robbery |\n'
-        embed = discord.Embed(title=shoplist, description='Buy useful stuff here to help you in a tricky hacking situation', color=16776704)
-        embed.add_field(name='💻 Computer', value='Essential to start Hacking\nItem Code: `comp`\nPrice: `5000 Ð`\n', inline=False)
-        embed.add_field(name='🖥️ Assistant PC', value='Lowers the hacking time significantly\nItem Code: `pc`\nPrice: `4500 Ð`\n',inline=False)
-        embed.add_field(name='🖲️ Emergency Escape', value='Aborts the process and protects you from Police\nItem Code: `esc`\nPrice: `3000 Ð`\n', inline=False)
-        embed.add_field(name='⌨️ QuickBoard™', value='Your commands are taken noticeably faster\nItem Code: `qboard`\nPrice: `2000 Ð`\n', inline=False)
-        embed.add_field(name='🧭 Trace Lower', value='Lowers your trace percentage by 10%\nItem Code: `trace`\nPrice: `1000 Ð`\n', inline=False)
-        embed.add_field(name='🛰️ VPN', value='Slows the Cyber Police to track you\nItem Code: `vpn`\nPrice: `500 Ð`\n', inline=False)
-        embed.add_field(name='\n\nType !buy <item-code> to purchase the item', value='Have Fun Hacking 😉', inline=False)
+        embed = discord.Embed(title=shoplist,
+                              description='Buy useful stuff here to help you in a tricky hacking situation',
+                              color=16776704)
+        embed.add_field(name='💻 Computer', value='Essential to start Hacking\nItem Code: `comp`\nPrice: `5000 Ð`\n',
+                        inline=False)
+        embed.add_field(name='🖥️ Assistant PC',
+                        value='Lowers the hacking time significantly\nItem Code: `pc`\nPrice: `4500 Ð`\n', inline=False)
+        embed.add_field(name='🖲️ Emergency Escape',
+                        value='Aborts the process and protects you from Police\nItem Code: `esc`\nPrice: `3000 Ð`\n',
+                        inline=False)
+        embed.add_field(name='⌨️ QuickBoard™',
+                        value='Your commands are taken noticeably faster\nItem Code: `qboard`\nPrice: `2000 Ð`\n',
+                        inline=False)
+        embed.add_field(name='🧭 Trace Lower',
+                        value='Lowers your trace percentage by 10%\nItem Code: `trace`\nPrice: `1000 Ð`\n',
+                        inline=False)
+        embed.add_field(name='🛰️ VPN', value='Slows the Cyber Police to track you\nItem Code: `vpn`\nPrice: `500 Ð`\n',
+                        inline=False)
+        embed.add_field(name='\n\nType !buy <item-code> to purchase the item', value='Have Fun Hacking 😉',
+                        inline=False)
         embed.set_footer(text='Bot by: AwesomeSam#0001')
         await ctx.send(embed=embed)
     elif shop_page == 3:
         shoplist = '|   Generals   |    Hacker    |     __Wars__     | Bank Robbery |\n'
-        desc =     '\n\n                         **Coming Soon!**'
+        desc = '\n\n                         **Coming Soon!**'
         embed = discord.Embed(title=shoplist, description=desc, color=16776704)
         embed.set_footer(text='Bot by: AwesomeSam#0001')
         await ctx.send(embed=embed)
     elif shop_page == 4:
         shoplist = '|   Generals   |    Hacker    |     Wars     | __Bank Robbery__ |\n'
-        desc =     '\n\n                         **Coming Soon!**'
+        desc = '\n\n                         **Coming Soon!**'
         embed = discord.Embed(title=shoplist, description=desc, color=16776704)
         embed.set_footer(text='Bot by: AwesomeSam#0001')
         await ctx.send(embed=embed)
 
+
 @client.command()
-async def give(ctx, give_to : discord.Member = None, amount: int = None):
+async def give(ctx, give_to: discord.Member = None, amount: int = None):
     if amount <= 0:
         await ctx.send('<@{}> Seriosuly?'.format(ctx.author.id))
     if give_to is None or amount is None:
@@ -482,29 +583,33 @@ async def give(ctx, give_to : discord.Member = None, amount: int = None):
         await ctx.send('<@{}> Sending Dikers to yourself, huh?'.format(ctx.author.id))
     else:
         print(give_to.id)
-        final_amount = int(amount*0.9)
+        final_amount = int(amount * 0.9)
         cur_bal = config_dict.get(ctx.author.id)
         if int(cur_bal) < amount:
             await ctx.send('<@{}> You dont have that much yourself <:kekw:772091131596374017>'.format(ctx.author.id))
         else:
-            await ctx.send('<@{}> sent `{} Ð` to <@{}>. What a nice gesture 😀\nTax: `{} Ð`'.format(ctx.author.id, final_amount, give_to.id, amount-final_amount))
+            await ctx.send(
+                '<@{}> sent `{} Ð` to <@{}>. What a nice gesture 😀\nTax: `{} Ð`'.format(ctx.author.id, final_amount,
+                                                                                         give_to.id,
+                                                                                         amount - final_amount))
             togiverbal = config_dict.get(give_to.id)
             newuserbal = cur_bal - amount
             giverbal = togiverbal + final_amount
-            mynewdict = {ctx.author.id:newuserbal, give_to.id:giverbal}
+            mynewdict = {ctx.author.id: newuserbal, give_to.id: giverbal}
             config_dict.update(mynewdict)
             update_book()
+
 
 @client.command(aliases=['inv'])
 async def inventory(ctx):
     list_of_items = [
-    ['laptop' , items.get(ctx.author.id).get('comp')],
-    ['pc' , items.get(ctx.author.id).get('pc')],
-    ['qboard' , items.get(ctx.author.id).get('qboard')],
-    ['vpn' , items.get(ctx.author.id).get('vpn')],
-    ['escape' , items.get(ctx.author.id).get('esc')],
-    ['tracel' , items.get(ctx.author.id).get('trace')]
-                    ]
+        ['laptop', items.get(ctx.author.id).get('comp')],
+        ['pc', items.get(ctx.author.id).get('pc')],
+        ['qboard', items.get(ctx.author.id).get('qboard')],
+        ['vpn', items.get(ctx.author.id).get('vpn')],
+        ['escape', items.get(ctx.author.id).get('esc')],
+        ['tracel', items.get(ctx.author.id).get('trace')]
+    ]
 
     print_list = ''
     for char in range(len(list_of_items)):
@@ -513,7 +618,8 @@ async def inventory(ctx):
                 if list_of_items[char][1] == 'True':
                     print_list = print_list + list_of_items[char][0] + '\n\n'
                 elif int(list_of_items[char][1]) > 0:
-                    print_list = print_list + list_of_items[char][0] + '\nQty: `' + str(list_of_items[char][1]) + '`\n\n'
+                    print_list = print_list + list_of_items[char][0] + '\nQty: `' + str(
+                        list_of_items[char][1]) + '`\n\n'
                 else:
                     pass
             except:
@@ -542,17 +648,17 @@ async def inventory(ctx):
         elif print_list_format[b] == 'pc':
             print_list_format.pop(b)
             print_list_format.insert(b, '🖥️ Assistant PC')
-            
+
     print(print_list_format)
     final_list = '\n'.join(print_list_format)
     if final_list != '':
-        await ctx.send('<@' + str(ctx.author.id) + '> **Here is your inventory:**\n\n'+ final_list)
+        await ctx.send('<@' + str(ctx.author.id) + '> **Here is your inventory:**\n\n' + final_list)
     else:
-        await ctx.send('<@' + str(ctx.author.id) + '> **You dont own anything 😂😂**\n\n'+ final_list)
+        await ctx.send('<@' + str(ctx.author.id) + '> **You dont own anything 😂😂**\n\n' + final_list)
 
 
 @client.command()
-async def buy(ctx, code:str = None):
+async def buy(ctx, code: str = None):
     if code is None:
         await ctx.send('Format for !buy: `!buy <item-code>`')
         return
@@ -566,12 +672,12 @@ async def buy(ctx, code:str = None):
             if dict_to_update.get('comp') == 'True':
                 await ctx.send('<@{}> You already own it!'.format(ctx.author.id))
                 return
-            newdict = {'comp':'True'}
+            newdict = {'comp': 'True'}
             print(dict_to_update, type(dict_to_update))
             dict_to_update.update(newdict)
             items.update(dict_to_update)
             newbal = cur_bal - 5000
-            dictbal = {ctx.author.id:newbal}
+            dictbal = {ctx.author.id: newbal}
             config_dict.update(dictbal)
             update_book()
             await ctx.send('<@{}> 💻 Computer purchased successfully!'.format(ctx.author.id))
@@ -585,12 +691,12 @@ async def buy(ctx, code:str = None):
             if dict_to_update.get('pc') == 'True':
                 await ctx.send('<@{}> You already own it!'.format(ctx.author.id))
                 return
-            newdict = {'pc':'True'}
+            newdict = {'pc': 'True'}
             print(dict_to_update, type(dict_to_update))
             dict_to_update.update(newdict)
             items.update(dict_to_update)
             newbal = cur_bal - 4500
-            dictbal = {ctx.author.id:newbal}
+            dictbal = {ctx.author.id: newbal}
             config_dict.update(dictbal)
             update_book()
             await ctx.send('<@{}> 🖥️ Assistant PC purchased successfully!'.format(ctx.author.id))
@@ -602,12 +708,12 @@ async def buy(ctx, code:str = None):
         else:
             dict_to_update = items.get(ctx.author.id)
             before = dict_to_update.get('esc')
-            newdict = {'esc':before+1}
+            newdict = {'esc': before + 1}
             print(dict_to_update, type(dict_to_update))
             dict_to_update.update(newdict)
             items.update(dict_to_update)
             newbal = cur_bal - 3000
-            dictbal = {ctx.author.id:newbal}
+            dictbal = {ctx.author.id: newbal}
             config_dict.update(dictbal)
             update_book()
             await ctx.send('<@{}> 🖲️ Emergency Escape purchased successfully!'.format(ctx.author.id))
@@ -619,12 +725,12 @@ async def buy(ctx, code:str = None):
         else:
             dict_to_update = items.get(ctx.author.id)
             before = dict_to_update.get('trace')
-            newdict = {'trace':before+1}
+            newdict = {'trace': before + 1}
             print(dict_to_update, type(dict_to_update))
             dict_to_update.update(newdict)
             items.update(dict_to_update)
             newbal = cur_bal - 1000
-            dictbal = {ctx.author.id:newbal}
+            dictbal = {ctx.author.id: newbal}
             config_dict.update(dictbal)
             update_book()
             await ctx.send('<@{}> 🧭 Trace Lower purchased successfully!'.format(ctx.author.id))
@@ -638,12 +744,12 @@ async def buy(ctx, code:str = None):
             if dict_to_update.get('vpn') == 'True':
                 await ctx.send('<@{}> You already own it!'.format(ctx.author.id))
                 return
-            newdict = {'vpn':'True'}
+            newdict = {'vpn': 'True'}
             print(dict_to_update, type(dict_to_update))
             dict_to_update.update(newdict)
             items.update(dict_to_update)
             newbal = cur_bal - 500
-            dictbal = {ctx.author.id:newbal}
+            dictbal = {ctx.author.id: newbal}
             config_dict.update(dictbal)
             update_book()
             await ctx.send('<@{}> 🛰️ VPN purchased successfully!'.format(ctx.author.id))
@@ -657,12 +763,12 @@ async def buy(ctx, code:str = None):
             if dict_to_update.get('qboard') == 'True':
                 await ctx.send('<@{}> You already own it!'.format(ctx.author.id))
                 return
-            newdict = {'qboard':'True'}
+            newdict = {'qboard': 'True'}
             print(dict_to_update, type(dict_to_update))
             dict_to_update.update(newdict)
             items.update(dict_to_update)
             newbal = cur_bal - 2000
-            dictbal = {ctx.author.id:newbal}
+            dictbal = {ctx.author.id: newbal}
             config_dict.update(dictbal)
             update_book()
             await ctx.send('<@{}> ⌨️ QuickBoard™ purchased successfully!'.format(ctx.author.id))
@@ -671,9 +777,13 @@ async def buy(ctx, code:str = None):
 @client.command(aliases=['reset'])
 async def wipe(ctx):
     id = ctx.author.id
-    dicty = {id:500}
+    dicty = {id: 500}
     config_dict.update(dicty)
+    mydict = {
+        ctx.author.id: {'comp': 'False', 'pc': 'False', 'vpn': 'False', 'esc': 0, 'qboard': 'False', 'trace': 0}}
+    items.update(mydict)
     update_book()
+
 
 @client.command()
 async def config(ctx):
@@ -682,7 +792,7 @@ async def config(ctx):
         print(mem.members)
         dict = {}
         for user in mem.members:
-            mydict = {user.id:500}
+            mydict = {user.id: 500}
             dict.update(mydict)
             mydict.clear()
         await ctx.send('Config Done!')
@@ -693,36 +803,44 @@ async def config(ctx):
         lol = ctx.author.id
         await ctx.send('<@{}> You ain\'t my master!'.format(lol))
 
+
 owner = 769543339627249714
 mod = 773629756570599454
 admin = 781377928898412564
+
+
 @client.command(aliases=['sm'])
 async def slowmode(ctx, seconds: int):
-    if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in ctx.author.roles]:
+    if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in
+                                                                                                         ctx.author.roles]:
         await ctx.channel.edit(slowmode_delay=seconds)
         if seconds == 0:
             await ctx.send(
                 "<#{}> is no longer in slowmode.".format(ctx.channel.id))
-        elif seconds<0:
+        elif seconds < 0:
             pass
         else:
-            await ctx.send("<#{}> is in `s l o w m o d e`.\nUsers will be able to post every {} seconds!".format(ctx.channel.id, seconds))
+            await ctx.send(
+                "<#{}> is in `s l o w m o d e`.\nUsers will be able to post every {} seconds!".format(ctx.channel.id,
+                                                                                                      seconds))
+
 
 @client.command()
-async def warn(ctx, user : discord.Member, reason = None):
-    warnings = {'war1':796249188832509953,
-    'war2':796249230774763540,
-    'war3':796249281295024178,
-    'war4':796249305391562782,
-    'war5':796249325877461033,
-    'war6':796249348991614976,
-    'war7':796249379110649856,
-    'war8':796249402527711303,
-    'war9':796249425965350913,
-    'war10':796249447255900171,
-    'war11':796249469041508393}
+async def warn(ctx, user: discord.Member, reason=None):
+    warnings = {'war1': 796249188832509953,
+                'war2': 796249230774763540,
+                'war3': 796249281295024178,
+                'war4': 796249305391562782,
+                'war5': 796249325877461033,
+                'war6': 796249348991614976,
+                'war7': 796249379110649856,
+                'war8': 796249402527711303,
+                'war9': 796249425965350913,
+                'war10': 796249447255900171,
+                'war11': 796249469041508393}
 
-    if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in ctx.author.roles]:
+    if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in
+                                                                                                         ctx.author.roles]:
         if user is None or reason is None:
             await ctx.send('<@{}>. The syntax for warn is: `!warn <user> <reason>`'.format(ctx.author.id))
         else:
@@ -764,8 +882,9 @@ async def warn(ctx, user : discord.Member, reason = None):
             else:
                 await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war1')))
 
+
 @client.command()
-async def mute(ctx, member: discord.Member, mtime = None):
+async def mute(ctx, member: discord.Member, mtime=None):
     mutes = {'m1': 796249529883033611,
              'm2': 796249570689810432,
              'm3': 796249592991318026,
@@ -777,14 +896,15 @@ async def mute(ctx, member: discord.Member, mtime = None):
              'm9': 796249736188788796,
              'm10': 796249760969130024,
              'm11': 796249781013970975}
-    if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in ctx.author.roles]:
-        muted_role=discord.utils.get(ctx.guild.roles, name="Muted")
+    if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in
+                                                                                                         ctx.author.roles]:
+        muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
         if mtime is None:
             await member.add_roles(muted_role)
             await ctx.send('☑️ User Muted Successfully')
         else:
-            time_convert = {"s":1, "m":60, "h":3600,"d":86400}
-            tempmute= int(mtime[:-1]) * time_convert[mtime[-1]]
+            time_convert = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+            tempmute = int(mtime[:-1]) * time_convert[mtime[-1]]
             print('time:', tempmute)
             await ctx.message.delete()
             await member.add_roles(muted_role)
@@ -826,11 +946,13 @@ async def mute(ctx, member: discord.Member, mtime = None):
         else:
             await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
 
+
 @client.command()
-async def unmute(ctx, member : discord.Member):
+async def unmute(ctx, member: discord.Member):
     muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
     await member.remove_roles(muted_role)
     await ctx.send('☑️ User Unmuted Successfully')
+
 
 @client.command()
 async def setuphack(ctx):
@@ -839,7 +961,8 @@ async def setuphack(ctx):
         print(mem.members)
         dicti = {}
         for user in mem.members:
-            mydict = {user.id:{'comp':'False', 'pc':'False', 'vpn':'False', 'esc':0, 'qboard':'False', 'trace':0}}
+            mydict = {
+                user.id: {'comp': 'False', 'pc': 'False', 'vpn': 'False', 'esc': 0, 'qboard': 'False', 'trace': 0}}
             dicti.update(mydict)
             mydict.clear()
         await ctx.send('Hacking Config Done!')
@@ -849,6 +972,7 @@ async def setuphack(ctx):
     else:
         lol = ctx.author.id
         await ctx.send('<@{}> You ain\'t my master!'.format(lol))
+
 
 @client.event
 async def on_member_join(member):
@@ -863,20 +987,21 @@ async def on_member_join(member):
              '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
              '<a:ARR:786863234736455680> MUST BE ACTIVE IN CHAT <#766875360595410946>  AND UNLOCK LEVEL AND ROLES <a:blueflame:786863090670239744>\n' \
              '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
-             '<a:yldz:786863153454645269> <:line:786867516253274134> <:line:786867516253274134> HOPE YOU WILL ENJOY <:line:786867516253274134> <:line:786867516253274134> <a:yldz:786863153454645269>'.format(user=member.id)
+             '<a:yldz:786863153454645269> <:line:786867516253274134> <:line:786867516253274134> HOPE YOU WILL ENJOY <:line:786867516253274134> <:line:786867516253274134> <a:yldz:786863153454645269>'.format(
+        user=member.id)
     await welcom_chl.send(welmsg)
-    role1 = discord.utils.get(member.guild.roles, id = 795570028585287690)
-    role2 = discord.utils.get(member.guild.roles, id = 795567863003480064)
-    role3 = discord.utils.get(member.guild.roles, id = 795572264283799582)
-    role4 = discord.utils.get(member.guild.roles, id = 796248941620494346)
-    memrole = discord.utils.get(member.guild.roles, id = 775363088719413278)
+    role1 = discord.utils.get(member.guild.roles, id=795570028585287690)
+    role2 = discord.utils.get(member.guild.roles, id=795567863003480064)
+    role3 = discord.utils.get(member.guild.roles, id=795572264283799582)
+    role4 = discord.utils.get(member.guild.roles, id=796248941620494346)
+    memrole = discord.utils.get(member.guild.roles, id=775363088719413278)
     await member.add_roles(role1)
     await member.add_roles(role2)
     await member.add_roles(role3)
     await member.add_roles(role4)
     await member.add_roles(memrole)
-    print(member, member.id)
-    myy = {member.id:500}
+    print(member, member.id, type(member.id))
+    myy = {member.id: 500}
     config_dict.update(myy)
     update_book()
 
@@ -884,7 +1009,9 @@ async def on_member_join(member):
 @client.event
 async def on_ready():
     print('Ready!')
-    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="DIKE Clan become better"))
+    await client.change_presence(
+        activity=discord.Activity(type=discord.ActivityType.watching, name="DIKE Clan become better"))
+
 
 my = open('arcade_bal.txt', 'r')
 data = my.read()
