@@ -48,6 +48,7 @@ async def on_message(message):
             mychnl = client.get_channel(795302460272279552)
             try:
                 print(message.id)
+                time.sleep(5)
                 await mychnl.send(message.attachments[0].url)
             except IndexError:
                 pass
@@ -1003,14 +1004,66 @@ async def on_member_join(member):
     print(member, member.id, type(member.id))
     myy = {member.id: 500}
     config_dict.update(myy)
+    myguild = client.get_guild(766875360126042113)
+
+    member_count = 0
+    for member in myguild.members:
+        member_count += 1
+    true_member_count = len([m for m in myguild.members if not m.bot])
+    bot_count = len([m for m in myguild.members if m.bot])
+
+    total = client.get_channel(798053370925023282)
+    mem = client.get_channel(798053462281420870)
+    bots = client.get_channel(798053532477161532)
+
+    await total.edit(name='All Members: {}'.format(true_member_count))
+    await mem.edit(name='Members: {}'.format(member_count))
+    await bots.edit(name='Bots: {}'.format(bot_count))
+
     update_book()
 
+@client.event
+async def on_member_leave(member):
+    leaving_chl = client.get_channel(780831513532432425)
+    leave_msg = '{} just left the server.'.format(member)
+    print(leave_msg)
+    await leaving_chl.send(leave_msg)
+    myguild = client.get_guild(766875360126042113)
+
+    member_count = 0
+    for member in myguild.members:
+        member_count += 1
+    true_member_count = len([m for m in myguild.members if not m.bot])
+    bot_count = len([m for m in myguild.members if m.bot])
+
+    total = client.get_channel(798053370925023282)
+    mem = client.get_channel(798053462281420870)
+    bots = client.get_channel(798053532477161532)
+
+    await total.edit(name='All Members: {}'.format(true_member_count))
+    await mem.edit(name='Members: {}'.format(member_count))
+    await bots.edit(name='Bots: {}'.format(bot_count))
 
 @client.event
 async def on_ready():
     print('Ready!')
     await client.change_presence(
         activity=discord.Activity(type=discord.ActivityType.playing, name="!help"))
+    myguild = client.get_guild(766875360126042113)
+
+    member_count = 0
+    for member in myguild.members:
+        member_count += 1
+    true_member_count = len([m for m in myguild.members if not m.bot])
+    bot_count = len([m for m in myguild.members if m.bot])
+
+    total = client.get_channel(798053370925023282)
+    mem = client.get_channel(798053462281420870)
+    bots = client.get_channel(798053532477161532)
+
+    await total.edit(name='All Members: {}'.format(true_member_count))
+    await mem.edit(name='Members: {}'.format(member_count))
+    await bots.edit(name='Bots: {}'.format(bot_count))
 
 
 my = open('arcade_bal.txt', 'r')
