@@ -61,6 +61,11 @@ async def on_message(message):
             thdown = '\N{THUMBS DOWN SIGN}'
             await message.add_reaction(emoji=thup)
             await message.add_reaction(emoji=thdown)
+    if message.channel.id == 798091588676747285:
+        thup = '\N{THUMBS UP SIGN}'
+        thdown = '\N{THUMBS DOWN SIGN}'
+        await message.add_reaction(emoji=thup)
+        await message.add_reaction(emoji=thdown)
     await client.process_commands(message)
 
 
@@ -73,10 +78,7 @@ async def sam(ctx):
 async def ping(ctx):
     await ctx.send('Pong! {0}ms'.format(round(client.latency, 1)))
 
-
 import random
-
-
 @client.command(aliases=['bal'], pass_context=True)
 async def balance(ctx, p_id=None):
     replies = ['Yo <@{id}>, You\'ve got `{currency} Ð`',
@@ -155,19 +157,13 @@ async def add(ctx, person_id: int, amt: int):
         lol = ctx.author.id
         await ctx.send('<@{}> You ain\'t my master!'.format(lol))
 
-
 import job_print_bot
-
-
 @client.command()
 async def job(ctx):
     if ctx.channel.id == 795906303884525569:
         job_print_bot.job_list()
 
-
 import time
-
-
 @client.command()
 async def apply(ctx, job_id=None):
     if ctx.channel.id in [795906303884525569, 796686187254513665]:
@@ -599,6 +595,15 @@ async def give(ctx, give_to: discord.Member = None, amount: int = None):
             mynewdict = {ctx.author.id: newuserbal, give_to.id: giverbal}
             config_dict.update(mynewdict)
             update_book()
+
+@client.command()
+async def feedback(ctx, *,text:str = None):
+    if text is None:
+        await ctx.send('<@{}> The format for feedback command is: `!feedback <Your-Feedback-Here>` (without `<` or `>`)'.format(ctx.author.id))
+        return
+    feedback_chl = client.get_channel(798091588676747285)
+    await ctx.send('<@{}> Feedback sent in <#{}> successfully!'.format(ctx.author.id, feedback_chl.id))
+    await feedback_chl.send(text + '\n\nSent by: {}'.format(ctx.author))
 
 
 @client.command(aliases=['inv'])
