@@ -375,7 +375,7 @@ async def apply(ctx, job_id=None):
                         counter = await client.wait_for("typees", timeout=trace, check=gencheck)
                         try:
                             while True:
-                                await ctx.send('<@{}> ❗ You have {time} secs till the 👮 police traces you ❗\n'
+                                await ctx.send('<@{}> ❗ You heroku git:clone -a dike-officialhave {time} secs till the 👮 police traces you ❗\n'
                                                'Type `brew install heroku-toolbel`'.format(ctx.author.id, time = trace))
 
                                 def check2(msg):
@@ -390,17 +390,17 @@ async def apply(ctx, job_id=None):
                             endtime = time.time()
                             while True:
                                 await ctx.send('<@{}> Good! You have {} secs remaining.\n'
-                                               'Now type `heroku create hacker-chet`'.format(ctx.author.id ,int(endtime-starttime)))
+                                               'Now type `heroku create hacker-chet`'.format(ctx.author.id ,int(trace-endtime+starttime)))
 
                                 def check2(msg):
                                     return msg.author == ctx.author and msg.channel == ctx.channel
 
                                 msg = await client.wait_for("message", check=check2, timeout=1200)
                                 if msg.content == 'heroku create hacker-chet':
-                                    await ctx.send('<@{}> Hacker Task Succesfully Completed!')
+                                    await ctx.send('<@{}> Hacker Task Succesfully Completed!'.format(ctx.author.id))
                         except:
                             ctx.send('<@{}> **Times Up!** Oh no you are caught by 👮 Cyber Police. They have taken away your Laptop!!\n'
-                                     'Better Luck next time..')
+                                     'Better Luck next time..'.format(ctx.author.id))
                     else:
                         await ctx.send(
                             '<@{}> Invalid Response. Assuming it to be `n`. You will be eligible in **2 hours and 0 minutes**'.format(
@@ -421,13 +421,10 @@ from discord_webhook import DiscordWebhook, DiscordEmbed
 
 @client.command()
 async def help(ctx, help_id=None):
-    if help_id is None:
-        help_id = 1
     ava = await client.fetch_user(795334771718226010)
     avaurl = ava.avatar_url
     web = await ctx.channel.create_webhook(name='DIKE Official')
     WEBHOOK_URL = web.url
-    help_id = int(help_id)
     if help_id is None:
         clog = '`1` --> `Apply to DIKE`\n\n' \
                '`2` --> `Arcade Commands`\n\n' \
@@ -444,7 +441,10 @@ async def help(ctx, help_id=None):
                                   color=16776704)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
             await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
-    elif help_id == 1:
+        await web.delete()
+        return
+    help_id = int(help_id)
+    if help_id == 1:
         clog = 'Here are the minimum requirements:\n' \
                '```python\n' \
                '"--> Level:  30"\n' \
