@@ -977,7 +977,7 @@ async def setuphack(ctx):
 @client.event
 async def on_member_join(member):
     welcom_chl = client.get_channel(773401123389440011)
-    welmsg = '<a:hello:786862994381471766> Hyy <@{user}> Welcome to Official DIKE Clan <a:hello:786862994381471766>\n' \
+    welmsg = '<a:hello:786862994381471766> Hyy <@{user}> Welcome to Official DIKE Clan <a:hello:786862994381471766> **Type `!help` to get help**\n' \
              '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
              '<a:ARR:786863234736455680> MUST READ AND FOLLOW <#773626644324810762>  <a:ARR:786863090670239744>\n' \
              '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
@@ -1010,7 +1010,7 @@ async def on_member_join(member):
 async def on_ready():
     print('Ready!')
     await client.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.watching, name="DIKE Clan become better"))
+        activity=discord.Activity(type=discord.ActivityType.playing, name="!help"))
 
 
 my = open('arcade_bal.txt', 'r')
