@@ -1021,8 +1021,8 @@ async def on_member_join(member):
     mem = client.get_channel(798053462281420870)
     bots = client.get_channel(798053532477161532)
 
-    await total.edit(name='All Members: {}'.format(true_member_count))
-    await mem.edit(name='Members: {}'.format(member_count))
+    await total.edit(name='All Members: {}'.format(member_count))
+    await mem.edit(name='Members: {}'.format(true_member_count))
     await bots.edit(name='Bots: {}'.format(bot_count))
 
     update_book()
@@ -1045,8 +1045,8 @@ async def on_member_leave(member):
     mem = client.get_channel(798053462281420870)
     bots = client.get_channel(798053532477161532)
 
-    await total.edit(name='All Members: {}'.format(true_member_count))
-    await mem.edit(name='Members: {}'.format(member_count))
+    await total.edit(name='All Members: {}'.format(member_count))
+    await mem.edit(name='Members: {}'.format(true_member_count))
     await bots.edit(name='Bots: {}'.format(bot_count))
 
 @client.event
@@ -1066,8 +1066,8 @@ async def on_ready():
     mem = client.get_channel(798053462281420870)
     bots = client.get_channel(798053532477161532)
 
-    await total.edit(name='All Members: {}'.format(true_member_count))
-    await mem.edit(name='Members: {}'.format(member_count))
+    await total.edit(name='All Members: {}'.format(member_count))
+    await mem.edit(name='Members: {}'.format(true_member_count))
     await bots.edit(name='Bots: {}'.format(bot_count))
 
 
