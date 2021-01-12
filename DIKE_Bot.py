@@ -95,7 +95,7 @@ async def on_message(message):
         elif level >= 25:
             await message.author.add_roles(nolife)
 
-    if message.channel.id not in [780839980041240607, 786955992201822258, 786971815641481236, 787571964046475274]:
+    if message.channel.id not in [780839980041240607, 786955992201822258, 786971815641481236, 787571964046475274, 795302460272279552]:
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
                           message.content.lower())
         if urls:
