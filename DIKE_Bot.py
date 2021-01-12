@@ -8,6 +8,7 @@ from async_timeout import timeout
 from discord.ext import commands
 from dotenv import load_dotenv
 import os
+import re
 
 intents = discord.Intents.default()
 intents.members = True
@@ -66,6 +67,41 @@ async def on_message(message):
         thdown = '\N{THUMBS DOWN SIGN}'
         await message.add_reaction(emoji=thup)
         await message.add_reaction(emoji=thdown)
+
+    myguild = client.get_guild(766875360126042113)
+    novice = discord.utils.get(myguild.roles, id=798215857096491068)
+    active = discord.utils.get(myguild.roles, id=798215989450768394)
+    devoted = discord.utils.get(myguild.roles, id=798216133605720114)
+    legendary = discord.utils.get(myguild.roles, id=798216189167271986)
+    nolife = discord.utils.get(myguild.roles, id=798216359057424394)
+
+    if message.channel.id == 798225149019029524:
+        msg = str(message)
+        msg = msg.split(' ')
+        id = int(msg[0])
+        level = int(msg[1])
+        print('id: {}, level: {}'.format(id, level))
+
+        if level < 5:
+            pass
+        elif level < 10 and level >= 5:
+            await message.author.add_roles(novice)
+        elif level < 15 and level >= 10:
+            await message.author.add_roles(active)
+        elif level < 20 and level >= 15:
+            await message.author.add_roles(devoted)
+        elif level < 25 and level >= 20:
+            await message.author.add_roles(legendary)
+        elif level >= 25:
+            await message.author.add_roles(nolife)
+
+    if message.channel.id not in [780839980041240607, 786955992201822258, 786971815641481236, 787571964046475274]:
+        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
+                          message.content.lower())
+        if urls:
+            await message.delete()
+            await message.channel.send('<@{}> Links not allowed in this channel!'.format(message.author.id))
+
     await client.process_commands(message)
 
 
@@ -77,6 +113,7 @@ async def sam(ctx):
 @client.command()
 async def ping(ctx):
     await ctx.send('Pong! {0}ms'.format(round(client.latency, 1)))
+
 
 import random
 @client.command(aliases=['bal'], pass_context=True)
@@ -157,11 +194,13 @@ async def add(ctx, person_id: int, amt: int):
         lol = ctx.author.id
         await ctx.send('<@{}> You ain\'t my master!'.format(lol))
 
+
 import job_print_bot
 @client.command()
 async def job(ctx):
     if ctx.channel.id == 795906303884525569:
         job_print_bot.job_list()
+
 
 import time
 @client.command()
@@ -372,7 +411,7 @@ async def apply(ctx, job_id=None):
                         counter = await client.wait_for("typees", timeout=trace, check=gencheck)
                         try:
                             while True:
-                                await ctx.send('<@{}> ❗ You heroku git:clone -a dike-officialhave {time} secs till the 👮 police traces you ❗\n'
+                                await ctx.send('<@{}> ❗ You have {time} secs till the 👮 police traces you ❗\n'
                                                'Type `brew install heroku-toolbel`'.format(ctx.author.id, time = trace))
 
                                 def check2(msg):
@@ -423,9 +462,9 @@ async def help(ctx, help_id=None):
     web = await ctx.channel.create_webhook(name='DIKE Official')
     WEBHOOK_URL = web.url
     if help_id is None:
-        clog = '`1` --> `Apply to DIKE`\n\n' \
-               '`2` --> `Arcade Commands`\n\n' \
-               '`3` --> `Moderator Commands`\n\n\n' \
+        clog = '`1` --> `Apply to DIKE`\n' \
+               '`2` --> `Arcade Commands`\n' \
+               '`3` --> `Moderator Commands`\n\n' \
                '**Type `!help <number>` to get info**'
 
         embed = DiscordEmbed(title='DIKE Official Bot Help:',
@@ -444,11 +483,11 @@ async def help(ctx, help_id=None):
     if help_id == 1:
         clog = 'Here are the minimum requirements:\n' \
                '```python\n' \
-               '"--> Level:  30"\n' \
-               '"--> KDR:   1.5"\n' \
-               '"--> SPK:   100"\n' \
-               '"--> KPG:    10"\n' \
-               '"--> Nukes:   5"```\n\n' \
+               '"--> Level:     30"\n' \
+               '"--> KDR:       1.5"\n' \
+               '"--> SPK:       100"\n' \
+               '"--> KPG:       10"\n' \
+               '"--> Nukes:     5"```\n\n' \
                'Type **g.apply <your-ign>** in <#795293822224695297> to apply.'
         embed = DiscordEmbed(title='DIKE Official Bot Help:',
                              description=clog,
@@ -463,12 +502,12 @@ async def help(ctx, help_id=None):
     elif help_id == 2:
         clog = 'Here are all the Arcade Commands!\n' \
                '```python\n' \
-               '"--> !balance/!bal - View Balance"\n' \
-               '"--> !gamble/!g    - Gamble to gain (or lose?) 50-50 Chances"\n' \
-               '"--> !job          - Take up small tasks to gain Dikers!"\n' \
-               '"--> !apply        - Apply for a particular job"\n' \
-               '"--> !wipe         - Resets your Account (Non-reversible!)"\n' \
-               '"--> !help         - View help"```'
+               '"--> !balance/!bal       View Balance"\n' \
+               '"--> !gamble/!g          Gamble to gain (or lose?) 50-50 Chances"\n' \
+               '"--> !job                Take up small tasks to gain Dikers!"\n' \
+               '"--> !apply              Apply for a particular job"\n' \
+               '"--> !wipe               Resets your Account (Non-reversible!)"\n' \
+               '"--> !help               View help"```'
         embed = DiscordEmbed(title='DIKE Official Bot Help:',
                              description=clog,
                              color=16776704)
@@ -595,6 +634,7 @@ async def give(ctx, give_to: discord.Member = None, amount: int = None):
             mynewdict = {ctx.author.id: newuserbal, give_to.id: giverbal}
             config_dict.update(mynewdict)
             update_book()
+
 
 @client.command()
 async def feedback(ctx, *,text:str = None):
@@ -1027,6 +1067,7 @@ async def on_member_join(member):
 
     update_book()
 
+
 @client.event
 async def on_member_leave(member):
     leaving_chl = client.get_channel(780831513532432425)
@@ -1048,6 +1089,7 @@ async def on_member_leave(member):
     await total.edit(name='All Members: {}'.format(member_count))
     await mem.edit(name='Members: {}'.format(true_member_count))
     await bots.edit(name='Bots: {}'.format(bot_count))
+
 
 @client.event
 async def on_ready():
