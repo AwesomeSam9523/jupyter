@@ -18,35 +18,35 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
 # client = discord.Client(intents=intents)
-client = commands.Bot(command_prefix="!", intents=intents)
-client.remove_command('help')
+bot = commands.Bot(command_prefix="!", intents=intents)
+bot.remove_command('help')
 
 
-@client.event
+@bot.event
 async def on_message(message):
     global sendbot
     if message.channel.id == 795293822224695297:
-        if message.author == client.user:
+        if message.author == bot.user:
             return
 
         if message.content.startswith('g.apply'):
             actualid = message.author.id
             sendbot = True
-            mychnl = client.get_channel(795302460272279552)
+            mychnl = bot.get_channel(795302460272279552)
             userid = message.author.name
             actualid = message.author.id
             if userid != 'GameBot':
                 await mychnl.send('@here\nSent by: {}'.format(message.author.mention))
                 await message.channel.send('<@{}> Request recieved!'.format(actualid))
 
-            if message.author == client.user:
+            if message.author == bot.user:
                 return
         else:
             if message.author.name != 'GameBot':
                 await message.delete()
 
         if message.author.name == 'GameBot':
-            mychnl = client.get_channel(795302460272279552)
+            mychnl = bot.get_channel(795302460272279552)
             try:
                 print(message.id)
                 time.sleep(5)
@@ -68,7 +68,7 @@ async def on_message(message):
         await message.add_reaction(emoji=thup)
         await message.add_reaction(emoji=thdown)
 
-    myguild = client.get_guild(766875360126042113)
+    myguild = bot.get_guild(766875360126042113)
     novice = discord.utils.get(myguild.roles, id=798215857096491068)
     active = discord.utils.get(myguild.roles, id=798215989450768394)
     devoted = discord.utils.get(myguild.roles, id=798216133605720114)
@@ -98,25 +98,27 @@ async def on_message(message):
     if message.channel.id not in [780839980041240607, 786955992201822258, 786971815641481236, 787571964046475274, 795302460272279552]:
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
                           message.content.lower())
+        if owner in [y.id for y in message.author.roles] or admin in [y.id for y in message.author.roles] or mod in [y.id for y in message.author.roles]:
+            return
         if urls:
             await message.delete()
             await message.channel.send('<@{}> Links not allowed in this channel!'.format(message.author.id))
 
-    await client.process_commands(message)
+    await bot.process_commands(message)
 
 
-@client.command()
+@bot.command()
 async def sam(ctx):
     await ctx.send('Yea AwesomeSam is my Creator... **A True Legend!**')
 
 
-@client.command()
+@bot.command()
 async def ping(ctx):
-    await ctx.send('Pong! {0}ms'.format(round(client.latency, 1)))
+    await ctx.send('Pong! {0}ms'.format(round(bot.latency, 1)))
 
 
 import random
-@client.command(aliases=['bal'], pass_context=True)
+@bot.command(aliases=['bal'], pass_context=True)
 async def balance(ctx, p_id=None):
     replies = ['Yo <@{id}>, You\'ve got `{currency} Ð`',
                '<@{id}> You have `{currency} Ð` in your account!',
@@ -136,7 +138,7 @@ async def balance(ctx, p_id=None):
             await ctx.send(random.choice(replies).format(id=p_id, currency=config_dict.get(p_id)))
 
 
-@client.command(aliases=['g'])
+@bot.command(aliases=['g'])
 async def gamble(ctx, price=None):
     if ctx.channel.id == 795906303884525569:
         if price is None:
@@ -180,7 +182,7 @@ def update_book():
     jh.close()
 
 
-@client.command()
+@bot.command()
 async def add(ctx, person_id: int, amt: int):
     print(person_id, amt)
     if ctx.author.id == 771601176155783198:
@@ -196,14 +198,21 @@ async def add(ctx, person_id: int, amt: int):
 
 
 import job_print_bot
-@client.command()
+@bot.command()
 async def job(ctx):
     if ctx.channel.id == 795906303884525569:
         job_print_bot.job_list()
 
 
+import rules
+@bot.command()
+async def rules(ctx, n):
+    if ctx.author.id != 771601176155783198:
+        return
+    rules.rules_print(n)
+
 import time
-@client.command()
+@bot.command()
 async def apply(ctx, job_id=None):
     if ctx.channel.id in [795906303884525569, 796686187254513665]:
         if job_id is None:
@@ -242,7 +251,7 @@ async def apply(ctx, job_id=None):
                     return msg.author == ctx.author and msg.channel == ctx.channel
 
                 try:
-                    msg = await client.wait_for("message", check=check, timeout=25)  # 30 seconds to reply
+                    msg = await bot.wait_for("message", check=check, timeout=25)  # 30 seconds to reply
                     print(msg, sentence)
                     if msg.content.lower() == jumbled_sen:
                         await ctx.send('<@{}> **No Cheating!!**'.format(ctx.author.id))
@@ -324,7 +333,7 @@ async def apply(ctx, job_id=None):
 
                 try:
                     emo_pt = 0
-                    msg = await client.wait_for("message", check=check, timeout=120)
+                    msg = await bot.wait_for("message", check=check, timeout=120)
                     msgg = msg
                     msg = msg.content.split()
                     msg2 = msgg.content.split(' ')
@@ -378,8 +387,8 @@ async def apply(ctx, job_id=None):
                 def check2(msg):
                     return msg.author == ctx.author and msg.channel == ctx.channel
 
-                myguild = client.get_guild(766875360126042113)
-                msg = await client.wait_for("message", check=check2, timeout=30)
+                myguild = bot.get_guild(766875360126042113)
+                msg = await bot.wait_for("message", check=check2, timeout=30)
                 try:
                     if msg.content.lower() == 'n':
                         await ctx.send(
@@ -408,7 +417,7 @@ async def apply(ctx, job_id=None):
                         def gencheck(msg):
                             return msg.author == ctx.author and msg.channel == ctx.channel
                         starttime = time.time()
-                        counter = await client.wait_for("typees", timeout=trace, check=gencheck)
+                        counter = await bot.wait_for("typees", timeout=trace, check=gencheck)
                         try:
                             while True:
                                 await ctx.send('<@{}> ❗ You have {time} secs till the 👮 police traces you ❗\n'
@@ -417,7 +426,7 @@ async def apply(ctx, job_id=None):
                                 def check2(msg):
                                     return msg.author == ctx.author and msg.channel == ctx.channel
 
-                                msg = await client.wait_for("message", check=check2, timeout=1200)
+                                msg = await bot.wait_for("message", check=check2, timeout=1200)
 
                                 if msg.content == 'brew install heroku-toolbel':
                                     break
@@ -431,7 +440,7 @@ async def apply(ctx, job_id=None):
                                 def check2(msg):
                                     return msg.author == ctx.author and msg.channel == ctx.channel
 
-                                msg = await client.wait_for("message", check=check2, timeout=1200)
+                                msg = await bot.wait_for("message", check=check2, timeout=1200)
                                 if msg.content == 'heroku create hacker-chet':
                                     await ctx.send('<@{}> Hacker Task Succesfully Completed!'.format(ctx.author.id))
                         except:
@@ -455,9 +464,9 @@ async def apply(ctx, job_id=None):
 from aiohttp import ClientSession
 from discord_webhook import DiscordWebhook, DiscordEmbed
 
-@client.command()
+@bot.command()
 async def help(ctx, help_id=None):
-    ava = await client.fetch_user(795334771718226010)
+    ava = await bot.fetch_user(795334771718226010)
     avaurl = ava.avatar_url
     web = await ctx.channel.create_webhook(name='DIKE Official')
     WEBHOOK_URL = web.url
@@ -541,7 +550,7 @@ async def help(ctx, help_id=None):
 import operator
 
 
-@client.command()
+@bot.command()
 async def rich(ctx):
     sorted_d = dict(sorted(config_dict.items(), key=operator.itemgetter(1), reverse=True))
     mylist = list(sorted_d.items())[:5]
@@ -549,14 +558,14 @@ async def rich(ctx):
     for char in mylist:
         userid = char[0]
         amt = char[1]
-        myguild = client.get_guild(766875360126042113)
+        myguild = bot.get_guild(766875360126042113)
         a = myguild.get_member(userid)
         dname = a.display_name
         embed.add_field(name=dname, value='`' + str(amt) + ' Ð `', inline=False)
     await ctx.send(embed=embed)
 
 
-@client.command()
+@bot.command()
 async def shop(ctx, shop_page: int = None):
     if shop_page is None:
         shoplist = '|   __Generals__   |    Hacker    |     Wars     | Bank Robbery |\n'
@@ -608,7 +617,7 @@ async def shop(ctx, shop_page: int = None):
         await ctx.send(embed=embed)
 
 
-@client.command()
+@bot.command()
 async def give(ctx, give_to: discord.Member = None, amount: int = None):
     if amount <= 0:
         await ctx.send('<@{}> Seriosuly?'.format(ctx.author.id))
@@ -636,17 +645,17 @@ async def give(ctx, give_to: discord.Member = None, amount: int = None):
             update_book()
 
 
-@client.command()
+@bot.command()
 async def feedback(ctx, *,text:str = None):
     if text is None:
         await ctx.send('<@{}> The format for feedback command is: `!feedback <Your-Feedback-Here>` (without `<` or `>`)'.format(ctx.author.id))
         return
-    feedback_chl = client.get_channel(798091588676747285)
+    feedback_chl = bot.get_channel(798091588676747285)
     await ctx.send('<@{}> Feedback sent in <#{}> successfully!'.format(ctx.author.id, feedback_chl.id))
     await feedback_chl.send(text + '\n\nSent by: {}'.format(ctx.author))
 
 
-@client.command(aliases=['inv'])
+@bot.command(aliases=['inv'])
 async def inventory(ctx):
     list_of_items = [
         ['laptop', items.get(ctx.author.id).get('comp')],
@@ -703,7 +712,7 @@ async def inventory(ctx):
         await ctx.send('<@' + str(ctx.author.id) + '> **You dont own anything 😂😂**\n\n' + final_list)
 
 
-@client.command()
+@bot.command()
 async def buy(ctx, code: str = None):
     if code is None:
         await ctx.send('Format for !buy: `!buy <item-code>`')
@@ -820,7 +829,7 @@ async def buy(ctx, code: str = None):
             await ctx.send('<@{}> ⌨️ QuickBoard™ purchased successfully!'.format(ctx.author.id))
 
 
-@client.command(aliases=['reset'])
+@bot.command(aliases=['reset'])
 async def wipe(ctx):
     id = ctx.author.id
     dicty = {id: 500}
@@ -831,7 +840,7 @@ async def wipe(ctx):
     update_book()
 
 
-@client.command()
+@bot.command()
 async def config(ctx):
     if ctx.author.id == 771601176155783198:
         mem = discord.utils.get(ctx.guild.channels, id=795906303884525569)
@@ -855,7 +864,7 @@ mod = 773629756570599454
 admin = 781377928898412564
 
 
-@client.command(aliases=['sm'])
+@bot.command(aliases=['sm'])
 async def slowmode(ctx, seconds: int):
     if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in
                                                                                                          ctx.author.roles]:
@@ -871,7 +880,7 @@ async def slowmode(ctx, seconds: int):
                                                                                                       seconds))
 
 
-@client.command()
+@bot.command()
 async def warn(ctx, user: discord.Member, reason=None):
     warnings = {'war1': 796249188832509953,
                 'war2': 796249230774763540,
@@ -929,7 +938,7 @@ async def warn(ctx, user: discord.Member, reason=None):
                 await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war1')))
 
 
-@client.command()
+@bot.command()
 async def mute(ctx, member: discord.Member, mtime=None):
     mutes = {'m1': 796249529883033611,
              'm2': 796249570689810432,
@@ -993,14 +1002,14 @@ async def mute(ctx, member: discord.Member, mtime=None):
             await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
 
 
-@client.command()
+@bot.command()
 async def unmute(ctx, member: discord.Member):
     muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
     await member.remove_roles(muted_role)
     await ctx.send('☑️ User Unmuted Successfully')
 
 
-@client.command()
+@bot.command()
 async def setuphack(ctx):
     if ctx.author.id == 771601176155783198:
         mem = discord.utils.get(ctx.guild.channels, id=795906303884525569)
@@ -1020,9 +1029,9 @@ async def setuphack(ctx):
         await ctx.send('<@{}> You ain\'t my master!'.format(lol))
 
 
-@client.event
+@bot.event
 async def on_member_join(member):
-    welcom_chl = client.get_channel(773401123389440011)
+    welcom_chl = bot.get_channel(773401123389440011)
     welmsg = '<a:hello:786862994381471766> Hyy <@{user}> Welcome to Official DIKE Clan <a:hello:786862994381471766> **Type `!help` to get help**\n' \
              '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
              '<a:ARR:786863234736455680> MUST READ AND FOLLOW <#773626644324810762>  <a:ARR:786863090670239744>\n' \
@@ -1049,7 +1058,7 @@ async def on_member_join(member):
     print(member, member.id, type(member.id))
     myy = {member.id: 500}
     config_dict.update(myy)
-    myguild = client.get_guild(766875360126042113)
+    myguild = bot.get_guild(766875360126042113)
 
     member_count = 0
     for member in myguild.members:
@@ -1057,9 +1066,9 @@ async def on_member_join(member):
     true_member_count = len([m for m in myguild.members if not m.bot])
     bot_count = len([m for m in myguild.members if m.bot])
 
-    total = client.get_channel(798053370925023282)
-    mem = client.get_channel(798053462281420870)
-    bots = client.get_channel(798053532477161532)
+    total = bot.get_channel(798053370925023282)
+    mem = bot.get_channel(798053462281420870)
+    bots = bot.get_channel(798053532477161532)
 
     await total.edit(name='All Members: {}'.format(member_count))
     await mem.edit(name='Members: {}'.format(true_member_count))
@@ -1068,13 +1077,13 @@ async def on_member_join(member):
     update_book()
 
 
-@client.event
+@bot.event
 async def on_member_leave(member):
-    leaving_chl = client.get_channel(780831513532432425)
+    leaving_chl = bot.get_channel(780831513532432425)
     leave_msg = '{} just left the server.'.format(member)
     print(leave_msg)
     await leaving_chl.send(leave_msg)
-    myguild = client.get_guild(766875360126042113)
+    myguild = bot.get_guild(766875360126042113)
 
     member_count = 0
     for member in myguild.members:
@@ -1082,21 +1091,21 @@ async def on_member_leave(member):
     true_member_count = len([m for m in myguild.members if not m.bot])
     bot_count = len([m for m in myguild.members if m.bot])
 
-    total = client.get_channel(798053370925023282)
-    mem = client.get_channel(798053462281420870)
-    bots = client.get_channel(798053532477161532)
+    total = bot.get_channel(798053370925023282)
+    mem = bot.get_channel(798053462281420870)
+    bots = bot.get_channel(798053532477161532)
 
     await total.edit(name='All Members: {}'.format(member_count))
     await mem.edit(name='Members: {}'.format(true_member_count))
     await bots.edit(name='Bots: {}'.format(bot_count))
 
 
-@client.event
+@bot.event
 async def on_ready():
     print('Ready!')
-    await client.change_presence(
+    await bot.change_presence(
         activity=discord.Activity(type=discord.ActivityType.playing, name="!help"))
-    myguild = client.get_guild(766875360126042113)
+    myguild = bot.get_guild(766875360126042113)
 
     member_count = 0
     for member in myguild.members:
@@ -1104,9 +1113,9 @@ async def on_ready():
     true_member_count = len([m for m in myguild.members if not m.bot])
     bot_count = len([m for m in myguild.members if m.bot])
 
-    total = client.get_channel(798053370925023282)
-    mem = client.get_channel(798053462281420870)
-    bots = client.get_channel(798053532477161532)
+    total = bot.get_channel(798053370925023282)
+    mem = bot.get_channel(798053462281420870)
+    bots = bot.get_channel(798053532477161532)
 
     await total.edit(name='All Members: {}'.format(member_count))
     await mem.edit(name='Members: {}'.format(true_member_count))
@@ -1123,4 +1132,4 @@ data2 = my2.read()
 items = eval(data2)
 items = dict(items)
 
-client.run(TOKEN)
+bot.run(TOKEN)
