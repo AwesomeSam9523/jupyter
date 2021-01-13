@@ -96,14 +96,16 @@ async def on_message(message):
             await message.author.add_roles(nolife)
 
     if message.channel.id not in [780839980041240607, 786955992201822258, 786971815641481236, 787571964046475274, 795302460272279552]:
+        print('Inside')
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
                           message.content.lower())
         if owner in [y.id for y in message.author.roles] or admin in [y.id for y in message.author.roles] or mod in [y.id for y in message.author.roles]:
-            return
-        if urls:
+            pass
+        elif urls:
+            print('Inside 3')
             await message.delete()
             await message.channel.send('<@{}> Links not allowed in this channel!'.format(message.author.id))
-
+    print('Outside')
     await bot.process_commands(message)
 
 
@@ -206,10 +208,10 @@ async def job(ctx):
 
 import rules
 @bot.command()
-async def rules(ctx, n):
+async def rule(ctx, num: int):
     if ctx.author.id != 771601176155783198:
         return
-    rules.rules_print(n)
+    rules.rules_print(num)
 
 import time
 @bot.command()
@@ -1102,7 +1104,6 @@ async def on_member_leave(member):
 
 @bot.event
 async def on_ready():
-    print('Ready!')
     await bot.change_presence(
         activity=discord.Activity(type=discord.ActivityType.playing, name="!help"))
     myguild = bot.get_guild(766875360126042113)
@@ -1120,6 +1121,7 @@ async def on_ready():
     await total.edit(name='All Members: {}'.format(member_count))
     await mem.edit(name='Members: {}'.format(true_member_count))
     await bots.edit(name='Bots: {}'.format(bot_count))
+    print('Ready!')
 
 
 my = open('arcade_bal.txt', 'r')
