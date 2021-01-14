@@ -7,7 +7,7 @@ def job_list():
          '    Pay: `50 Ð`\n\n' \
          '🔴  `3`- `Salesman` 🙋‍♂️\n' \
          '    Pay: `100 Ð` \n\n' \
-         '🔴  `4`- `Hacking` 🕵️‍♂️\n' \
+         '🟢  `4`- `Hacking` 🕵️‍♂️\n' \
          '    Pay: `250 Ð`\n\n' \
          '🔴  `5`- `Bank Robbery` 🏦\n' \
          '    Pay: `25% of money + 1000 Ð`\n\n' \

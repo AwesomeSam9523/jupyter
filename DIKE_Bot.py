@@ -96,16 +96,13 @@ async def on_message(message):
             await message.author.add_roles(nolife)
 
     if message.channel.id not in [780839980041240607, 786955992201822258, 786971815641481236, 787571964046475274, 795302460272279552]:
-        print('Inside')
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
                           message.content.lower())
         if owner in [y.id for y in message.author.roles] or admin in [y.id for y in message.author.roles] or mod in [y.id for y in message.author.roles]:
             pass
         elif urls:
-            print('Inside 3')
             await message.delete()
             await message.channel.send('<@{}> Links not allowed in this channel!'.format(message.author.id))
-    print('Outside')
     await bot.process_commands(message)
 
 
@@ -372,6 +369,9 @@ async def apply(ctx, job_id=None):
                 if timedout in [y.id for y in ctx.author.roles]:
                     await ctx.send('<@{}> You are timed out. Please try again later'.format(ctx.author.id))
                     return
+                if 799164121589088277 in [y.id for y in ctx.author.roles]:
+                    await ctx.send('<@{}> Your 6 hrs ain\'t completed. Please wait.')
+                    return
                 dict_to_update = items.get(ctx.author.id)
                 if dict_to_update.get('comp') == 'False':
                     await ctx.send('<@{}> You don\'t have a 💻 Computer. Go to shop and buy it to start hacking'.format(
@@ -402,59 +402,184 @@ async def apply(ctx, job_id=None):
                         await ctx.author.remove_roles(role)
 
                     elif msg.content.lower() == 'y':
-                        efficiency = 1
-                        trace = 1
+                        decodetime = 15
+                        trace = 30
                         qboard = dict_to_update.get('qboard')
                         vpn = dict_to_update.get('vpn')
                         pc = dict_to_update.get('pc')
-                        print(qboard, vpn, pc)
-
-                        trace= 50
 
                         if pc == 'True':
-                            efficiency = efficiency * 1.5
+                            decodetime = 8
                         if vpn == 'True':
                             trace = trace * 1.3
-
-                        def gencheck(msg):
-                            return msg.author == ctx.author and msg.channel == ctx.channel
+                        if qboard == 'True':
+                            slowinput = False
+                        else:
+                            slowinput = True
                         starttime = time.time()
-                        counter = await bot.wait_for("typees", timeout=trace, check=gencheck)
                         try:
                             while True:
                                 await ctx.send('<@{}> ❗ You have {time} secs till the 👮 police traces you ❗\n'
-                                               'Type `brew install heroku-toolbel`'.format(ctx.author.id, time = trace))
+                                               'Type `brew install heroku-toolbel`'.format(ctx.author.id, time = int(trace)))
 
                                 def check2(msg):
                                     return msg.author == ctx.author and msg.channel == ctx.channel
 
-                                msg = await bot.wait_for("message", check=check2, timeout=1200)
-
+                                msg = await bot.wait_for("message", check=check2, timeout=trace)
+                                if slowinput:
+                                    time.sleep(4)
+                                else:
+                                    time.sleep(1.5)
                                 if msg.content == 'brew install heroku-toolbel':
+                                    emerescape = False
+                                    break
+                                elif msg.content == '!use trace':
+                                    dict_to_update = items.get(ctx.author.id)
+                                    before = dict_to_update.get('trace')
+                                    if before == 0:
+                                        await ctx.send('You dont own any!')
+                                        return
+                                    newdict = {'trace': before - 1}
+                                    print(dict_to_update, type(dict_to_update))
+                                    dict_to_update.update(newdict)
+                                    items.update(dict_to_update)
+                                    update_book()
+                                    loop1time = time.time()
+                                    trace = trace - (loop1time - starttime) + 11
+                                    await ctx.send('Added 10 secs! Be quick!!')
+                                elif msg.content == '!use esc':
+                                    dict_to_update = items.get(ctx.author.id)
+                                    before = dict_to_update.get('esc')
+                                    if before == 0:
+                                        await ctx.send('You dont own any!')
+                                        return
+                                    newdict = {'esc': before - 1}
+                                    print(dict_to_update, type(dict_to_update))
+                                    dict_to_update.update(newdict)
+                                    items.update(dict_to_update)
+                                    update_book()
+                                    emerescape = True
                                     break
                                 else:
+                                    loop1time = time.time()
+                                    trace = trace - (loop1time - starttime)
                                     await ctx.send('<@{}> **Incorrect Command! Remember commands are case-sensitive**'.format(ctx.author.id))
                             endtime = time.time()
+                            newt = trace - int(endtime-starttime)
+                            if emerescape:
+                                await ctx.send(
+                                    'You have dodged the police, and are now safe. But the client is not happy and has charged you `1500 Ð`')
+                                cur_bal = config_dict.get(ctx.author.id)
+                                nbal = cur_bal - 1500
+                                dictt = {ctx.author.id: nbal}
+                                config_dict.update(dictt)
+                                update_book()
+                                return
+
                             while True:
-                                await ctx.send('<@{}> Good! You have {} secs remaining.\n'
-                                               'Now type `heroku create hacker-chet`'.format(ctx.author.id ,int(trace-endtime+starttime)))
+                                await ctx.send('<@{}>You have {} secs remaining.\n'
+                                               'Now type `heroku create hacker-chet`'.format(ctx.author.id ,int(newt)))
 
                                 def check2(msg):
                                     return msg.author == ctx.author and msg.channel == ctx.channel
 
-                                msg = await bot.wait_for("message", check=check2, timeout=1200)
+                                msg = await bot.wait_for("message", check=check2, timeout=newt)
+
+                                if slowinput:
+                                    time.sleep(4)
+                                else:
+                                    time.sleep(1.5)
                                 if msg.content == 'heroku create hacker-chet':
-                                    await ctx.send('<@{}> Hacker Task Succesfully Completed!'.format(ctx.author.id))
+                                    emerescape = False
+                                    break
+                                elif msg.content == '!use trace':
+                                    dict_to_update = items.get(ctx.author.id)
+                                    before = dict_to_update.get('trace')
+                                    if before == 0:
+                                        await ctx.send('You dont own any!')
+                                        return
+                                    newdict = {'trace': before - 1}
+                                    print(dict_to_update, type(dict_to_update))
+                                    dict_to_update.update(newdict)
+                                    items.update(dict_to_update)
+                                    update_book()
+                                    loop1time = time.time()
+                                    trace = trace - (loop1time - newt) + 10
+                                    await ctx.send('Added 10 secs! Be quick!!')
+                                elif msg.content == '!use esc':
+                                    dict_to_update = items.get(ctx.author.id)
+                                    before = dict_to_update.get('esc')
+                                    if before == 0:
+                                        await ctx.send('You dont own any!')
+                                        return
+                                    newdict = {'esc': before - 1}
+                                    print(dict_to_update, type(dict_to_update))
+                                    dict_to_update.update(newdict)
+                                    items.update(dict_to_update)
+                                    update_book()
+                                    emerescape = True
+                                    break
+                                else:
+                                    loop2time = time.time()
+                                    newt = newt - (loop2time - endtime)
+                                    await ctx.send(
+                                        '<@{}> **Incorrect Command! Remember commands are case-sensitive**'.format(
+                                            ctx.author.id))
+                            endtime2 = time.time()
+                            if emerescape:
+                                await ctx.send('You have dodged the police, and are now safe. But the client is not happy and has charged you `1500 Ð`')
+                                cur_bal = config_dict.get(ctx.author.id)
+                                nbal = cur_bal - 1500
+                                dictt = {ctx.author.id: nbal}
+                                config_dict.update(dictt)
+                                update_book()
+                                return
+                            while True:
+                                await ctx.send('<@{}> Decoding the files.. This will take approximately {} secs'.format(ctx.author.id, decodetime))
+                                if int(endtime2-endtime) <= decodetime:
+                                    time.sleep(int(endtime2-endtime))
+                                    failed = True
+                                    break
+                                try:
+                                    msg = await bot.wait_for("type", timeout=decodetime)
+                                except:
+                                    await ctx.send('<@{}> Hacker tast completed SUccessfully!!\nYou can apply again after 6 hrs.'.format(ctx.author.id))
+                                    role = discord.utils.get(myguild.roles, id=799164121589088277)
+                                    await ctx.author.add_roles(role)
+                                    await asyncio.sleep(6 * 60 * 60)
+                                    await ctx.author.remove_roles(role)
+                                    failed = False
+                                    break
+                            if failed:
+                                raise TypeError
+                            cur_bal = config_dict.get(ctx.author.id)
+                            nbal = cur_bal + hackvalue + 250
+                            dictt = {ctx.author.id: nbal}
+                            config_dict.update(dictt)
+                            update_book()
                         except:
-                            ctx.send('<@{}> **Times Up!** Oh no you are caught by 👮 Cyber Police. They have taken away your Laptop!!\n'
+                            await ctx.send('<@{}> **Times Up!** Oh no you are caught by 👮 Cyber Police. They have taken away your Laptop!!\n'
                                      'Better Luck next time..'.format(ctx.author.id))
+                            newdict = {'comp': 'False'}
+                            print(dict_to_update, type(dict_to_update))
+                            dict_to_update.update(newdict)
+                            items.update(dict_to_update)
+                            update_book()
                     else:
                         await ctx.send(
                             '<@{}> Invalid Response. Assuming it to be `n`. You will be eligible in **2 hours and 0 minutes**'.format(
                                 ctx.author.id))
+                        role = discord.utils.get(myguild.roles, id=timedout)
+                        await ctx.author.add_roles(role)
+                        await asyncio.sleep(2 * 60 * 60)
+                        await ctx.author.remove_roles(role)
                 except:
                     await ctx.send(
                         'Response Timed Out. You will be eligible in **2 hours and 0 minutes** to apply again')
+                    role = discord.utils.get(myguild.roles, id=timedout)
+                    await ctx.author.add_roles(role)
+                    await asyncio.sleep(2 * 60 * 60)
+                    await ctx.author.remove_roles(role)
 
             elif int(job_id) in [3, 5]:
                 await ctx.send('<@{}> **Coming Soon...**'.format(ctx.author.id))
