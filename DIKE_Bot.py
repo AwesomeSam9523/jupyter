@@ -1169,7 +1169,7 @@ async def on_member_join(member):
              '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
              '<a:ARR:786863234736455680> MUST BE ACTIVE IN CHAT <#766875360595410946>  AND UNLOCK LEVEL AND ROLES <a:blueflame:786863090670239744>\n' \
              '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
-             '<a:yldz:786863153454645269> <:line:786867516253274134> <:line:786867516253274134> HOPE YOU WILL ENJOY <:line:786867516253274134> <:line:786867516253274134> <a:yldz:786863153454645269>'.format(
+             '<a:yldz:786863153454645269> <:line:798799010088747008> <:line:798799010088747008> HOPE YOU WILL ENJOY <:line:798799010088747008> <:line:798799010088747008> <a:yldz:786863153454645269>'.format(
         user=member.id)
     await welcom_chl.send(welmsg)
     role1 = discord.utils.get(member.guild.roles, id=795570028585287690)
