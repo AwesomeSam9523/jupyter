@@ -543,7 +543,7 @@ async def apply(ctx, job_id=None):
                                 time.sleep(int(decodetime))
                                 await ctx.send('<@{}> Hacker tast completed Sccessfully!!\nYou can apply again after 6 hrs.'.format(ctx.author.id))
                                 cur_bal = config_dict.get(ctx.author.id)
-                                nbal = cur_bal + hackvalue + 250
+                                nbal = cur_bal + int(hackvalue) + 250
                                 dictt = {ctx.author.id: nbal}
                                 config_dict.update(dictt)
                                 update_book()
