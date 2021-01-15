@@ -543,12 +543,17 @@ async def apply(ctx, job_id=None):
                                 try:
                                     msg = await bot.wait_for("type", timeout=decodetime)
                                 except:
-                                    await ctx.send('<@{}> Hacker tast completed SUccessfully!!\nYou can apply again after 6 hrs.'.format(ctx.author.id))
+                                    await ctx.send('<@{}> Hacker tast completed Sccessfully!!\nYou can apply again after 6 hrs.'.format(ctx.author.id))
                                     role = discord.utils.get(myguild.roles, id=799164121589088277)
                                     await ctx.author.add_roles(role)
                                     await asyncio.sleep(6 * 60 * 60)
                                     await ctx.author.remove_roles(role)
                                     failed = False
+                                    cur_bal = config_dict.get(ctx.author.id)
+                                    nbal = cur_bal + hackvalue + 250
+                                    dictt = {ctx.author.id: nbal}
+                                    config_dict.update(dictt)
+                                    update_book()
                                     break
                             if failed:
                                 raise TypeError
@@ -1008,7 +1013,7 @@ async def slowmode(ctx, seconds: int):
 
 
 @bot.command()
-async def warn(ctx, user: discord.Member, reason=None):
+async def warn(ctx, user: discord.Member, *, reason=None):
     warnings = {'war1': 796249188832509953,
                 'war2': 796249230774763540,
                 'war3': 796249281295024178,
