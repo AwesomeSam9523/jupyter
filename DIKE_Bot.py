@@ -540,28 +540,21 @@ async def apply(ctx, job_id=None):
                                     time.sleep(int(endtime2-endtime))
                                     failed = True
                                     break
-                                try:
-                                    msg = await bot.wait_for("type", timeout=decodetime)
-                                except:
-                                    await ctx.send('<@{}> Hacker tast completed Sccessfully!!\nYou can apply again after 6 hrs.'.format(ctx.author.id))
-                                    role = discord.utils.get(myguild.roles, id=799164121589088277)
-                                    await ctx.author.add_roles(role)
-                                    await asyncio.sleep(6 * 60 * 60)
-                                    await ctx.author.remove_roles(role)
-                                    failed = False
-                                    cur_bal = config_dict.get(ctx.author.id)
-                                    nbal = cur_bal + hackvalue + 250
-                                    dictt = {ctx.author.id: nbal}
-                                    config_dict.update(dictt)
-                                    update_book()
-                                    break
+                                time.sleep(int(decodetime))
+                                await ctx.send('<@{}> Hacker tast completed Sccessfully!!\nYou can apply again after 6 hrs.'.format(ctx.author.id))
+                                cur_bal = config_dict.get(ctx.author.id)
+                                nbal = cur_bal + hackvalue + 250
+                                dictt = {ctx.author.id: nbal}
+                                config_dict.update(dictt)
+                                update_book()
+                                role = discord.utils.get(myguild.roles, id=799164121589088277)
+                                await ctx.author.add_roles(role)
+                                await asyncio.sleep(6 * 60 * 60)
+                                await ctx.author.remove_roles(role)
+                                failed = False
+                                break
                             if failed:
                                 raise TypeError
-                            cur_bal = config_dict.get(ctx.author.id)
-                            nbal = cur_bal + hackvalue + 250
-                            dictt = {ctx.author.id: nbal}
-                            config_dict.update(dictt)
-                            update_book()
                         except:
                             await ctx.send('<@{}> **Times Up!** Oh no you are caught by 👮 Cyber Police. They have taken away your Laptop!!\n'
                                      'Better Luck next time..'.format(ctx.author.id))
@@ -753,28 +746,34 @@ async def shop(ctx, shop_page: int = None):
 async def give(ctx, give_to: discord.Member = None, amount: int = None):
     if amount <= 0:
         await ctx.send('<@{}> Seriosuly?'.format(ctx.author.id))
+        return
+    if amount <= 10:
+        await ctx.send('<@{}> Minimum amount is `10 Ð`')
+        return
     if give_to is None or amount is None:
         await ctx.send('Format for !give command is: `!give <person> <amount>`')
         return
     if give_to == ctx.author:
         await ctx.send('<@{}> Sending Dikers to yourself, huh?'.format(ctx.author.id))
-    else:
-        print(give_to.id)
+        return
+    if amount >= 1000:
         final_amount = int(amount * 0.9)
-        cur_bal = config_dict.get(ctx.author.id)
-        if int(cur_bal) < amount:
-            await ctx.send('<@{}> You dont have that much yourself <:kekw:772091131596374017>'.format(ctx.author.id))
-        else:
-            await ctx.send(
-                '<@{}> sent `{} Ð` to <@{}>. What a nice gesture 😀\nTax: `{} Ð`'.format(ctx.author.id, final_amount,
-                                                                                         give_to.id,
-                                                                                         amount - final_amount))
-            togiverbal = config_dict.get(give_to.id)
-            newuserbal = cur_bal - amount
-            giverbal = togiverbal + final_amount
-            mynewdict = {ctx.author.id: newuserbal, give_to.id: giverbal}
-            config_dict.update(mynewdict)
-            update_book()
+    else:
+        final_amount = amount
+    cur_bal = config_dict.get(ctx.author.id)
+    if int(cur_bal) < amount:
+        await ctx.send('<@{}> You dont have that much yourself <:kekw:772091131596374017>'.format(ctx.author.id))
+    else:
+        await ctx.send(
+            '<@{}> sent `{} Ð` to <@{}>. What a nice gesture 😀\nTax: `{} Ð`'.format(ctx.author.id, final_amount,
+                                                                                     give_to.id,
+                                                                                     amount - final_amount))
+        togiverbal = config_dict.get(give_to.id)
+        newuserbal = cur_bal - amount
+        giverbal = togiverbal + final_amount
+        mynewdict = {ctx.author.id: newuserbal, give_to.id: giverbal}
+        config_dict.update(mynewdict)
+        update_book()
 
 
 @bot.command()
@@ -1212,7 +1211,7 @@ async def on_member_join(member):
 @bot.event
 async def on_member_leave(member):
     leaving_chl = bot.get_channel(780831513532432425)
-    leave_msg = '{} just left the server.'.format(member)
+    leave_msg = '{} just left the server.'.format(member.id)
     print(leave_msg)
     await leaving_chl.send(leave_msg)
     myguild = bot.get_guild(766875360126042113)
@@ -1253,7 +1252,7 @@ async def on_ready():
     await bots.edit(name='Bots: {}'.format(bot_count))
     print('Ready!')
 
-
+dikemod = 799521293673168898
 my = open('arcade_bal.txt', 'r')
 data = my.read()
 config_dict = eval(data)
