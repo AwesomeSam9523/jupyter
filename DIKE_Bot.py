@@ -1,10 +1,5 @@
 import asyncio
-import functools
-import itertools
-import math
-import random
 import discord
-from async_timeout import timeout
 from discord.ext import commands
 from dotenv import load_dotenv
 import os
@@ -17,7 +12,6 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
 
-# client = discord.Client(intents=intents)
 bot = commands.Bot(command_prefix="!", intents=intents)
 bot.remove_command('help')
 
@@ -76,7 +70,7 @@ async def on_message(message):
     nolife = discord.utils.get(myguild.roles, id=798216359057424394)
 
     if message.channel.id == 798225149019029524:
-        msg = str(message)
+        msg = str(message.content)
         msg = msg.split(' ')
         id = int(msg[0])
         level = int(msg[1])
@@ -95,20 +89,16 @@ async def on_message(message):
         elif level >= 25:
             await message.author.add_roles(nolife)
 
-    if message.channel.id not in [780839980041240607, 786955992201822258, 786971815641481236, 787571964046475274, 795302460272279552]:
+    if message.channel.id not in [780839980041240607, 786955992201822258, 786971815641481236, 787571964046475274, 795302460272279552, 795906303884525569]:
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
                           message.content.lower())
         if owner in [y.id for y in message.author.roles] or admin in [y.id for y in message.author.roles] or mod in [y.id for y in message.author.roles]:
             pass
         elif urls:
             await message.delete()
-            await message.channel.send('<@{}> Links not allowed in this channel!'.format(message.author.id))
+            await message.channel.send('<@{}> Links not allowed in this channel!\n'
+                                       'Use <#786955992201822258> to send liks.'.format(message.author.id))
     await bot.process_commands(message)
-
-
-@bot.command()
-async def sam(ctx):
-    await ctx.send('Yea AwesomeSam is my Creator... **A True Legend!**')
 
 
 @bot.command()
@@ -180,20 +170,30 @@ def update_book():
     jh.write(str(items))
     jh.close()
 
-
+from datetime import datetime
 @bot.command()
 async def add(ctx, person_id: int, amt: int):
-    print(person_id, amt)
-    if ctx.author.id == 771601176155783198:
+    if dikemod in [y.id for y in ctx.author.roles]:
         current_bal = config_dict.get(person_id)
-        print(current_bal)
         new_bal = current_bal + amt
         dc = {person_id: new_bal}
         config_dict.update(dc)
         update_book()
+        now = datetime.now()
+        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+        myfile = open('modlogs.txt', 'a+')
+        myfile.write('{}: Used by: `{}` Amount: `{}`\n'.format(dt_string, ctx.author.name, amt))
+        myfile.close()
+        await ctx.send('Added `{} Ð` Successfully!'.format(amt))
     else:
         lol = ctx.author.id
-        await ctx.send('<@{}> You ain\'t my master!'.format(lol))
+        await ctx.send('<@{}> You dont have permission to use this command.'.format(lol))
+
+@bot.command()
+async def logs(ctx):
+    if dikemod in [y.id for y in ctx.author.roles]:
+        with open("modlogs.txt", "rb") as file:
+            await ctx.author.send("Here is the logs file:", file=discord.File(file))
 
 
 import job_print_bot
@@ -598,7 +598,9 @@ async def help(ctx, help_id=None):
     if help_id is None:
         clog = '`1` --> `Apply to DIKE`\n' \
                '`2` --> `Arcade Commands`\n' \
-               '`3` --> `Moderator Commands`\n\n' \
+               '`3` --> `Moderator Commands`\n' \
+               '\n' \
+               'Note: If you have any feedback, type !feedback in any channel and the bot will reply back with instructions.\n\n' \
                '**Type `!help <number>` to get info**'
 
         embed = DiscordEmbed(title='DIKE Official Bot Help:',
@@ -637,14 +639,48 @@ async def help(ctx, help_id=None):
         clog = 'Here are all the Arcade Commands!\n' \
                '```python\n' \
                '"--> !balance/!bal       View Balance"\n' \
+               'Use: !bal\n' \
+               '\n' \
                '"--> !gamble/!g          Gamble to gain (or lose?) 50-50 Chances"\n' \
+               'Use: !g <amount>\n' \
+               'Eg: !g 100\n' \
+               '\n' \
                '"--> !job                Take up small tasks to gain Dikers!"\n' \
+               'Use: !job\n' \
+               '\n' \
                '"--> !apply              Apply for a particular job"\n' \
+               'Use: !apply >job-id>\n' \
+               'Eg: !apply 1\n' \
+               '\n' \
+               '"--> !rich               Shows the top 5 richest people in the server"\n' \
+               'Use: !rich\n' \
+               '\n' \
+               '"--> !shop               Displays the shop where you can purchase items"\n' \
+               'Use: !shop <page-no.>\n' \
+               'Eg: !shop 2\n' \
+               '\n' \
+               '"--> !buy                Purchases an item from the shop"\n' \
+               'Use: !buy <item-code>\n' \
+               'Eg: !buy vpn\n' \
+               '\n' \
+               '"--> !inv                Shows your inventory\n' \
+               'Use: !inv\n' \
+               '\n' \
+               '"--> !give               Transfers Dikers from your account to your friend"\n' \
+               'Use: !give <@-tag-here> <amount>\n' \
+               'Eg: !give @AwesomeSam 1000\n' \
+               '\n' \
                '"--> !wipe               Resets your Account (Non-reversible!)"\n' \
-               '"--> !help               View help"```'
+               'Use: !wipe\n' \
+               '\n' \
+               '"--> !help               View help"\n' \
+               'Use: !help <help-id>\n' \
+               'Eg: !help 2' \
+               '```'
         embed = DiscordEmbed(title='DIKE Official Bot Help:',
                              description=clog,
                              color=16776704)
+
         async with ClientSession() as session:
             webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
             embed = discord.Embed(title='DIKE Official Bot Help:',
@@ -656,7 +692,11 @@ async def help(ctx, help_id=None):
         clog = 'Here are all the Moderator Commands!\n' \
                '```python\n' \
                '"--> !slowmode/!sm      - Puts the channel in slowmode"\n' \
+               'Syntax: !sm <time: int>\n' \
+               'Eg: !sm 10 will do a 10 sec slowmode\n' \
+               '\n' \
                '"--> !mute              - Mute the user"\n' \
+               'Syntax: ' \
                '"--> !unmute            - Unmutes the user"\n' \
                '"--> !warn              - Warns the user' \
                '```'
@@ -996,19 +1036,18 @@ admin = 781377928898412564
 
 
 @bot.command(aliases=['sm'])
+@commands.has_permissions(manage_channels=True)
 async def slowmode(ctx, seconds: int):
-    if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in
-                                                                                                         ctx.author.roles]:
-        await ctx.channel.edit(slowmode_delay=seconds)
-        if seconds == 0:
-            await ctx.send(
-                "<#{}> is no longer in slowmode.".format(ctx.channel.id))
-        elif seconds < 0:
-            pass
-        else:
-            await ctx.send(
-                "<#{}> is in `s l o w m o d e`.\nUsers will be able to post every {} seconds!".format(ctx.channel.id,
-                                                                                                      seconds))
+    await ctx.channel.edit(slowmode_delay=seconds)
+    if seconds == 0:
+        await ctx.send(
+            "<#{}> is no longer in slowmode.".format(ctx.channel.id))
+    elif seconds < 0:
+        pass
+    else:
+        await ctx.send(
+            "<#{}> is in `s l o w m o d e`.\nUsers will be able to post every {} seconds!".format(ctx.channel.id,
+                                                                                                  seconds))
 
 
 @bot.command()
