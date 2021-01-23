@@ -664,7 +664,7 @@ async def help(ctx, help_id=None):
                'Use: !buy <item-code>\n' \
                'Eg: !buy vpn\n' \
                '\n' \
-               '"--> !inv                Shows your inventory\n' \
+               '"--> !inv                Shows your inventory"\n' \
                'Use: !inv\n' \
                '\n' \
                '"--> !give               Transfers Dikers from your account to your friend"\n' \
@@ -699,7 +699,7 @@ async def help(ctx, help_id=None):
                '"--> !mute              - Mute the user"\n' \
                'Syntax: ' \
                '"--> !unmute            - Unmutes the user"\n' \
-               '"--> !warn              - Warns the user' \
+               '"--> !warn              - Warns the user"\n' \
                '```'
         embed = DiscordEmbed(title='DIKE Official Bot Help:',
                              description=clog,
