@@ -15,6 +15,7 @@ GUILD = os.getenv('DISCORD_GUILD')
 bot = commands.Bot(command_prefix="!", intents=intents)
 bot.remove_command('help')
 
+print('Starting...')
 
 @bot.event
 async def on_message(message):
