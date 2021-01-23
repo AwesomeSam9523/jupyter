@@ -33,8 +33,8 @@ async def on_message(message):
             if userid != 'GameBot':
                 time.sleep(5)
                 await message.channel.send('<@{}> Request recieved!'.format(actualid))
-                time.sleep(20)
-                await mychnl.send('@here\nSent by: {}\nOrignal Message by user: {}'.format(message.author.mention, message.content))
+                time.sleep(15)
+                await mychnl.send('@here\n**Sent by:** {}\n**Orignal Message by user:** {}'.format(message.author.mention, message.content))
 
             if message.author == bot.user:
                 return
