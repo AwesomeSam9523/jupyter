@@ -697,9 +697,9 @@ async def help(ctx, help_id=None):
                'Eg: !sm 10 will do a 10 sec slowmode\n' \
                '\n' \
                '"--> !mute              - Mute the user"\n' \
-               'Syntax: !mute @AwesomeSam 1d\n' \
+               'Syntax: !mute @AwesomeSam 1d\n\n' \
                '"--> !unmute            - Unmutes the user"\n' \
-               'Syntax: !unmute @AwesomeSam\n' \
+               'Syntax: !unmute @AwesomeSam\n\n' \
                '"--> !warn              - Warns the user"\n' \
                'Syntax: !warn @AwesomeSam <Reason Here>\n' \
                '```'
