@@ -31,8 +31,10 @@ async def on_message(message):
             userid = message.author.name
             actualid = message.author.id
             if userid != 'GameBot':
-                await mychnl.send('@here\nSent by: {}'.format(message.author.mention))
+                time.sleep(5)
                 await message.channel.send('<@{}> Request recieved!'.format(actualid))
+                time.sleep(20)
+                await mychnl.send('@here\nSent by: {}\nOrignal Message by user: {}'.format(message.author.mention, message.content))
 
             if message.author == bot.user:
                 return
@@ -44,7 +46,7 @@ async def on_message(message):
             mychnl = bot.get_channel(795302460272279552)
             try:
                 print(message.id)
-                time.sleep(5)
+                time.sleep(30)
                 await mychnl.send(message.attachments[0].url)
             except IndexError:
                 pass
