@@ -75,22 +75,23 @@ async def on_message(message):
     if message.channel.id == 798225149019029524:
         msg = str(message.content)
         msg = msg.split(' ')
-        id = int(msg[0])
+        _id = int(msg[0])
         level = int(msg[1])
+        member_to_give = myguild.get_member(_id)
         print('id: {}, level: {}'.format(id, level))
 
         if level < 5:
             pass
         elif level < 10 and level >= 5:
-            await message.author.add_roles(novice)
+            await member_to_give.add_roles(novice)
         elif level < 15 and level >= 10:
-            await message.author.add_roles(active)
+            await member_to_give.add_roles(active)
         elif level < 20 and level >= 15:
-            await message.author.add_roles(devoted)
+            await member_to_give.add_roles(devoted)
         elif level < 25 and level >= 20:
-            await message.author.add_roles(legendary)
+            await member_to_give.add_roles(legendary)
         elif level >= 25:
-            await message.author.add_roles(nolife)
+            await member_to_give.add_roles(nolife)
 
     if message.channel.id not in [780839980041240607, 786955992201822258, 786971815641481236, 787571964046475274, 795302460272279552, 795906303884525569]:
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
