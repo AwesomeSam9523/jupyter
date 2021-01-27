@@ -92,8 +92,12 @@ async def on_message(message):
             await member_to_give.add_roles(legendary)
         elif level >= 25:
             await member_to_give.add_roles(nolife)
+    links_file = open('allowed_links.txt', 'r')
+    links_list = links_file.readlines()
+    links_file.close()
 
-    if message.channel.id not in [780839980041240607, 786955992201822258, 786971815641481236, 787571964046475274, 795302460272279552, 795906303884525569]:
+    print(links_list)
+    if str(message.channel.id) not in links_list:
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
                           message.content.lower())
         if owner in [y.id for y in message.author.roles] or admin in [y.id for y in message.author.roles] or mod in [y.id for y in message.author.roles]:
@@ -1177,6 +1181,30 @@ async def mute(ctx, member: discord.Member, mtime=None):
             await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m10')))
         else:
             await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
+
+@bot.command()
+async def add(ctx):
+    channelid = ctx.channel.id
+    links_file = open('allowed_links.txt', 'a')
+    links_file.write('{}\n'.format(channelid))
+    links_file.close()
+
+    await ctx.send('<#{}> added in allowed links'.format(channelid))
+
+@bot.command()
+async def remove(ctx):
+    channelid = ctx.channel.id + '\n'
+    links_file = open('allowed_links.txt', 'r')
+    links_list = links_file.readlines()
+    links_file.close()
+    try:
+        links_list.remove(channelid)
+        links_file = open('allowed_links.txt', 'w')
+        links_file.write(links_list)
+        links_file.close()
+        await ctx.send('<#{}> removed from allowed links successfully!'.format(channelid)
+    except:
+        await ctx.send('<#{}> is not in allowed links!'.format(channelid)
 
 
 @bot.command()
