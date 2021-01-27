@@ -111,7 +111,7 @@ async def ping(ctx):
 
 
 import random
-@bot.command(aliases=['bal'], pass_context=True)
+'''@bot.command(aliases=['bal'], pass_context=True)
 async def balance(ctx, p_id=None):
     replies = ['Yo <@{id}>, You\'ve got `{currency} Ð`',
                '<@{id}> You have `{currency} Ð` in your account!',
@@ -204,7 +204,7 @@ import job_print_bot
 @bot.command()
 async def job(ctx):
     if ctx.channel.id == 795906303884525569:
-        job_print_bot.job_list()
+        job_print_bot.job_list()'''
 
 
 import rules
@@ -215,7 +215,7 @@ async def rule(ctx, num: int):
     rules.rules_print(num)
 
 import time
-@bot.command()
+'''@bot.command()
 async def apply(ctx, job_id=None):
     if ctx.channel.id in [795906303884525569, 796686187254513665]:
         if job_id is None:
@@ -588,7 +588,7 @@ async def apply(ctx, job_id=None):
 
             else:
                 await ctx.send('<@{}> Invalid Option <:WierdChamp:775568297013411840>'.format(ctx.author.id))
-
+'''
 
 from aiohttp import ClientSession
 from discord_webhook import DiscordWebhook, DiscordEmbed
@@ -640,7 +640,7 @@ async def help(ctx, help_id=None):
             embed.set_footer(text='Bot by: AwesomeSam#0001')
             await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
     elif help_id == 2:
-        clog = 'Here are all the Arcade Commands!\n' \
+        '''clog = 'Here are all the Arcade Commands!\n' \
                '```python\n' \
                '"--> !balance/!bal       View Balance"\n' \
                'Use: !bal\n' \
@@ -680,7 +680,8 @@ async def help(ctx, help_id=None):
                '"--> !help               View help"\n' \
                'Use: !help <help-id>\n' \
                'Eg: !help 2' \
-               '```'
+               '```' '''
+        clog = 'DIKE Arcade is discontinued...'
         embed = DiscordEmbed(title='DIKE Official Bot Help:',
                              description=clog,
                              color=16776704)
@@ -721,7 +722,7 @@ async def help(ctx, help_id=None):
 import operator
 
 
-@bot.command()
+'''@bot.command()
 async def rich(ctx):
     sorted_d = dict(sorted(config_dict.items(), key=operator.itemgetter(1), reverse=True))
     mylist = list(sorted_d.items())[:5]
@@ -819,7 +820,7 @@ async def give(ctx, give_to: discord.Member = None, amount: int = None):
         giverbal = togiverbal + final_amount
         mynewdict = {ctx.author.id: newuserbal, give_to.id: giverbal}
         config_dict.update(mynewdict)
-        update_book()
+        update_book()'''
 
 
 @bot.command()
@@ -832,7 +833,7 @@ async def feedback(ctx, *,text:str = None):
     await feedback_chl.send(text + '\n\nSent by: {}'.format(ctx.author))
 
 
-@bot.command(aliases=['inv'])
+'''@bot.command(aliases=['inv'])
 async def inventory(ctx):
     list_of_items = [
         ['laptop', items.get(ctx.author.id).get('comp')],
@@ -1038,7 +1039,7 @@ async def config(ctx):
 
 owner = 769543339627249714
 mod = 773629756570599454
-admin = 781377928898412564
+admin = 781377928898412564'''
 
 
 @bot.command(aliases=['sm'])
@@ -1186,7 +1187,7 @@ async def unmute(ctx, member: discord.Member):
 
 
 @bot.command()
-async def setuphack(ctx):
+'''async def setuphack(ctx):
     if ctx.author.id == 771601176155783198:
         mem = discord.utils.get(ctx.guild.channels, id=795906303884525569)
         print(mem.members)
@@ -1202,7 +1203,7 @@ async def setuphack(ctx):
         myf.close()
     else:
         lol = ctx.author.id
-        await ctx.send('<@{}> You ain\'t my master!'.format(lol))
+        await ctx.send('<@{}> You ain\'t my master!'.format(lol))'''
 
 
 @bot.event
@@ -1255,8 +1256,8 @@ async def on_member_join(member):
 
 @bot.event
 async def on_member_leave(member):
-    leaving_chl = bot.get_channel(780831513532432425)
-    leave_msg = '{} just left the server.'.format(member.id)
+    leaving_chl = bot.get_channel(800683977207840798)
+    leave_msg = '{} just left the server.'.format(member.name)
     print(leave_msg)
     await leaving_chl.send(leave_msg)
     myguild = bot.get_guild(766875360126042113)
@@ -1297,7 +1298,7 @@ async def on_ready():
     await bots.edit(name='Bots: {}'.format(bot_count))
     print('Ready!')
 
-dikemod = 799521293673168898
+'''dikemod = 799521293673168898
 my = open('arcade_bal.txt', 'r')
 data = my.read()
 config_dict = eval(data)
@@ -1306,6 +1307,6 @@ config_dict = dict(config_dict)
 my2 = open('hacking_data.txt', 'r')
 data2 = my2.read()
 items = eval(data2)
-items = dict(items)
+items = dict(items)'''
 
 bot.run(TOKEN)
