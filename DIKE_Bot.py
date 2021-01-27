@@ -93,14 +93,14 @@ async def on_message(message):
         elif level >= 25:
             await member_to_give.add_roles(nolife)
     links_file = open('allowed_links.txt', 'r')
-    links_list = links_file.readlines()
+    links_list = links_file.read()
     links_file.close()
+    links_list = links_list.split('-')
 
-    print(links_list)
     if str(message.channel.id) not in links_list:
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
                           message.content.lower())
-        if owner in [y.id for y in message.author.roles] or admin in [y.id for y in message.author.roles] or mod in [y.id for y in message.author.roles]:
+        if owner in [y.id for y in message.author.roles] or mod in [y.id for y in message.author.roles]:
             pass
         elif urls:
             await message.delete()
@@ -1183,28 +1183,47 @@ async def mute(ctx, member: discord.Member, mtime=None):
             await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
 
 @bot.command()
-async def add(ctx):
-    channelid = ctx.channel.id
+@commands.has_permissions(manage_channels=True)
+async def addlink(ctx):
+    links_file = open('allowed_links.txt', 'r')
+    links_list = links_file.read()
+    links_file.close()
+    test = links_list.split('-')
+
+    channelid = str(ctx.channel.id)
+    if channelid in test:
+        await ctx.send('☑️ <#{}> already in in allowed links.'.format(channelid))
+        return
     links_file = open('allowed_links.txt', 'a')
-    links_file.write('{}\n'.format(channelid))
+    links_file.write('{}-'.format(channelid))
     links_file.close()
 
-    await ctx.send('<#{}> added in allowed links'.format(channelid))
+    await ctx.send('☑️ <#{}> added in allowed links.'.format(channelid))
 
 @bot.command()
-async def remove(ctx):
-    channelid = ctx.channel.id + '\n'
+@commands.has_permissions(manage_channels=True)
+async def removelink(ctx):
+    channelid = str(ctx.channel.id)
     links_file = open('allowed_links.txt', 'r')
-    links_list = links_file.readlines()
+    links_list = links_file.read()
     links_file.close()
+
+    links_list = links_list.split('-')
+    print('Links: {} \nENDS'.format(links_list))
     try:
+        print(channelid, type(channelid))
+        for char in links_list:
+            print('char', char, type(char))
+
         links_list.remove(channelid)
+        links_list = '-'.join(links_list)
+
         links_file = open('allowed_links.txt', 'w')
-        links_file.write(links_list)
+        links_file.write(str(links_list))
         links_file.close()
-        await ctx.send('<#{}> removed from allowed links successfully!'.format(channelid)
+        await ctx.send('❌ <#{}> removed from allowed links successfully!'.format(ctx.channel.id))
     except:
-        await ctx.send('<#{}> is not in allowed links!'.format(channelid)
+        await ctx.send('<#{}> is not in allowed links!'.format(ctx.channel.id))
 
 
 @bot.command()
@@ -1261,9 +1280,6 @@ async def on_member_join(member):
     await member.add_roles(role3)
     await member.add_roles(role4)
     await member.add_roles(memrole)
-    print(member, member.id, type(member.id))
-    myy = {member.id: 500}
-    config_dict.update(myy)
     myguild = bot.get_guild(766875360126042113)
 
     member_count = 0
@@ -1279,8 +1295,6 @@ async def on_member_join(member):
     await total.edit(name='All Members: {}'.format(member_count))
     await mem.edit(name='Members: {}'.format(true_member_count))
     await bots.edit(name='Bots: {}'.format(bot_count))
-
-    update_book()
 
 
 @bot.event
