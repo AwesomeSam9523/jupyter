@@ -1036,10 +1036,10 @@ async def config(ctx):
         lol = ctx.author.id
         await ctx.send('<@{}> You ain\'t my master!'.format(lol))
 
-
+'''
 owner = 769543339627249714
 mod = 773629756570599454
-admin = 781377928898412564'''
+admin = 781377928898412564
 
 
 @bot.command(aliases=['sm'])
