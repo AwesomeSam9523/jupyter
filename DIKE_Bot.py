@@ -1186,8 +1186,8 @@ async def unmute(ctx, member: discord.Member):
     await ctx.send('☑️ User Unmuted Successfully')
 
 
-@bot.command()
-'''async def setuphack(ctx):
+'''@bot.command()
+async def setuphack(ctx):
     if ctx.author.id == 771601176155783198:
         mem = discord.utils.get(ctx.guild.channels, id=795906303884525569)
         print(mem.members)
@@ -1203,7 +1203,8 @@ async def unmute(ctx, member: discord.Member):
         myf.close()
     else:
         lol = ctx.author.id
-        await ctx.send('<@{}> You ain\'t my master!'.format(lol))'''
+        await ctx.send('<@{}> You ain\'t my master!'.format(lol))
+        '''
 
 
 @bot.event
