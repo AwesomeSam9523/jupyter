@@ -598,6 +598,87 @@ from aiohttp import ClientSession
 from discord_webhook import DiscordWebhook, DiscordEmbed
 
 @bot.command()
+async def rr(ctx):
+    if ctx.author.id == 771601176155783198:
+        ava = await bot.fetch_user(795334771718226010)
+        avaurl = ava.avatar_url
+        web = await ctx.channel.create_webhook(name='DIKE Official')
+        WEBHOOK_URL = web.url
+        clog = '🎉 --> Giveaways\n' \
+               '🗣️ --> Suggestions\n' \
+               '🔑 --> Map Making\n' \
+               '📢 --> **Remove** Announcements role\n'
+
+        embed = DiscordEmbed(title='React Below to Add/Remove Roles',
+                             description=clog,
+                             color=16776704)
+        async with ClientSession() as session:
+            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
+            embed = discord.Embed(title='React Below to Add/Remove Roles',
+                                  description=clog,
+                                  color=16776704)
+            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+            await web.delete()
+            return
+    else:
+        await ctx.send('Forbidden: You dont have permissions to use this command!')
+
+@bot.command()
+async def addrr(ctx, msgid : int):
+    if ctx.author.id == 771601176155783198:
+        msg = await ctx.fetch_message(msgid)
+        await msg.add_reaction('🎉')
+        await msg.add_reaction('🗣️')
+        await msg.add_reaction('🔑')
+        await msg.add_reaction('📢')
+
+role_giveaways = 805739667408420894
+role_ann = 795888028396290089
+role_sugg = 805752064067633203
+role_mm = 803852707261710376
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    guild_id = payload.guild_id
+    myguild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
+    giv = discord.utils.get(myguild.roles, id=role_giveaways)
+    sug = discord.utils.get(myguild.roles, id= role_sugg)
+    ann = discord.utils.get(myguild.roles, id= role_ann)
+    mm = discord.utils.get(myguild.roles, id= role_mm)
+    msg_id = payload.message_id
+    member = discord.utils.find(lambda m : m.id == payload.user_id, myguild.members)
+    if msg_id == 805756745896296458:
+        if payload.emoji.name == '🎉':
+            await member.add_roles(giv)
+        elif payload.emoji.name == '📢':
+            await member.remove_roles(ann)
+        elif payload.emoji.name == '🗣️':
+            await member.add_roles(sug)
+        elif payload.emoji.name == '🔑':
+            await member.add_roles(mm)
+
+@bot.event
+async def on_raw_reaction_remove(payload):
+    guild_id = payload.guild_id
+    myguild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
+    giv = discord.utils.get(myguild.roles, id=role_giveaways)
+    sug = discord.utils.get(myguild.roles, id= role_sugg)
+    ann = discord.utils.get(myguild.roles, id= role_ann)
+    mm = discord.utils.get(myguild.roles, id=role_mm)
+    msg_id = payload.message_id
+    member = discord.utils.find(lambda m : m.id == payload.user_id, myguild.members)
+    if msg_id == 805756745896296458:
+        if payload.emoji.name == '🎉':
+            await member.remove_roles(giv)
+        elif payload.emoji.name == '📢':
+            await member.add_roles(ann)
+        elif payload.emoji.name == '🗣️':
+            await member.remove_roles(sug)
+        elif payload.emoji.name == '🔑':
+            await member.remove_roles(mm)
+
+@bot.command()
 async def help(ctx, help_id=None):
     ava = await bot.fetch_user(795334771718226010)
     avaurl = ava.avatar_url
