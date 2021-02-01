@@ -689,7 +689,7 @@ async def help(ctx, help_id=None):
                '`2` --> `Arcade Commands`\n' \
                '`3` --> `Moderator Commands`\n' \
                '\n' \
-               'Note: If you have any feedback, type !feedback in any channel and the bot will reply back with instructions.\n\n' \
+               'Note: If you have any suggestion, type !suggest in any channel and the bot will reply back with instructions.\n\n' \
                '**Type `!help <number>` to get info**'
 
         embed = DiscordEmbed(title='DIKE Official Bot Help:',
@@ -909,13 +909,14 @@ async def give(ctx, give_to: discord.Member = None, amount: int = None):
 
 
 @bot.command()
-async def feedback(ctx, *,text:str = None):
+async def suggest(ctx, *,text:str = None):
     if text is None:
-        await ctx.send('<@{}> The format for feedback command is: `!feedback <Your-Feedback-Here>` (without `<` or `>`)'.format(ctx.author.id))
+        await ctx.send('<@{}> The format for suggestion command is: `!suggest <Your-Suggestion-Here>` (without `<` or `>`)'.format(ctx.author.id))
         return
     feedback_chl = bot.get_channel(798091588676747285)
-    await ctx.send('<@{}> Feedback sent in <#{}> successfully!'.format(ctx.author.id, feedback_chl.id))
-    await feedback_chl.send(text + '\n\nSent by: {}'.format(ctx.author))
+    await ctx.send('<@{}> Suggestion sent in <#{}> successfully!'.format(ctx.author.id, feedback_chl.id))
+    compile = text + '\nSent by: {}'.format(ctx.author)
+    await feedback_chl.send('<&805752064067633203> \n' + '```\n' + compile + '\n```')
 
 
 '''@bot.command(aliases=['inv'])
