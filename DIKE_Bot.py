@@ -60,10 +60,11 @@ async def on_message(message):
             await message.add_reaction(emoji=thup)
             await message.add_reaction(emoji=thdown)
     if message.channel.id == 798091588676747285:
-        thup = '\N{THUMBS UP SIGN}'
-        thdown = '\N{THUMBS DOWN SIGN}'
-        await message.add_reaction(emoji=thup)
-        await message.add_reaction(emoji=thdown)
+        if message.author.id == 795334771718226010:
+            thup = '\N{THUMBS UP SIGN}'
+            thdown = '\N{THUMBS DOWN SIGN}'
+            await message.add_reaction(emoji=thup)
+            await message.add_reaction(emoji=thdown)
 
     myguild = bot.get_guild(766875360126042113)
     novice = discord.utils.get(myguild.roles, id=798215857096491068)
