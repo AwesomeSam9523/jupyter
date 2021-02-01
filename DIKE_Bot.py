@@ -908,15 +908,15 @@ async def give(ctx, give_to: discord.Member = None, amount: int = None):
         update_book()'''
 
 
-@bot.command()
+@bot.command(aliases=['feedback'])
 async def suggest(ctx, *,text:str = None):
     if text is None:
         await ctx.send('<@{}> The format for suggestion command is: `!suggest <Your-Suggestion-Here>` (without `<` or `>`)'.format(ctx.author.id))
         return
     feedback_chl = bot.get_channel(798091588676747285)
     await ctx.send('<@{}> Suggestion sent in <#{}> successfully!'.format(ctx.author.id, feedback_chl.id))
-    compile = text + '\nSent by: {}'.format(ctx.author)
-    await feedback_chl.send('<&805752064067633203> \n' + '```\n' + compile + '\n```')
+    compile = text + '\n\nSent by: {}'.format(ctx.author)
+    await feedback_chl.send('<@&805752064067633203> \n' + '```\n' + compile + '\n```')
 
 
 '''@bot.command(aliases=['inv'])
