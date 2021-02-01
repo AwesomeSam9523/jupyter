@@ -218,6 +218,13 @@ async def rule(ctx, num: int):
         return
     rules.rules_print(num)
 
+@bot.command()
+async def links(ctx):
+    if dikemod in [y.id for y in ctx.author.roles]:
+        with open("allowed_links.txt", "rb") as file:
+            await ctx.author.send("Here is the allowed_links file:", file=discord.File(file))
+
+
 import time
 '''@bot.command()
 async def apply(ctx, job_id=None):
@@ -1423,8 +1430,8 @@ async def on_ready():
     await bots.edit(name='Bots: {}'.format(bot_count))
     print('Ready!')
 
-'''dikemod = 799521293673168898
-my = open('arcade_bal.txt', 'r')
+dikemod = 799521293673168898
+'''my = open('arcade_bal.txt', 'r')
 data = my.read()
 config_dict = eval(data)
 config_dict = dict(config_dict)
