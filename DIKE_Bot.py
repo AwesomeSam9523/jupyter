@@ -18,6 +18,16 @@ bot.remove_command('help')
 print('Starting...')
 
 @bot.event
+async def on_guild_join(guild):
+    for channel in guild.text_channels:
+        if channel.permissions_for(guild.me).send_messages:
+            await channel.send('**Thank You for inviting me in your server!**\n'
+                               '\n'
+                               'To setup me, type `!setup`\n'
+                               'For more info, type `!info`')
+        break
+
+@bot.event
 async def on_message(message):
     global sendbot
     if message.channel.id == 795293822224695297:
@@ -40,6 +50,8 @@ async def on_message(message):
                 return
         else:
             if message.author.name != 'GameBot':
+                if admin in [y.id for y in message.author.roles] or mod in [y.id for y in message.author.roles]:
+                    return
                 await message.delete()
 
         if message.author.name == 'GameBot':
@@ -109,11 +121,62 @@ async def on_message(message):
                                        'Use <#786955992201822258> to send liks.'.format(message.author.id))
     await bot.process_commands(message)
 
+@bot.command()
+async def setup(ctx, setup_id : int = None):
+    ava = await bot.fetch_user(795334771718226010)
+    avaurl = ava.avatar_url
+    web = await ctx.channel.create_webhook(name='DIKE Official')
+    WEBHOOK_URL = web.url
+    if setup_id is None:
+        clog = '\n' \
+               'Here are command for specific setups:\n\n' \
+               '`1` --> `General Setup (Required)`\n' \
+               '`2` --> `Krunker Applications`\n' \
+               '`3` --> `Moderation`\n' \
+               '\n\n' \
+               '**Type `!setup <number>` to get started**'
+
+        embed = DiscordEmbed(title='DIKE Official Setup',
+                             description=clog,
+                             color=16776704)
+        async with ClientSession() as session:
+            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
+            embed = discord.Embed(title='DIKE Official Setup',
+                                  description=clog,
+                                  color=16776704)
+            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+        await web.delete()
+        return
+    if setup_id == 1:
+        clog = '\n' \
+               '**Please provide me' \
+               '`1` --> `General Setup (Required)`\n' \
+               '`2` --> `Krunker Applications`\n' \
+               '`3` --> `Moderation`\n' \
+               '\n\n' \
+               '**Type `!setup <number>` to get started**'
+
+        embed = DiscordEmbed(title='DIKE Official Setup',
+                             description=clog,
+                             color=16776704)
+        async with ClientSession() as session:
+            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
+            embed = discord.Embed(title='DIKE Official Setup',
+                                  description=clog,
+                                  color=16776704)
+            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+        await web.delete()
+
 
 @bot.command()
 async def ping(ctx):
     await ctx.send('Pong! `{} ms`'.format(int(bot.latency*1000)))
 
+@bot.command()
+async def pf(ctx):
+    await ctx.send('/p AwesomeSam')
 
 
 @bot.command()
