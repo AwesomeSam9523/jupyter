@@ -112,121 +112,600 @@ async def on_message(message):
 
 @bot.command()
 async def ping(ctx):
-    await ctx.send('Pong! {0}ms'.format(round(bot.latency, 1)))
+    await ctx.send('Pong! `{} ms`'.format(int(bot.latency*1000)))
 
 
-import random
-'''@bot.command(aliases=['bal'], pass_context=True)
-async def balance(ctx, p_id=None):
-    replies = ['Yo <@{id}>, You\'ve got `{currency} Ð`',
-               '<@{id}> You have `{currency} Ð` in your account!',
-               'Ah! So... <@{id}> has got `{currency} Ð` in there!']
-    if ctx.channel.id in [795906303884525569, 796686187254513665]:
-        if p_id is None:
-            p_id = ctx.author.id
-            await ctx.send(random.choice(replies).format(id=p_id, currency=config_dict.get(p_id)))
-        else:
-            p_id = str(p_id)
-            p_id = p_id.split('!')
-            p_id = p_id[1]
-            p_id = list(p_id)
-            p_id.pop(-1)
-            p_id = ''.join(p_id)
-            p_id = int(p_id)
-            await ctx.send(random.choice(replies).format(id=p_id, currency=config_dict.get(p_id)))
-
-
-@bot.command(aliases=['g'])
-async def gamble(ctx, price=None):
-    if ctx.channel.id == 795906303884525569:
-        if price is None:
-            await ctx.send('Use `!gamble <amount>` or `!g <amount>` to gamble')
-            return
-        low_bal = ['Oops! <@{id}> You just have {currency} Ð. What were you thinking <:NepSmug:775572252145745920>',
-                   '<@{id}> So you wanna gamble more than you have <:WierdChamp:775568297013411840>? Idiot.',
-                   '<@{id}> You dont have enough Ðikes <:1391_pepe_joy:775568241904320572><:1391_pepe_joy:775568241904320572>']
-
-        _id = ctx.author.id
-        current_bal = config_dict.get(_id)
-        price = int(price)
-        if current_bal < price:
-            await ctx.send(random.choice(low_bal).format(id=_id, currency=current_bal))
-        elif price <= 0:
-            await ctx.send('<@{}> Beta <:WierdChamp:775568297013411840>, Tumse na ho payega'.format(_id))
-        else:
-            win_loss = ['Won', 'Lost']
-            take = random.choice(win_loss)
-            if take == 'Won':
-                await ctx.send('Wohoo! <@{id}> You gambled `{stake} Ð` and have won! 🎉🎉'.format(id=_id, stake=price))
-                new_bal = current_bal + price
-                dc = {_id: new_bal}
-                config_dict.update(dc)
-            else:
-                await ctx.send('Damn! <@{id}> You just lost `{stake} Ð`. Sad? <:kekw:772091131596374017>'.format(id=_id,
-                                                                                                                 stake=price))
-                new_bal = current_bal - price
-                dc = {_id: new_bal}
-                config_dict.update(dc)
-        update_book()
-
-
-def update_book():
-    my = open('arcade_bal.txt', 'w')
-    my.write(str(config_dict))
-    my.close()
-
-    jh = open('hacking_data.txt', 'w')
-    jh.write(str(items))
-    jh.close()
-
-from datetime import datetime
-@bot.command()
-async def add(ctx, person_id: int, amt: int):
-    if dikemod in [y.id for y in ctx.author.roles]:
-        current_bal = config_dict.get(person_id)
-        new_bal = current_bal + amt
-        dc = {person_id: new_bal}
-        config_dict.update(dc)
-        update_book()
-        now = datetime.now()
-        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-        myfile = open('modlogs.txt', 'a+')
-        myfile.write('{}: Used by: `{}` Amount: `{}`\n'.format(dt_string, ctx.author.name, amt))
-        myfile.close()
-        await ctx.send('Added `{} Ð` Successfully!'.format(amt))
-    else:
-        lol = ctx.author.id
-        await ctx.send('<@{}> You dont have permission to use this command.'.format(lol))
 
 @bot.command()
-async def logs(ctx):
-    if dikemod in [y.id for y in ctx.author.roles]:
-        with open("modlogs.txt", "rb") as file:
-            await ctx.author.send("Here is the logs file:", file=discord.File(file))
-
-
-import job_print_bot
-@bot.command()
-async def job(ctx):
-    if ctx.channel.id == 795906303884525569:
-        job_print_bot.job_list()'''
-
-
-import rules
-@bot.command()
-async def rule(ctx, num: int):
+async def rule(ctx):
     if ctx.author.id != 771601176155783198:
         return
-    rules.rules_print(num)
+    ava = await bot.fetch_user(795334771718226010)
+    avaurl = ava.avatar_url
+    web = await ctx.channel.create_webhook(name='DIKE Official')
+    WEBHOOK_URL = web.url
+
+    async with ClientSession() as session:
+        webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
+        embed = discord.Embed(title='Server Rules',
+                              description='Here are the mandatory rules:\n'
+                                          'If you witness someone breaking ANY of these rules please contact any active Moderator/Admib immediately with proof!',
+                              color=16776704)
+        embed.add_field(
+            name='[1] Discord Terms of Service and Community Guidelines, as well Krunker\'s Terms & Conditions apply to this server',
+            value='You must follow both of these in order to stay in the server! If you\'re caught breaking them you will be removed')
+        embed.add_field(name='[2] Account Trading or Selling',
+                        value='If you\'re caught attempting to sell accounts you will be removed from the server!', inline=False)
+        embed.add_field(name='[3] Communicate using English only',
+                        value='All other languages in <#781071181314392064>\n'
+                              'Communicate in English around the server, even in Pickups Chat', inline=False)
+        embed.add_field(inline=False, name='[4] No Self Promotion or Advertisement',
+                        value='DM an admin to get Content Creator role, this will allow you to Promote your Twitch/Youtube in <#786956059495104554>.\n'
+                              'Otherwise any Self Promotion or Advertisement will be removed and you will be punished!')
+        embed.add_field(inline=False, name='[5] Use an appropriate Name and Profile Picture',
+                        value='Avoid any Special Characters and Emojis\n'
+                              'There must be at least 3 standard characters in your nickname, so that you can be pinged')
+        embed.add_field(inline=False, name='[6] No Personal Information',
+                        value='Protect your privacy and the privacy of others\n'
+                              'Don\'t reveal any personal info of others without their prior consent')
+        embed.add_field(inline=False, name='[7] No Political or Religious topics',
+                        value='We do not want to offend any users on the server so please stay away from these topics\n'
+                              'Religious topics includes racial slurs. No swearing or being toxic against a specific nationality!')
+        embed.add_field(inline=False, name='[8] Use common sense',
+                        value='Attempting to use loopholes/bypasses can result in a larger punishment')
+        embed.add_field(inline=False, name='[9] No Harassing, Abusing, or Bullying',
+                        value='We have zero-tolerance for harming others\n'
+                              'Jokes may be let off depending on the severity')
+        embed.add_field(inline=False, name='[10] Do not spam',
+                        value='Avoid excessive messages, images, formatting, emojis, commands, and @mentions\n'
+                              'Avoid Ghost Pinging, if you do so by accident let the pinged user know')
+        embed.add_field(inline=False, name='[11] No hackusating',
+                        value='DM a staff member with adequate proof\n'
+                              'Don\'t accuse another person of hacks in public chats')
+        embed.add_field(inline=False, name='[13] Don\'t disobey staff',
+                        value='When asked to stop, stop!')
+        embed.add_field(inline=False, name='[14] Do Not DM any Staff Members until asked',
+                        value='Do not DM any Admin/Mod for any reason whatsoever, until asked, even if they are active in chat')
+        embed.add_field(
+            name='Violation of this rule will lead to a irrevocable mute of 12 hours which will be incremented to kick/ban if you are found guilty again.',
+            value='Thank You')
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+
+        await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+        await web.delete()
+        return
 
 @bot.command()
+@commands.has_permissions(manage_channels=True)
 async def links(ctx):
-    if dikemod in [y.id for y in ctx.author.roles]:
-        with open("allowed_links.txt", "rb") as file:
-            await ctx.author.send("Here is the allowed_links file:", file=discord.File(file))
+    file = open("allowed_links.txt", "r")
+    file2 = file.read()
+    file2 = file2.split('-')
+    file.close()
+    main = ''
+    for i in range(len(file2) - 1):
+        main = main + '<#' + file2[i] + '>\n'
+    embed = discord.Embed(title='List of channel with links **allowed**:',
+                         description=main,
+                         color=16776704)
+    await ctx.send(embed=embed)
 
 
 import time
+from aiohttp import ClientSession
+from discord_webhook import DiscordWebhook, DiscordEmbed
+
+@bot.command()
+async def rr(ctx):
+    if ctx.author.id == 771601176155783198:
+        ava = await bot.fetch_user(795334771718226010)
+        avaurl = ava.avatar_url
+        web = await ctx.channel.create_webhook(name='DIKE Official')
+        WEBHOOK_URL = web.url
+        clog = '🎉 --> Giveaways\n' \
+               '🗣️ --> Suggestions\n' \
+               '🔑 --> Map Making\n' \
+               '📢 --> **Remove** Announcements role\n'
+
+        embed = DiscordEmbed(title='React Below to Add/Remove Roles',
+                             description=clog,
+                             color=16776704)
+        async with ClientSession() as session:
+            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
+            embed = discord.Embed(title='React Below to Add/Remove Roles',
+                                  description=clog,
+                                  color=16776704)
+            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+            await web.delete()
+            return
+    else:
+        await ctx.send('Forbidden: You dont have permissions to use this command!')
+
+@bot.command()
+async def addrr(ctx, msgid : int):
+    if ctx.author.id == 771601176155783198:
+        msg = await ctx.fetch_message(msgid)
+        await msg.add_reaction('🎉')
+        await msg.add_reaction('🗣️')
+        await msg.add_reaction('🔑')
+        await msg.add_reaction('📢')
+
+role_giveaways = 805739667408420894
+role_ann = 795888028396290089
+role_sugg = 805752064067633203
+role_mm = 803852707261710376
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    guild_id = payload.guild_id
+    myguild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
+    giv = discord.utils.get(myguild.roles, id=role_giveaways)
+    sug = discord.utils.get(myguild.roles, id= role_sugg)
+    ann = discord.utils.get(myguild.roles, id= role_ann)
+    mm = discord.utils.get(myguild.roles, id= role_mm)
+    msg_id = payload.message_id
+    member = discord.utils.find(lambda m : m.id == payload.user_id, myguild.members)
+    if msg_id == 805756745896296458:
+        if payload.emoji.name == '🎉':
+            await member.add_roles(giv)
+        elif payload.emoji.name == '📢':
+            await member.remove_roles(ann)
+        elif payload.emoji.name == '🗣️':
+            await member.add_roles(sug)
+        elif payload.emoji.name == '🔑':
+            await member.add_roles(mm)
+
+@bot.event
+async def on_raw_reaction_remove(payload):
+    guild_id = payload.guild_id
+    myguild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
+    giv = discord.utils.get(myguild.roles, id=role_giveaways)
+    sug = discord.utils.get(myguild.roles, id= role_sugg)
+    ann = discord.utils.get(myguild.roles, id= role_ann)
+    mm = discord.utils.get(myguild.roles, id=role_mm)
+    msg_id = payload.message_id
+    member = discord.utils.find(lambda m : m.id == payload.user_id, myguild.members)
+    if msg_id == 805756745896296458:
+        if payload.emoji.name == '🎉':
+            await member.remove_roles(giv)
+        elif payload.emoji.name == '📢':
+            await member.add_roles(ann)
+        elif payload.emoji.name == '🗣️':
+            await member.remove_roles(sug)
+        elif payload.emoji.name == '🔑':
+            await member.remove_roles(mm)
+
+@bot.command()
+async def help(ctx, help_id=None):
+    ava = await bot.fetch_user(795334771718226010)
+    avaurl = ava.avatar_url
+    web = await ctx.channel.create_webhook(name='DIKE Official')
+    WEBHOOK_URL = web.url
+    if help_id is None:
+        clog = '`1` --> `Apply to DIKE`\n' \
+               '`2` --> `Arcade Commands`\n' \
+               '`3` --> `Moderator Commands`\n' \
+               '\n' \
+               'Note: If you have any suggestion, type !suggest in any channel and the bot will reply back with instructions.\n\n' \
+               '**Type `!help <number>` to get info**'
+
+        embed = DiscordEmbed(title='DIKE Official Bot Help:',
+                             description=clog,
+                             color=16776704)
+        async with ClientSession() as session:
+            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
+            embed = discord.Embed(title='DIKE Official Bot Help:',
+                                  description=clog,
+                                  color=16776704)
+            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+        await web.delete()
+        return
+    help_id = int(help_id)
+    if help_id == 1:
+        clog = 'Here are the minimum requirements:\n' \
+               '```python\n' \
+               '"--> Level:     30"\n' \
+               '"--> KDR:       1.5"\n' \
+               '"--> SPK:       100"\n' \
+               '"--> KPG:       10"\n' \
+               '"--> Nukes:     5"```\n\n' \
+               'Type **g.apply <your-ign>** in <#795293822224695297> to apply.'
+        embed = DiscordEmbed(title='DIKE Official Bot Help:',
+                             description=clog,
+                             color=16776704)
+        async with ClientSession() as session:
+            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
+            embed = discord.Embed(title='DIKE Official Bot Help:',
+                                  description=clog,
+                                  color=16776704)
+            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+    elif help_id == 2:
+        '''clog = 'Here are all the Arcade Commands!\n' \
+               '```python\n' \
+               '"--> !balance/!bal       View Balance"\n' \
+               'Use: !bal\n' \
+               '\n' \
+               '"--> !gamble/!g          Gamble to gain (or lose?) 50-50 Chances"\n' \
+               'Use: !g <amount>\n' \
+               'Eg: !g 100\n' \
+               '\n' \
+               '"--> !job                Take up small tasks to gain Dikers!"\n' \
+               'Use: !job\n' \
+               '\n' \
+               '"--> !apply              Apply for a particular job"\n' \
+               'Use: !apply >job-id>\n' \
+               'Eg: !apply 1\n' \
+               '\n' \
+               '"--> !rich               Shows the top 5 richest people in the server"\n' \
+               'Use: !rich\n' \
+               '\n' \
+               '"--> !shop               Displays the shop where you can purchase items"\n' \
+               'Use: !shop <page-no.>\n' \
+               'Eg: !shop 2\n' \
+               '\n' \
+               '"--> !buy                Purchases an item from the shop"\n' \
+               'Use: !buy <item-code>\n' \
+               'Eg: !buy vpn\n' \
+               '\n' \
+               '"--> !inv                Shows your inventory"\n' \
+               'Use: !inv\n' \
+               '\n' \
+               '"--> !give               Transfers Dikers from your account to your friend"\n' \
+               'Use: !give <@-tag-here> <amount>\n' \
+               'Eg: !give @AwesomeSam 1000\n' \
+               '\n' \
+               '"--> !wipe               Resets your Account (Non-reversible!)"\n' \
+               'Use: !wipe\n' \
+               '\n' \
+               '"--> !help               View help"\n' \
+               'Use: !help <help-id>\n' \
+               'Eg: !help 2' \
+               '```' '''
+        clog = 'DIKE Arcade is discontinued...'
+        embed = DiscordEmbed(title='DIKE Official Bot Help:',
+                             description=clog,
+                             color=16776704)
+
+        async with ClientSession() as session:
+            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
+            embed = discord.Embed(title='DIKE Official Bot Help:',
+                                  description=clog,
+                                  color=16776704)
+            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+    elif help_id == 3:
+        clog = 'Here are all the Moderator Commands!\n' \
+               '```python\n' \
+               '"--> !slowmode/!sm      - Puts the channel in slowmode"\n' \
+               'Syntax: !sm <time: int>\n' \
+               'Eg: !sm 10 will do a 10 sec slowmode\n' \
+               '\n' \
+               '"--> !mute              - Mute the user"\n' \
+               'Syntax: !mute @AwesomeSam 1d\n\n' \
+               '"--> !unmute            - Unmutes the user"\n' \
+               'Syntax: !unmute @AwesomeSam\n\n' \
+               '"--> !warn              - Warns the user"\n' \
+               'Syntax: !warn @AwesomeSam <Reason Here>\n' \
+               '```'
+        embed = DiscordEmbed(title='DIKE Official Bot Help:',
+                             description=clog,
+                             color=16776704)
+        async with ClientSession() as session:
+            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
+            embed = discord.Embed(title='DIKE Official Bot Help:',
+                                  description=clog,
+                                  color=16776704)
+            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+    await web.delete()
+
+
+@bot.command(aliases=['feedback'])
+async def suggest(ctx, *,text:str = None):
+    if text is None:
+        await ctx.send('<@{}> The format for suggestion command is: `!suggest <Your-Suggestion-Here>` (without `<` or `>`)'.format(ctx.author.id))
+        return
+    feedback_chl = bot.get_channel(798091588676747285)
+    await ctx.send('<@{}> Suggestion sent in <#{}> successfully!'.format(ctx.author.id, feedback_chl.id))
+    compile = text + '\n\nSent by: {}'.format(ctx.author)
+    await feedback_chl.send('<@&805752064067633203> \n' + '```\n' + compile + '\n```')
+
+
+
+owner = 769543339627249714
+mod = 773629756570599454
+admin = 781377928898412564
+
+
+@bot.command(aliases=['sm'])
+@commands.has_permissions(manage_channels=True)
+async def slowmode(ctx, seconds: int):
+    await ctx.channel.edit(slowmode_delay=seconds)
+    if seconds == 0:
+        await ctx.send(
+            "<#{}> is no longer in slowmode.".format(ctx.channel.id))
+    elif seconds < 0:
+        pass
+    else:
+        await ctx.send(
+            "<#{}> is in `s l o w m o d e`.\nUsers will be able to post every {} seconds!".format(ctx.channel.id,
+                                                                                                  seconds))
+
+
+@bot.command()
+async def warn(ctx, user: discord.Member, *, reason=None):
+    warnings = {'war1': 796249188832509953,
+                'war2': 796249230774763540,
+                'war3': 796249281295024178,
+                'war4': 796249305391562782,
+                'war5': 796249325877461033,
+                'war6': 796249348991614976,
+                'war7': 796249379110649856,
+                'war8': 796249402527711303,
+                'war9': 796249425965350913,
+                'war10': 796249447255900171,
+                'war11': 796249469041508393}
+
+    if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in
+                                                                                                         ctx.author.roles]:
+        if user is None or reason is None:
+            await ctx.send('<@{}>. The syntax for warn is: `!warn <user> <reason>`'.format(ctx.author.id))
+        else:
+            await user.send('**You have been Warned in `✔ Official DIKE Clan` for:** {}'.format(reason))
+            await ctx.message.delete()
+            await ctx.send('☑️ User Warned Successfully')
+
+            user_role_ids = [int(y.id) for y in user.roles]
+            if warnings.get('war1') in user_role_ids:
+                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war2')))
+                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war1')))
+            elif warnings.get('war2') in user_role_ids:
+                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war3')))
+                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war2')))
+            elif warnings.get('war3') in user_role_ids:
+                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war4')))
+                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war3')))
+            elif warnings.get('war4') in user_role_ids:
+                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war5')))
+                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war4')))
+            elif warnings.get('war5') in user_role_ids:
+                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war6')))
+                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war5')))
+            elif warnings.get('war6') in user_role_ids:
+                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war7')))
+                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war6')))
+            elif warnings.get('war7') in user_role_ids:
+                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war8')))
+                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war7')))
+            elif warnings.get('war8') in user_role_ids:
+                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war9')))
+                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war8')))
+            elif warnings.get('war9') in user_role_ids:
+                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war10')))
+                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war9')))
+            elif warnings.get('war10') in user_role_ids:
+                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war11')))
+                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war10')))
+            else:
+                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war1')))
+
+
+@bot.command()
+async def mute(ctx, member: discord.Member, mtime=None):
+    mutes = {'m1': 796249529883033611,
+             'm2': 796249570689810432,
+             'm3': 796249592991318026,
+             'm4': 796249619897385000,
+             'm5': 796249643273027655,
+             'm6': 796249664722305035,
+             'm7': 796249688025202718,
+             'm8': 796249708782813215,
+             'm9': 796249736188788796,
+             'm10': 796249760969130024,
+             'm11': 796249781013970975}
+    if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in
+                                                                                                         ctx.author.roles]:
+        muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
+        if mtime is None:
+            await member.add_roles(muted_role)
+            await ctx.send('☑️ User Muted Successfully')
+        else:
+            time_convert = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+            tempmute = int(mtime[:-1]) * time_convert[mtime[-1]]
+            print('time:', tempmute)
+            await ctx.message.delete()
+            await member.add_roles(muted_role)
+            await ctx.send('☑️ User Muted Successfully')
+            await asyncio.sleep(tempmute)
+            await member.remove_roles(muted_role)
+
+        user_role_ids = [int(y.id) for y in member.roles]
+        if mutes.get('m1') in user_role_ids:
+            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m2')))
+            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
+        elif mutes.get('m2') in user_role_ids:
+            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m3')))
+            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m2')))
+        elif mutes.get('m3') in user_role_ids:
+            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m4')))
+            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m3')))
+        elif mutes.get('m4') in user_role_ids:
+            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m5')))
+            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m4')))
+        elif mutes.get('m5') in user_role_ids:
+            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m6')))
+            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m5')))
+        elif mutes.get('m6') in user_role_ids:
+            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m7')))
+            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m6')))
+        elif mutes.get('m7') in user_role_ids:
+            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m8')))
+            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m7')))
+        elif mutes.get('m8') in user_role_ids:
+            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m9')))
+            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m8')))
+        elif mutes.get('m9') in user_role_ids:
+            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m10')))
+            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m9')))
+        elif mutes.get('m10') in user_role_ids:
+            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m11')))
+            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m10')))
+        else:
+            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
+
+@bot.command()
+@commands.has_permissions(manage_channels=True)
+async def addlink(ctx):
+    links_file = open('allowed_links.txt', 'r')
+    links_list = links_file.read()
+    links_file.close()
+    test = links_list.split('-')
+
+    channelid = str(ctx.channel.id)
+    if channelid in test:
+        await ctx.send('☑️ <#{}> already in in allowed links.'.format(channelid))
+        return
+    links_file = open('allowed_links.txt', 'a')
+    links_file.write('{}-'.format(channelid))
+    links_file.close()
+
+    await ctx.send('☑️ <#{}> added in allowed links.'.format(channelid))
+
+@bot.command()
+@commands.has_permissions(manage_channels=True)
+async def removelink(ctx):
+    channelid = str(ctx.channel.id)
+    links_file = open('allowed_links.txt', 'r')
+    links_list = links_file.read()
+    links_file.close()
+
+    links_list = links_list.split('-')
+    print('Links: {} \nENDS'.format(links_list))
+    try:
+        print(channelid, type(channelid))
+        for char in links_list:
+            print('char', char, type(char))
+
+        links_list.remove(channelid)
+        links_list = '-'.join(links_list)
+
+        links_file = open('allowed_links.txt', 'w')
+        links_file.write(str(links_list))
+        links_file.close()
+        await ctx.send('❌ <#{}> removed from allowed links successfully!'.format(ctx.channel.id))
+    except:
+        await ctx.send('<#{}> is not in allowed links!'.format(ctx.channel.id))
+
+
+@bot.command()
+async def unmute(ctx, member: discord.Member):
+    muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
+    await member.remove_roles(muted_role)
+    await ctx.send('☑️ User Unmuted Successfully')
+
+
+@bot.event
+async def on_member_join(member):
+    welcom_chl = bot.get_channel(773401123389440011)
+    welmsg = '<a:hello:786862994381471766> Hyy <@{user}> Welcome to Official DIKE Clan <a:hello:786862994381471766> **Type `!help` to get help**\n' \
+             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
+             '<a:ARR:786863234736455680> MUST READ AND FOLLOW <#773626644324810762>  <a:ARR:786863090670239744>\n' \
+             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
+             '<a:ARR:786863234736455680> CHECK <#773404953377112104> TO KNOW HOW TO GET ROLES <a:ARR:786863090670239744>\n' \
+             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
+             '<a:ARR:786863234736455680> MUST BE UPDATED AND READ DAILY <#773876008725905420> <a:ARR:786863090670239744>\n' \
+             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
+             '<a:ARR:786863234736455680> MUST BE ACTIVE IN CHAT <#766875360595410946>  AND UNLOCK LEVEL AND ROLES <a:blueflame:786863090670239744>\n' \
+             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
+             '<a:yldz:786863153454645269> <:line:798799010088747008> <:line:798799010088747008> HOPE YOU WILL ENJOY <:line:798799010088747008> <:line:798799010088747008> <a:yldz:786863153454645269>'.format(
+        user=member.id)
+    await welcom_chl.send(welmsg)
+    role1 = discord.utils.get(member.guild.roles, id=795570028585287690)
+    role2 = discord.utils.get(member.guild.roles, id=795567863003480064)
+    role3 = discord.utils.get(member.guild.roles, id=795572264283799582)
+    role4 = discord.utils.get(member.guild.roles, id=796248941620494346)
+    memrole = discord.utils.get(member.guild.roles, id=775363088719413278)
+    await member.add_roles(role1)
+    await member.add_roles(role2)
+    await member.add_roles(role3)
+    await member.add_roles(role4)
+    await member.add_roles(memrole)
+    myguild = bot.get_guild(766875360126042113)
+
+    member_count = 0
+    for member in myguild.members:
+        member_count += 1
+    true_member_count = len([m for m in myguild.members if not m.bot])
+    bot_count = len([m for m in myguild.members if m.bot])
+
+    total = bot.get_channel(798053370925023282)
+    mem = bot.get_channel(798053462281420870)
+    bots = bot.get_channel(798053532477161532)
+
+    await total.edit(name='All Members: {}'.format(member_count))
+    await mem.edit(name='Members: {}'.format(true_member_count))
+    await bots.edit(name='Bots: {}'.format(bot_count))
+
+
+@bot.event
+async def on_member_leave(member):
+    leaving_chl = bot.get_channel(800683977207840798)
+    leave_msg = '{} just left the server.'.format(member.name)
+    print(leave_msg)
+    await leaving_chl.send(leave_msg)
+    myguild = bot.get_guild(766875360126042113)
+
+    member_count = 0
+    for member in myguild.members:
+        member_count += 1
+    true_member_count = len([m for m in myguild.members if not m.bot])
+    bot_count = len([m for m in myguild.members if m.bot])
+
+    total = bot.get_channel(798053370925023282)
+    mem = bot.get_channel(798053462281420870)
+    bots = bot.get_channel(798053532477161532)
+
+    await total.edit(name='All Members: {}'.format(member_count))
+    await mem.edit(name='Members: {}'.format(true_member_count))
+    await bots.edit(name='Bots: {}'.format(bot_count))
+
+
+@bot.event
+async def on_ready():
+    await bot.change_presence(
+        activity=discord.Activity(type=discord.ActivityType.playing, name="!help"))
+    myguild = bot.get_guild(766875360126042113)
+
+    member_count = 0
+    for member in myguild.members:
+        member_count += 1
+    true_member_count = len([m for m in myguild.members if not m.bot])
+    bot_count = len([m for m in myguild.members if m.bot])
+
+    total = bot.get_channel(798053370925023282)
+    mem = bot.get_channel(798053462281420870)
+    bots = bot.get_channel(798053532477161532)
+
+    await total.edit(name='All Members: {}'.format(member_count))
+    await mem.edit(name='Members: {}'.format(true_member_count))
+    await bots.edit(name='Bots: {}'.format(bot_count))
+    print('Ready!')
+
+dikemod = 799521293673168898
+'''my = open('arcade_bal.txt', 'r')
+data = my.read()
+config_dict = eval(data)
+config_dict = dict(config_dict)
+
+my2 = open('hacking_data.txt', 'r')
+data2 = my2.read()
+items = eval(data2)
+items = dict(items)'''
+
+bot.run(TOKEN)
 '''@bot.command()
 async def apply(ctx, job_id=None):
     if ctx.channel.id in [795906303884525569, 796686187254513665]:
@@ -600,334 +1079,8 @@ async def apply(ctx, job_id=None):
 
             else:
                 await ctx.send('<@{}> Invalid Option <:WierdChamp:775568297013411840>'.format(ctx.author.id))
-'''
 
-from aiohttp import ClientSession
-from discord_webhook import DiscordWebhook, DiscordEmbed
-
-@bot.command()
-async def rr(ctx):
-    if ctx.author.id == 771601176155783198:
-        ava = await bot.fetch_user(795334771718226010)
-        avaurl = ava.avatar_url
-        web = await ctx.channel.create_webhook(name='DIKE Official')
-        WEBHOOK_URL = web.url
-        clog = '🎉 --> Giveaways\n' \
-               '🗣️ --> Suggestions\n' \
-               '🔑 --> Map Making\n' \
-               '📢 --> **Remove** Announcements role\n'
-
-        embed = DiscordEmbed(title='React Below to Add/Remove Roles',
-                             description=clog,
-                             color=16776704)
-        async with ClientSession() as session:
-            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
-            embed = discord.Embed(title='React Below to Add/Remove Roles',
-                                  description=clog,
-                                  color=16776704)
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
-            await web.delete()
-            return
-    else:
-        await ctx.send('Forbidden: You dont have permissions to use this command!')
-
-@bot.command()
-async def addrr(ctx, msgid : int):
-    if ctx.author.id == 771601176155783198:
-        msg = await ctx.fetch_message(msgid)
-        await msg.add_reaction('🎉')
-        await msg.add_reaction('🗣️')
-        await msg.add_reaction('🔑')
-        await msg.add_reaction('📢')
-
-role_giveaways = 805739667408420894
-role_ann = 795888028396290089
-role_sugg = 805752064067633203
-role_mm = 803852707261710376
-
-@bot.event
-async def on_raw_reaction_add(payload):
-    guild_id = payload.guild_id
-    myguild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
-    giv = discord.utils.get(myguild.roles, id=role_giveaways)
-    sug = discord.utils.get(myguild.roles, id= role_sugg)
-    ann = discord.utils.get(myguild.roles, id= role_ann)
-    mm = discord.utils.get(myguild.roles, id= role_mm)
-    msg_id = payload.message_id
-    member = discord.utils.find(lambda m : m.id == payload.user_id, myguild.members)
-    if msg_id == 805756745896296458:
-        if payload.emoji.name == '🎉':
-            await member.add_roles(giv)
-        elif payload.emoji.name == '📢':
-            await member.remove_roles(ann)
-        elif payload.emoji.name == '🗣️':
-            await member.add_roles(sug)
-        elif payload.emoji.name == '🔑':
-            await member.add_roles(mm)
-
-@bot.event
-async def on_raw_reaction_remove(payload):
-    guild_id = payload.guild_id
-    myguild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
-    giv = discord.utils.get(myguild.roles, id=role_giveaways)
-    sug = discord.utils.get(myguild.roles, id= role_sugg)
-    ann = discord.utils.get(myguild.roles, id= role_ann)
-    mm = discord.utils.get(myguild.roles, id=role_mm)
-    msg_id = payload.message_id
-    member = discord.utils.find(lambda m : m.id == payload.user_id, myguild.members)
-    if msg_id == 805756745896296458:
-        if payload.emoji.name == '🎉':
-            await member.remove_roles(giv)
-        elif payload.emoji.name == '📢':
-            await member.add_roles(ann)
-        elif payload.emoji.name == '🗣️':
-            await member.remove_roles(sug)
-        elif payload.emoji.name == '🔑':
-            await member.remove_roles(mm)
-
-@bot.command()
-async def help(ctx, help_id=None):
-    ava = await bot.fetch_user(795334771718226010)
-    avaurl = ava.avatar_url
-    web = await ctx.channel.create_webhook(name='DIKE Official')
-    WEBHOOK_URL = web.url
-    if help_id is None:
-        clog = '`1` --> `Apply to DIKE`\n' \
-               '`2` --> `Arcade Commands`\n' \
-               '`3` --> `Moderator Commands`\n' \
-               '\n' \
-               'Note: If you have any suggestion, type !suggest in any channel and the bot will reply back with instructions.\n\n' \
-               '**Type `!help <number>` to get info**'
-
-        embed = DiscordEmbed(title='DIKE Official Bot Help:',
-                             description=clog,
-                             color=16776704)
-        async with ClientSession() as session:
-            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
-            embed = discord.Embed(title='DIKE Official Bot Help:',
-                                  description=clog,
-                                  color=16776704)
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
-        await web.delete()
-        return
-    help_id = int(help_id)
-    if help_id == 1:
-        clog = 'Here are the minimum requirements:\n' \
-               '```python\n' \
-               '"--> Level:     30"\n' \
-               '"--> KDR:       1.5"\n' \
-               '"--> SPK:       100"\n' \
-               '"--> KPG:       10"\n' \
-               '"--> Nukes:     5"```\n\n' \
-               'Type **g.apply <your-ign>** in <#795293822224695297> to apply.'
-        embed = DiscordEmbed(title='DIKE Official Bot Help:',
-                             description=clog,
-                             color=16776704)
-        async with ClientSession() as session:
-            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
-            embed = discord.Embed(title='DIKE Official Bot Help:',
-                                  description=clog,
-                                  color=16776704)
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
-    elif help_id == 2:
-        '''clog = 'Here are all the Arcade Commands!\n' \
-               '```python\n' \
-               '"--> !balance/!bal       View Balance"\n' \
-               'Use: !bal\n' \
-               '\n' \
-               '"--> !gamble/!g          Gamble to gain (or lose?) 50-50 Chances"\n' \
-               'Use: !g <amount>\n' \
-               'Eg: !g 100\n' \
-               '\n' \
-               '"--> !job                Take up small tasks to gain Dikers!"\n' \
-               'Use: !job\n' \
-               '\n' \
-               '"--> !apply              Apply for a particular job"\n' \
-               'Use: !apply >job-id>\n' \
-               'Eg: !apply 1\n' \
-               '\n' \
-               '"--> !rich               Shows the top 5 richest people in the server"\n' \
-               'Use: !rich\n' \
-               '\n' \
-               '"--> !shop               Displays the shop where you can purchase items"\n' \
-               'Use: !shop <page-no.>\n' \
-               'Eg: !shop 2\n' \
-               '\n' \
-               '"--> !buy                Purchases an item from the shop"\n' \
-               'Use: !buy <item-code>\n' \
-               'Eg: !buy vpn\n' \
-               '\n' \
-               '"--> !inv                Shows your inventory"\n' \
-               'Use: !inv\n' \
-               '\n' \
-               '"--> !give               Transfers Dikers from your account to your friend"\n' \
-               'Use: !give <@-tag-here> <amount>\n' \
-               'Eg: !give @AwesomeSam 1000\n' \
-               '\n' \
-               '"--> !wipe               Resets your Account (Non-reversible!)"\n' \
-               'Use: !wipe\n' \
-               '\n' \
-               '"--> !help               View help"\n' \
-               'Use: !help <help-id>\n' \
-               'Eg: !help 2' \
-               '```' '''
-        clog = 'DIKE Arcade is discontinued...'
-        embed = DiscordEmbed(title='DIKE Official Bot Help:',
-                             description=clog,
-                             color=16776704)
-
-        async with ClientSession() as session:
-            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
-            embed = discord.Embed(title='DIKE Official Bot Help:',
-                                  description=clog,
-                                  color=16776704)
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
-    elif help_id == 3:
-        clog = 'Here are all the Moderator Commands!\n' \
-               '```python\n' \
-               '"--> !slowmode/!sm      - Puts the channel in slowmode"\n' \
-               'Syntax: !sm <time: int>\n' \
-               'Eg: !sm 10 will do a 10 sec slowmode\n' \
-               '\n' \
-               '"--> !mute              - Mute the user"\n' \
-               'Syntax: !mute @AwesomeSam 1d\n\n' \
-               '"--> !unmute            - Unmutes the user"\n' \
-               'Syntax: !unmute @AwesomeSam\n\n' \
-               '"--> !warn              - Warns the user"\n' \
-               'Syntax: !warn @AwesomeSam <Reason Here>\n' \
-               '```'
-        embed = DiscordEmbed(title='DIKE Official Bot Help:',
-                             description=clog,
-                             color=16776704)
-        async with ClientSession() as session:
-            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
-            embed = discord.Embed(title='DIKE Official Bot Help:',
-                                  description=clog,
-                                  color=16776704)
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
-    await web.delete()
-
-import operator
-
-
-'''@bot.command()
-async def rich(ctx):
-    sorted_d = dict(sorted(config_dict.items(), key=operator.itemgetter(1), reverse=True))
-    mylist = list(sorted_d.items())[:5]
-    embed = discord.Embed(title="Riches of the Rich", description="", color=16776704)
-    for char in mylist:
-        userid = char[0]
-        amt = char[1]
-        myguild = bot.get_guild(766875360126042113)
-        a = myguild.get_member(userid)
-        dname = a.display_name
-        embed.add_field(name=dname, value='`' + str(amt) + ' Ð `', inline=False)
-    await ctx.send(embed=embed)
-
-
-@bot.command()
-async def shop(ctx, shop_page: int = None):
-    if shop_page is None:
-        shoplist = '|   __Generals__   |    Hacker    |     Wars     | Bank Robbery |\n'
-        desc = '\n\n                         **Coming Soon!**'
-        embed = discord.Embed(title=shoplist, description=desc, color=16776704)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
-        await ctx.send(embed=embed)
-    elif shop_page == 1:
-        shoplist = '|   __Generals__   |    Hacker    |     Wars     | Bank Robbery |\n'
-        desc = '\n\n                         **Coming Soon!**'
-        embed = discord.Embed(title=shoplist, description=desc, color=16776704)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
-        await ctx.send(embed=embed)
-    elif shop_page == 2:
-        shoplist = '|   Generals   |    __Hacker__    |     Wars     | Bank Robbery |\n'
-        embed = discord.Embed(title=shoplist,
-                              description='Buy useful stuff here to help you in a tricky hacking situation',
-                              color=16776704)
-        embed.add_field(name='💻 Computer', value='Essential to start Hacking\nItem Code: `comp`\nPrice: `5000 Ð`\n',
-                        inline=False)
-        embed.add_field(name='🖥️ Assistant PC',
-                        value='Lowers the hacking time significantly\nItem Code: `pc`\nPrice: `4500 Ð`\n', inline=False)
-        embed.add_field(name='🖲️ Emergency Escape',
-                        value='Aborts the process and protects you from Police\nItem Code: `esc`\nPrice: `3000 Ð`\n',
-                        inline=False)
-        embed.add_field(name='⌨️ QuickBoard™',
-                        value='Your commands are taken noticeably faster\nItem Code: `qboard`\nPrice: `2000 Ð`\n',
-                        inline=False)
-        embed.add_field(name='🧭 Trace Lower',
-                        value='Lowers your trace percentage by 10%\nItem Code: `trace`\nPrice: `1000 Ð`\n',
-                        inline=False)
-        embed.add_field(name='🛰️ VPN', value='Slows the Cyber Police to track you\nItem Code: `vpn`\nPrice: `500 Ð`\n',
-                        inline=False)
-        embed.add_field(name='\n\nType !buy <item-code> to purchase the item', value='Have Fun Hacking 😉',
-                        inline=False)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
-        await ctx.send(embed=embed)
-    elif shop_page == 3:
-        shoplist = '|   Generals   |    Hacker    |     __Wars__     | Bank Robbery |\n'
-        desc = '\n\n                         **Coming Soon!**'
-        embed = discord.Embed(title=shoplist, description=desc, color=16776704)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
-        await ctx.send(embed=embed)
-    elif shop_page == 4:
-        shoplist = '|   Generals   |    Hacker    |     Wars     | __Bank Robbery__ |\n'
-        desc = '\n\n                         **Coming Soon!**'
-        embed = discord.Embed(title=shoplist, description=desc, color=16776704)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
-        await ctx.send(embed=embed)
-
-
-@bot.command()
-async def give(ctx, give_to: discord.Member = None, amount: int = None):
-    if amount <= 0:
-        await ctx.send('<@{}> Seriosuly?'.format(ctx.author.id))
-        return
-    if amount <= 10:
-        await ctx.send('<@{}> Minimum amount is `10 Ð`')
-        return
-    if give_to is None or amount is None:
-        await ctx.send('Format for !give command is: `!give <person> <amount>`')
-        return
-    if give_to == ctx.author:
-        await ctx.send('<@{}> Sending Dikers to yourself, huh?'.format(ctx.author.id))
-        return
-    if amount >= 1000:
-        final_amount = int(amount * 0.9)
-    else:
-        final_amount = amount
-    cur_bal = config_dict.get(ctx.author.id)
-    if int(cur_bal) < amount:
-        await ctx.send('<@{}> You dont have that much yourself <:kekw:772091131596374017>'.format(ctx.author.id))
-    else:
-        await ctx.send(
-            '<@{}> sent `{} Ð` to <@{}>. What a nice gesture 😀\nTax: `{} Ð`'.format(ctx.author.id, final_amount,
-                                                                                     give_to.id,
-                                                                                     amount - final_amount))
-        togiverbal = config_dict.get(give_to.id)
-        newuserbal = cur_bal - amount
-        giverbal = togiverbal + final_amount
-        mynewdict = {ctx.author.id: newuserbal, give_to.id: giverbal}
-        config_dict.update(mynewdict)
-        update_book()'''
-
-
-@bot.command(aliases=['feedback'])
-async def suggest(ctx, *,text:str = None):
-    if text is None:
-        await ctx.send('<@{}> The format for suggestion command is: `!suggest <Your-Suggestion-Here>` (without `<` or `>`)'.format(ctx.author.id))
-        return
-    feedback_chl = bot.get_channel(798091588676747285)
-    await ctx.send('<@{}> Suggestion sent in <#{}> successfully!'.format(ctx.author.id, feedback_chl.id))
-    compile = text + '\n\nSent by: {}'.format(ctx.author)
-    await feedback_chl.send('<@&805752064067633203> \n' + '```\n' + compile + '\n```')
-
-
-'''@bot.command(aliases=['inv'])
+@bot.command(aliases=['inv'])
 async def inventory(ctx):
     list_of_items = [
         ['laptop', items.get(ctx.author.id).get('comp')],
@@ -1130,200 +1283,203 @@ async def config(ctx):
         lol = ctx.author.id
         await ctx.send('<@{}> You ain\'t my master!'.format(lol))
 
-'''
-owner = 769543339627249714
-mod = 773629756570599454
-admin = 781377928898412564
+@bot.command()
+async def rich(ctx):
+    sorted_d = dict(sorted(config_dict.items(), key=operator.itemgetter(1), reverse=True))
+    mylist = list(sorted_d.items())[:5]
+    embed = discord.Embed(title="Riches of the Rich", description="", color=16776704)
+    for char in mylist:
+        userid = char[0]
+        amt = char[1]
+        myguild = bot.get_guild(766875360126042113)
+        a = myguild.get_member(userid)
+        dname = a.display_name
+        embed.add_field(name=dname, value='`' + str(amt) + ' Ð `', inline=False)
+    await ctx.send(embed=embed)
 
 
-@bot.command(aliases=['sm'])
-@commands.has_permissions(manage_channels=True)
-async def slowmode(ctx, seconds: int):
-    await ctx.channel.edit(slowmode_delay=seconds)
-    if seconds == 0:
-        await ctx.send(
-            "<#{}> is no longer in slowmode.".format(ctx.channel.id))
-    elif seconds < 0:
-        pass
+@bot.command()
+async def shop(ctx, shop_page: int = None):
+    if shop_page is None:
+        shoplist = '|   __Generals__   |    Hacker    |     Wars     | Bank Robbery |\n'
+        desc = '\n\n                         **Coming Soon!**'
+        embed = discord.Embed(title=shoplist, description=desc, color=16776704)
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        await ctx.send(embed=embed)
+    elif shop_page == 1:
+        shoplist = '|   __Generals__   |    Hacker    |     Wars     | Bank Robbery |\n'
+        desc = '\n\n                         **Coming Soon!**'
+        embed = discord.Embed(title=shoplist, description=desc, color=16776704)
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        await ctx.send(embed=embed)
+    elif shop_page == 2:
+        shoplist = '|   Generals   |    __Hacker__    |     Wars     | Bank Robbery |\n'
+        embed = discord.Embed(title=shoplist,
+                              description='Buy useful stuff here to help you in a tricky hacking situation',
+                              color=16776704)
+        embed.add_field(name='💻 Computer', value='Essential to start Hacking\nItem Code: `comp`\nPrice: `5000 Ð`\n',
+                        inline=False)
+        embed.add_field(name='🖥️ Assistant PC',
+                        value='Lowers the hacking time significantly\nItem Code: `pc`\nPrice: `4500 Ð`\n', inline=False)
+        embed.add_field(name='🖲️ Emergency Escape',
+                        value='Aborts the process and protects you from Police\nItem Code: `esc`\nPrice: `3000 Ð`\n',
+                        inline=False)
+        embed.add_field(name='⌨️ QuickBoard™',
+                        value='Your commands are taken noticeably faster\nItem Code: `qboard`\nPrice: `2000 Ð`\n',
+                        inline=False)
+        embed.add_field(name='🧭 Trace Lower',
+                        value='Lowers your trace percentage by 10%\nItem Code: `trace`\nPrice: `1000 Ð`\n',
+                        inline=False)
+        embed.add_field(name='🛰️ VPN', value='Slows the Cyber Police to track you\nItem Code: `vpn`\nPrice: `500 Ð`\n',
+                        inline=False)
+        embed.add_field(name='\n\nType !buy <item-code> to purchase the item', value='Have Fun Hacking 😉',
+                        inline=False)
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        await ctx.send(embed=embed)
+    elif shop_page == 3:
+        shoplist = '|   Generals   |    Hacker    |     __Wars__     | Bank Robbery |\n'
+        desc = '\n\n                         **Coming Soon!**'
+        embed = discord.Embed(title=shoplist, description=desc, color=16776704)
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        await ctx.send(embed=embed)
+    elif shop_page == 4:
+        shoplist = '|   Generals   |    Hacker    |     Wars     | __Bank Robbery__ |\n'
+        desc = '\n\n                         **Coming Soon!**'
+        embed = discord.Embed(title=shoplist, description=desc, color=16776704)
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        await ctx.send(embed=embed)
+
+
+@bot.command()
+async def give(ctx, give_to: discord.Member = None, amount: int = None):
+    if amount <= 0:
+        await ctx.send('<@{}> Seriosuly?'.format(ctx.author.id))
+        return
+    if amount <= 10:
+        await ctx.send('<@{}> Minimum amount is `10 Ð`')
+        return
+    if give_to is None or amount is None:
+        await ctx.send('Format for !give command is: `!give <person> <amount>`')
+        return
+    if give_to == ctx.author:
+        await ctx.send('<@{}> Sending Dikers to yourself, huh?'.format(ctx.author.id))
+        return
+    if amount >= 1000:
+        final_amount = int(amount * 0.9)
+    else:
+        final_amount = amount
+    cur_bal = config_dict.get(ctx.author.id)
+    if int(cur_bal) < amount:
+        await ctx.send('<@{}> You dont have that much yourself <:kekw:772091131596374017>'.format(ctx.author.id))
     else:
         await ctx.send(
-            "<#{}> is in `s l o w m o d e`.\nUsers will be able to post every {} seconds!".format(ctx.channel.id,
-                                                                                                  seconds))
-
-
-@bot.command()
-async def warn(ctx, user: discord.Member, *, reason=None):
-    warnings = {'war1': 796249188832509953,
-                'war2': 796249230774763540,
-                'war3': 796249281295024178,
-                'war4': 796249305391562782,
-                'war5': 796249325877461033,
-                'war6': 796249348991614976,
-                'war7': 796249379110649856,
-                'war8': 796249402527711303,
-                'war9': 796249425965350913,
-                'war10': 796249447255900171,
-                'war11': 796249469041508393}
-
-    if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in
-                                                                                                         ctx.author.roles]:
-        if user is None or reason is None:
-            await ctx.send('<@{}>. The syntax for warn is: `!warn <user> <reason>`'.format(ctx.author.id))
+            '<@{}> sent `{} Ð` to <@{}>. What a nice gesture 😀\nTax: `{} Ð`'.format(ctx.author.id, final_amount,
+                                                                                     give_to.id,
+                                                                                     amount - final_amount))
+        togiverbal = config_dict.get(give_to.id)
+        newuserbal = cur_bal - amount
+        giverbal = togiverbal + final_amount
+        mynewdict = {ctx.author.id: newuserbal, give_to.id: giverbal}
+        config_dict.update(mynewdict)
+        update_book()
+        
+@bot.command(aliases=['bal'], pass_context=True)
+async def balance(ctx, p_id=None):
+    replies = ['Yo <@{id}>, You\'ve got `{currency} Ð`',
+               '<@{id}> You have `{currency} Ð` in your account!',
+               'Ah! So... <@{id}> has got `{currency} Ð` in there!']
+    if ctx.channel.id in [795906303884525569, 796686187254513665]:
+        if p_id is None:
+            p_id = ctx.author.id
+            await ctx.send(random.choice(replies).format(id=p_id, currency=config_dict.get(p_id)))
         else:
-            await user.send('**You have been Warned in `✔ Official DIKE Clan` for:** {}'.format(reason))
-            await ctx.message.delete()
-            await ctx.send('☑️ User Warned Successfully')
+            p_id = str(p_id)
+            p_id = p_id.split('!')
+            p_id = p_id[1]
+            p_id = list(p_id)
+            p_id.pop(-1)
+            p_id = ''.join(p_id)
+            p_id = int(p_id)
+            await ctx.send(random.choice(replies).format(id=p_id, currency=config_dict.get(p_id)))
 
-            user_role_ids = [int(y.id) for y in user.roles]
-            if warnings.get('war1') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war2')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war1')))
-            elif warnings.get('war2') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war3')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war2')))
-            elif warnings.get('war3') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war4')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war3')))
-            elif warnings.get('war4') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war5')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war4')))
-            elif warnings.get('war5') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war6')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war5')))
-            elif warnings.get('war6') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war7')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war6')))
-            elif warnings.get('war7') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war8')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war7')))
-            elif warnings.get('war8') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war9')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war8')))
-            elif warnings.get('war9') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war10')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war9')))
-            elif warnings.get('war10') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war11')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war10')))
+
+@bot.command(aliases=['g'])
+async def gamble(ctx, price=None):
+    if ctx.channel.id == 795906303884525569:
+        if price is None:
+            await ctx.send('Use `!gamble <amount>` or `!g <amount>` to gamble')
+            return
+        low_bal = ['Oops! <@{id}> You just have {currency} Ð. What were you thinking <:NepSmug:775572252145745920>',
+                   '<@{id}> So you wanna gamble more than you have <:WierdChamp:775568297013411840>? Idiot.',
+                   '<@{id}> You dont have enough Ðikes <:1391_pepe_joy:775568241904320572><:1391_pepe_joy:775568241904320572>']
+
+        _id = ctx.author.id
+        current_bal = config_dict.get(_id)
+        price = int(price)
+        if current_bal < price:
+            await ctx.send(random.choice(low_bal).format(id=_id, currency=current_bal))
+        elif price <= 0:
+            await ctx.send('<@{}> Beta <:WierdChamp:775568297013411840>, Tumse na ho payega'.format(_id))
+        else:
+            win_loss = ['Won', 'Lost']
+            take = random.choice(win_loss)
+            if take == 'Won':
+                await ctx.send('Wohoo! <@{id}> You gambled `{stake} Ð` and have won! 🎉🎉'.format(id=_id, stake=price))
+                new_bal = current_bal + price
+                dc = {_id: new_bal}
+                config_dict.update(dc)
             else:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war1')))
+                await ctx.send('Damn! <@{id}> You just lost `{stake} Ð`. Sad? <:kekw:772091131596374017>'.format(id=_id,
+                                                                                                                 stake=price))
+                new_bal = current_bal - price
+                dc = {_id: new_bal}
+                config_dict.update(dc)
+        update_book()
+
+
+def update_book():
+    my = open('arcade_bal.txt', 'w')
+    my.write(str(config_dict))
+    my.close()
+
+    jh = open('hacking_data.txt', 'w')
+    jh.write(str(items))
+    jh.close()
+
+from datetime import datetime
+@bot.command()
+async def add(ctx, person_id: int, amt: int):
+    if dikemod in [y.id for y in ctx.author.roles]:
+        current_bal = config_dict.get(person_id)
+        new_bal = current_bal + amt
+        dc = {person_id: new_bal}
+        config_dict.update(dc)
+        update_book()
+        now = datetime.now()
+        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+        myfile = open('modlogs.txt', 'a+')
+        myfile.write('{}: Used by: `{}` Amount: `{}`\n'.format(dt_string, ctx.author.name, amt))
+        myfile.close()
+        await ctx.send('Added `{} Ð` Successfully!'.format(amt))
+    else:
+        lol = ctx.author.id
+        await ctx.send('<@{}> You dont have permission to use this command.'.format(lol))
+
+@bot.command()
+async def logs(ctx):
+    if dikemod in [y.id for y in ctx.author.roles]:
+        with open("modlogs.txt", "rb") as file:
+            await ctx.author.send("Here is the logs file:", file=discord.File(file))
+
+
+import job_print_bot
+@bot.command()
+async def job(ctx):
+    if ctx.channel.id == 795906303884525569:
+        job_print_bot.job_list()
 
 
 @bot.command()
-async def mute(ctx, member: discord.Member, mtime=None):
-    mutes = {'m1': 796249529883033611,
-             'm2': 796249570689810432,
-             'm3': 796249592991318026,
-             'm4': 796249619897385000,
-             'm5': 796249643273027655,
-             'm6': 796249664722305035,
-             'm7': 796249688025202718,
-             'm8': 796249708782813215,
-             'm9': 796249736188788796,
-             'm10': 796249760969130024,
-             'm11': 796249781013970975}
-    if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in
-                                                                                                         ctx.author.roles]:
-        muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
-        if mtime is None:
-            await member.add_roles(muted_role)
-            await ctx.send('☑️ User Muted Successfully')
-        else:
-            time_convert = {"s": 1, "m": 60, "h": 3600, "d": 86400}
-            tempmute = int(mtime[:-1]) * time_convert[mtime[-1]]
-            print('time:', tempmute)
-            await ctx.message.delete()
-            await member.add_roles(muted_role)
-            await ctx.send('☑️ User Muted Successfully')
-            await asyncio.sleep(tempmute)
-            await member.remove_roles(muted_role)
-
-        user_role_ids = [int(y.id) for y in member.roles]
-        if mutes.get('m1') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m2')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
-        elif mutes.get('m2') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m3')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m2')))
-        elif mutes.get('m3') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m4')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m3')))
-        elif mutes.get('m4') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m5')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m4')))
-        elif mutes.get('m5') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m6')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m5')))
-        elif mutes.get('m6') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m7')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m6')))
-        elif mutes.get('m7') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m8')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m7')))
-        elif mutes.get('m8') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m9')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m8')))
-        elif mutes.get('m9') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m10')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m9')))
-        elif mutes.get('m10') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m11')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m10')))
-        else:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
-
-@bot.command()
-@commands.has_permissions(manage_channels=True)
-async def addlink(ctx):
-    links_file = open('allowed_links.txt', 'r')
-    links_list = links_file.read()
-    links_file.close()
-    test = links_list.split('-')
-
-    channelid = str(ctx.channel.id)
-    if channelid in test:
-        await ctx.send('☑️ <#{}> already in in allowed links.'.format(channelid))
-        return
-    links_file = open('allowed_links.txt', 'a')
-    links_file.write('{}-'.format(channelid))
-    links_file.close()
-
-    await ctx.send('☑️ <#{}> added in allowed links.'.format(channelid))
-
-@bot.command()
-@commands.has_permissions(manage_channels=True)
-async def removelink(ctx):
-    channelid = str(ctx.channel.id)
-    links_file = open('allowed_links.txt', 'r')
-    links_list = links_file.read()
-    links_file.close()
-
-    links_list = links_list.split('-')
-    print('Links: {} \nENDS'.format(links_list))
-    try:
-        print(channelid, type(channelid))
-        for char in links_list:
-            print('char', char, type(char))
-
-        links_list.remove(channelid)
-        links_list = '-'.join(links_list)
-
-        links_file = open('allowed_links.txt', 'w')
-        links_file.write(str(links_list))
-        links_file.close()
-        await ctx.send('❌ <#{}> removed from allowed links successfully!'.format(ctx.channel.id))
-    except:
-        await ctx.send('<#{}> is not in allowed links!'.format(ctx.channel.id))
-
-
-@bot.command()
-async def unmute(ctx, member: discord.Member):
-    muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
-    await member.remove_roles(muted_role)
-    await ctx.send('☑️ User Unmuted Successfully')
-
-
-'''@bot.command()
 async def setuphack(ctx):
     if ctx.author.id == 771601176155783198:
         mem = discord.utils.get(ctx.guild.channels, id=795906303884525569)
@@ -1342,104 +1498,3 @@ async def setuphack(ctx):
         lol = ctx.author.id
         await ctx.send('<@{}> You ain\'t my master!'.format(lol))
         '''
-
-
-@bot.event
-async def on_member_join(member):
-    welcom_chl = bot.get_channel(773401123389440011)
-    welmsg = '<a:hello:786862994381471766> Hyy <@{user}> Welcome to Official DIKE Clan <a:hello:786862994381471766> **Type `!help` to get help**\n' \
-             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
-             '<a:ARR:786863234736455680> MUST READ AND FOLLOW <#773626644324810762>  <a:ARR:786863090670239744>\n' \
-             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
-             '<a:ARR:786863234736455680> CHECK <#773404953377112104> TO KNOW HOW TO GET ROLES <a:ARR:786863090670239744>\n' \
-             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
-             '<a:ARR:786863234736455680> MUST BE UPDATED AND READ DAILY <#773876008725905420> <a:ARR:786863090670239744>\n' \
-             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
-             '<a:ARR:786863234736455680> MUST BE ACTIVE IN CHAT <#766875360595410946>  AND UNLOCK LEVEL AND ROLES <a:blueflame:786863090670239744>\n' \
-             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
-             '<a:yldz:786863153454645269> <:line:798799010088747008> <:line:798799010088747008> HOPE YOU WILL ENJOY <:line:798799010088747008> <:line:798799010088747008> <a:yldz:786863153454645269>'.format(
-        user=member.id)
-    await welcom_chl.send(welmsg)
-    role1 = discord.utils.get(member.guild.roles, id=795570028585287690)
-    role2 = discord.utils.get(member.guild.roles, id=795567863003480064)
-    role3 = discord.utils.get(member.guild.roles, id=795572264283799582)
-    role4 = discord.utils.get(member.guild.roles, id=796248941620494346)
-    memrole = discord.utils.get(member.guild.roles, id=775363088719413278)
-    await member.add_roles(role1)
-    await member.add_roles(role2)
-    await member.add_roles(role3)
-    await member.add_roles(role4)
-    await member.add_roles(memrole)
-    myguild = bot.get_guild(766875360126042113)
-
-    member_count = 0
-    for member in myguild.members:
-        member_count += 1
-    true_member_count = len([m for m in myguild.members if not m.bot])
-    bot_count = len([m for m in myguild.members if m.bot])
-
-    total = bot.get_channel(798053370925023282)
-    mem = bot.get_channel(798053462281420870)
-    bots = bot.get_channel(798053532477161532)
-
-    await total.edit(name='All Members: {}'.format(member_count))
-    await mem.edit(name='Members: {}'.format(true_member_count))
-    await bots.edit(name='Bots: {}'.format(bot_count))
-
-
-@bot.event
-async def on_member_leave(member):
-    leaving_chl = bot.get_channel(800683977207840798)
-    leave_msg = '{} just left the server.'.format(member.name)
-    print(leave_msg)
-    await leaving_chl.send(leave_msg)
-    myguild = bot.get_guild(766875360126042113)
-
-    member_count = 0
-    for member in myguild.members:
-        member_count += 1
-    true_member_count = len([m for m in myguild.members if not m.bot])
-    bot_count = len([m for m in myguild.members if m.bot])
-
-    total = bot.get_channel(798053370925023282)
-    mem = bot.get_channel(798053462281420870)
-    bots = bot.get_channel(798053532477161532)
-
-    await total.edit(name='All Members: {}'.format(member_count))
-    await mem.edit(name='Members: {}'.format(true_member_count))
-    await bots.edit(name='Bots: {}'.format(bot_count))
-
-
-@bot.event
-async def on_ready():
-    await bot.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.playing, name="!help"))
-    myguild = bot.get_guild(766875360126042113)
-
-    member_count = 0
-    for member in myguild.members:
-        member_count += 1
-    true_member_count = len([m for m in myguild.members if not m.bot])
-    bot_count = len([m for m in myguild.members if m.bot])
-
-    total = bot.get_channel(798053370925023282)
-    mem = bot.get_channel(798053462281420870)
-    bots = bot.get_channel(798053532477161532)
-
-    await total.edit(name='All Members: {}'.format(member_count))
-    await mem.edit(name='Members: {}'.format(true_member_count))
-    await bots.edit(name='Bots: {}'.format(bot_count))
-    print('Ready!')
-
-dikemod = 799521293673168898
-'''my = open('arcade_bal.txt', 'r')
-data = my.read()
-config_dict = eval(data)
-config_dict = dict(config_dict)
-
-my2 = open('hacking_data.txt', 'r')
-data2 = my2.read()
-items = eval(data2)
-items = dict(items)'''
-
-bot.run(TOKEN)
