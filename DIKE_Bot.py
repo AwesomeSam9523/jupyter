@@ -446,10 +446,18 @@ async def slowmode(ctx, seconds: int):
 
 @bot.command()
 @commands.has_permissions(manage_channels=True)
-async def say(ctx, *, tosay : str):
-    await ctx.send(tosay)
+async def say(ctx, channel : str, *, tosay : str):
+    chlid = channel.split('#')
+    chlid = chlid[1]
+    chlid = list(chlid)
+    chlid.pop(-1)
+    chlid = ''.join(chlid)
+
+    chl = bot.get_channel(int(chlid))
+    await chl.send(tosay)
 
 @bot.command()
+@commands.has_permissions(ban_members=True, kick_members=True)
 async def warn(ctx, user: discord.Member, *, reason=None):
     warnings = {'war1': 796249188832509953,
                 'war2': 796249230774763540,
@@ -463,51 +471,50 @@ async def warn(ctx, user: discord.Member, *, reason=None):
                 'war10': 796249447255900171,
                 'war11': 796249469041508393}
 
-    if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in
-                                                                                                         ctx.author.roles]:
-        if user is None or reason is None:
-            await ctx.send('<@{}>. The syntax for warn is: `!warn <user> <reason>`'.format(ctx.author.id))
+
+    if user is None or reason is None:
+        await ctx.send('<@{}>. The syntax for warn is: `!warn <user> <reason>`'.format(ctx.author.id))
+    else:
+        await user.send('**You have been Warned in `✔ Official DIKE Clan` for:** {}'.format(reason))
+        await ctx.message.delete()
+        await ctx.send('☑️ User Warned Successfully')
+
+        user_role_ids = [int(y.id) for y in user.roles]
+        if warnings.get('war1') in user_role_ids:
+            await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war2')))
+            await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war1')))
+        elif warnings.get('war2') in user_role_ids:
+            await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war3')))
+            await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war2')))
+        elif warnings.get('war3') in user_role_ids:
+            await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war4')))
+            await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war3')))
+        elif warnings.get('war4') in user_role_ids:
+            await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war5')))
+            await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war4')))
+        elif warnings.get('war5') in user_role_ids:
+            await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war6')))
+            await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war5')))
+        elif warnings.get('war6') in user_role_ids:
+            await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war7')))
+            await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war6')))
+        elif warnings.get('war7') in user_role_ids:
+            await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war8')))
+            await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war7')))
+        elif warnings.get('war8') in user_role_ids:
+            await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war9')))
+            await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war8')))
+        elif warnings.get('war9') in user_role_ids:
+            await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war10')))
+            await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war9')))
+        elif warnings.get('war10') in user_role_ids:
+            await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war11')))
+            await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war10')))
         else:
-            await user.send('**You have been Warned in `✔ Official DIKE Clan` for:** {}'.format(reason))
-            await ctx.message.delete()
-            await ctx.send('☑️ User Warned Successfully')
+            await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war1')))
 
-            user_role_ids = [int(y.id) for y in user.roles]
-            if warnings.get('war1') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war2')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war1')))
-            elif warnings.get('war2') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war3')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war2')))
-            elif warnings.get('war3') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war4')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war3')))
-            elif warnings.get('war4') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war5')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war4')))
-            elif warnings.get('war5') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war6')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war5')))
-            elif warnings.get('war6') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war7')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war6')))
-            elif warnings.get('war7') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war8')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war7')))
-            elif warnings.get('war8') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war9')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war8')))
-            elif warnings.get('war9') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war10')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war9')))
-            elif warnings.get('war10') in user_role_ids:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war11')))
-                await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war10')))
-            else:
-                await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war1')))
-
-#{766875360126042113:{"allowed":[796686187254513665,780839980041240607,803893272233771009,786971815641481236,787571964046475274,786955992201822258], "actual":786955992201822258}}
 @bot.command()
+@commands.has_permissions(ban_members=True, kick_members=True)
 async def mute(ctx, member: discord.Member, mtime=None):
     mutes = {'m1': 796249529883033611,
              'm2': 796249570689810432,
@@ -520,55 +527,54 @@ async def mute(ctx, member: discord.Member, mtime=None):
              'm9': 796249736188788796,
              'm10': 796249760969130024,
              'm11': 796249781013970975}
-    if owner in [y.id for y in ctx.author.roles] or mod in [y.id for y in ctx.author.roles] or admin in [y.id for y in
-                                                                                                         ctx.author.roles]:
-        muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
-        if mtime is None:
-            await member.add_roles(muted_role)
-            await ctx.send('☑️ User Muted Successfully')
-        else:
-            time_convert = {"s": 1, "m": 60, "h": 3600, "d": 86400}
-            tempmute = int(mtime[:-1]) * time_convert[mtime[-1]]
-            print('time:', tempmute)
-            await ctx.message.delete()
-            await member.add_roles(muted_role)
-            await ctx.send('☑️ User Muted Successfully')
-            await asyncio.sleep(tempmute)
-            await member.remove_roles(muted_role)
 
-        user_role_ids = [int(y.id) for y in member.roles]
-        if mutes.get('m1') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m2')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
-        elif mutes.get('m2') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m3')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m2')))
-        elif mutes.get('m3') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m4')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m3')))
-        elif mutes.get('m4') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m5')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m4')))
-        elif mutes.get('m5') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m6')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m5')))
-        elif mutes.get('m6') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m7')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m6')))
-        elif mutes.get('m7') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m8')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m7')))
-        elif mutes.get('m8') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m9')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m8')))
-        elif mutes.get('m9') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m10')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m9')))
-        elif mutes.get('m10') in user_role_ids:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m11')))
-            await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m10')))
-        else:
-            await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
+    muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
+    if mtime is None:
+        await member.add_roles(muted_role)
+        await ctx.send('☑️ User Muted Successfully')
+    else:
+        time_convert = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+        tempmute = int(mtime[:-1]) * time_convert[mtime[-1]]
+        print('time:', tempmute)
+        await ctx.message.delete()
+        await member.add_roles(muted_role)
+        await ctx.send('☑️ User Muted Successfully')
+        await asyncio.sleep(tempmute)
+        await member.remove_roles(muted_role)
+
+    user_role_ids = [int(y.id) for y in member.roles]
+    if mutes.get('m1') in user_role_ids:
+        await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m2')))
+        await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
+    elif mutes.get('m2') in user_role_ids:
+        await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m3')))
+        await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m2')))
+    elif mutes.get('m3') in user_role_ids:
+        await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m4')))
+        await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m3')))
+    elif mutes.get('m4') in user_role_ids:
+        await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m5')))
+        await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m4')))
+    elif mutes.get('m5') in user_role_ids:
+        await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m6')))
+        await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m5')))
+    elif mutes.get('m6') in user_role_ids:
+        await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m7')))
+        await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m6')))
+    elif mutes.get('m7') in user_role_ids:
+        await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m8')))
+        await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m7')))
+    elif mutes.get('m8') in user_role_ids:
+        await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m9')))
+        await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m8')))
+    elif mutes.get('m9') in user_role_ids:
+        await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m10')))
+        await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m9')))
+    elif mutes.get('m10') in user_role_ids:
+        await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m11')))
+        await member.remove_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m10')))
+    else:
+        await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
 
 @bot.command()
 async def id(ctx):
@@ -622,6 +628,7 @@ async def removelink(ctx):
 
 
 @bot.command()
+@commands.has_permissions(ban_members=True, kick_members=True)
 async def unmute(ctx, member: discord.Member):
     muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
     await member.remove_roles(muted_role)
@@ -656,6 +663,11 @@ async def on_member_join(member):
     await member.add_roles(memrole)
     myguild = bot.get_guild(766875360126042113)
 
+    allusers = 0
+    for guild in bot.guilds:
+        allusers += len(guild.members)
+    await bot.change_presence(
+        activity=discord.Activity(type=discord.ActivityType.playing, name="!help with {} people".format(allusers)))
     member_count = 0
     for member in myguild.members:
         member_count += 1
@@ -673,6 +685,11 @@ async def on_member_join(member):
 
 @bot.event
 async def on_member_leave(member):
+    allusers = 0
+    for guild in bot.guilds:
+        allusers += len(guild.members)
+    await bot.change_presence(
+        activity=discord.Activity(type=discord.ActivityType.playing, name="!help with {} people".format(allusers)))
     leaving_chl = bot.get_channel(800683977207840798)
     leave_msg = '{} just left the server.'.format(member.name)
     print(leave_msg)
@@ -696,8 +713,11 @@ async def on_member_leave(member):
 
 @bot.event
 async def on_ready():
+    allusers = 0
+    for guild in bot.guilds:
+        allusers += len(guild.members)
     await bot.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.playing, name="!help"))
+        activity=discord.Activity(type=discord.ActivityType.playing, name="!help with {} people".format(allusers)))
     myguild = bot.get_guild(766875360126042113)
 
     member_count = 0
