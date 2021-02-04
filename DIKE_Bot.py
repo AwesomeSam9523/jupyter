@@ -96,12 +96,13 @@ async def on_message(message):
             await member_to_give.add_roles(legendary)
         elif level >= 25:
             await member_to_give.add_roles(nolife)
-    links_file = open('allowed_links.txt', 'r')
-    links_list = links_file.read()
-    links_file.close()
-    links_list = links_list.split('-')
 
-    if str(message.channel.id) not in links_list:
+    guildid = message.guild.id
+    links_file = links_data.get(guildid)
+    allowed_links = links_file.get('allowed')
+    send_links = links_file.get('actual')
+
+    if message.channel.id not in allowed_links:
         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
                           message.content.lower())
         if owner in [y.id for y in message.author.roles] or mod in [y.id for y in message.author.roles]:
@@ -109,7 +110,7 @@ async def on_message(message):
         elif urls:
             await message.delete()
             await message.channel.send('<@{}> Links not allowed in this channel!\n'
-                                       'Use <#786955992201822258> to send liks.'.format(message.author.id))
+                                       'Use <#{}> to send links.'.format(message.author.id, send_links))
     await bot.process_commands(message)
 
 
@@ -182,13 +183,11 @@ async def rule(ctx):
 @bot.command()
 @commands.has_permissions(manage_channels=True)
 async def links(ctx):
-    file = open("allowed_links.txt", "r")
-    file2 = file.read()
-    file2 = file2.split('-')
-    file.close()
+    thisguild = links_data.get(ctx.message.guild.id)
+    file2 = thisguild.get('allowed')
     main = ''
-    for i in range(len(file2) - 1):
-        main = main + '<#' + file2[i] + '>\n'
+    for i in range(len(file2)):
+        main = main + '<#' + str(file2[i]) + '>\n'
     embed = discord.Embed(title='List of channel with links **allowed**:',
                           description=main,
                           color=16776704)
@@ -445,6 +444,10 @@ async def slowmode(ctx, seconds: int):
             "<#{}> is in `s l o w m o d e`.\nUsers will be able to post every {} seconds!".format(ctx.channel.id,
                                                                                                   seconds))
 
+@bot.command()
+@commands.has_permissions(manage_channels=True)
+async def say(ctx, *, tosay : str):
+    await ctx.send(tosay)
 
 @bot.command()
 async def warn(ctx, user: discord.Member, *, reason=None):
@@ -503,7 +506,7 @@ async def warn(ctx, user: discord.Member, *, reason=None):
             else:
                 await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war1')))
 
-
+#{766875360126042113:{"allowed":[796686187254513665,780839980041240607,803893272233771009,786971815641481236,787571964046475274,786955992201822258], "actual":786955992201822258}}
 @bot.command()
 async def mute(ctx, member: discord.Member, mtime=None):
     mutes = {'m1': 796249529883033611,
@@ -567,49 +570,54 @@ async def mute(ctx, member: discord.Member, mtime=None):
         else:
             await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
 
+@bot.command()
+async def id(ctx):
+    await ctx.send(ctx.channel.id)
 
 @bot.command()
 @commands.has_permissions(manage_channels=True)
 async def addlink(ctx):
-    links_file = open('allowed_links.txt', 'r')
-    links_list = links_file.read()
-    links_file.close()
-    test = links_list.split('-')
-
-    channelid = str(ctx.channel.id)
-    if channelid in test:
-        await ctx.send('☑️ <#{}> already in in allowed links.'.format(channelid))
+    print(ctx.message.guild.id)
+    myguild = dict(eval(str(links_data.get(ctx.message.guild.id))))
+    allowed_links = myguild.get('allowed')
+    print(allowed_links, type(allowed_links))
+    if ctx.channel.id in allowed_links:
+        await ctx.send('☑️ <#{}> already in in allowed links.'.format(ctx.channel.id))
         return
-    links_file = open('allowed_links.txt', 'a')
-    links_file.write('{}-'.format(channelid))
+    allowed_links.append(ctx.channel.id)
+    print(allowed_links)
+    fakedict = {"allowed":allowed_links}
+    print(fakedict)
+    print('myguild', myguild)
+    print('links_data', links_data)
+    fakemain = {ctx.message.guild.id:myguild}
+    links_data.update(fakemain)
+    print(links_data)
+
+    links_file = open('allowed_links.txt', 'w')
+    links_file.write(str(links_data))
     links_file.close()
 
-    await ctx.send('☑️ <#{}> added in allowed links.'.format(channelid))
+    await ctx.send('☑️ <#{}> added in allowed links.'.format(ctx.channel.id))
 
 
 @bot.command()
 @commands.has_permissions(manage_channels=True)
 async def removelink(ctx):
-    channelid = str(ctx.channel.id)
-    links_file = open('allowed_links.txt', 'r')
-    links_list = links_file.read()
-    links_file.close()
+    myguild = links_data.get(ctx.message.guild.id)
+    allowed_links = myguild.get('allowed')
 
-    links_list = links_list.split('-')
-    print('Links: {} \nENDS'.format(links_list))
-    try:
-        print(channelid, type(channelid))
-        for char in links_list:
-            print('char', char, type(char))
-
-        links_list.remove(channelid)
-        links_list = '-'.join(links_list)
+    if ctx.channel.id in allowed_links:
+        allowed_links.remove(ctx.channel.id)
+        fakedict = {"allowed": allowed_links}
+        fakemain = {ctx.message.guild.id:myguild}
+        links_data.update(fakemain)
 
         links_file = open('allowed_links.txt', 'w')
-        links_file.write(str(links_list))
+        links_file.write(str(links_data))
         links_file.close()
         await ctx.send('❌ <#{}> removed from allowed links successfully!'.format(ctx.channel.id))
-    except:
+    else:
         await ctx.send('<#{}> is not in allowed links!'.format(ctx.channel.id))
 
 
@@ -706,6 +714,12 @@ async def on_ready():
     await mem.edit(name='Members: {}'.format(true_member_count))
     await bots.edit(name='Bots: {}'.format(bot_count))
     print('Ready!')
+
+links_file = open('allowed_links.txt', 'r')
+links_data = dict(eval(str(links_file.read())))
+links_file.close()
+
+print(links_data, type(links_data))
 
 
 dikemod = 799521293673168898
