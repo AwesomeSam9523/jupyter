@@ -17,14 +17,34 @@ bot.remove_command('help')
 
 print('Starting...')
 
-
+import random
 @bot.event
 async def on_message(message):
+    if message.author == bot.user:
+        return
     global sendbot
-    if message.channel.id == 795293822224695297:
-        if message.author == bot.user:
-            return
+    mentionlist = [
+        'Yes I am alive! Say?',
+        'Let me live, please!',
+        'Bruh what is it now?',
+        'Whoa I am here man, what now?',
+        'Stop pinging me unnecessarily!'
+    ]
+    devlist = [
+        'Yes master?',
+        'I am here master!',
+        'Yes Sir!?',
+        'Present Sir!',
+        'What can I do for you sir?'
+    ]
+    mention = f'<@!{bot.user.id}>'
+    if mention in message.content:
+        if message.author.id != 771601176155783198:
+            await message.reply(random.choice(mentionlist))
+        else:
+            await message.reply(random.choice(devlist))
 
+    if message.channel.id == 795293822224695297:
         if message.content.startswith('g.apply'):
             actualid = message.author.id
             sendbot = True
