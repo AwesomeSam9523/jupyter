@@ -1,3 +1,4 @@
+import ast
 import asyncio
 import discord
 from discord.ext import commands
@@ -218,9 +219,14 @@ import time
 from aiohttp import ClientSession
 from discord_webhook import DiscordWebhook, DiscordEmbed
 
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def p(ctx, *, toprint : str):
+    await ctx.send('Done! Check terminal for output')
+    print(toprint)
 
 @bot.command()
-async def rr(ctx):
+async def rr_(ctx):
     if ctx.author.id == 771601176155783198:
         ava = await bot.fetch_user(795334771718226010)
         avaurl = ava.avatar_url
@@ -246,6 +252,127 @@ async def rr(ctx):
     else:
         await ctx.send('Forbidden: You dont have permissions to use this command!')
 
+@bot.command()
+async def rrsetup(ctx):
+    embed = discord.Embed(title='Enter the Message Type:',
+                          description='`1- Group Roles`\n'
+                                      '`2- Single Role`',
+                          color=16776704)
+    embed.set_footer(text='Bot by: AwesomeSam#0001')
+    m1 = await ctx.send(embed=embed)
+
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel
+
+    try:
+        msg = await bot.wait_for("message", check=check, timeout=120)
+
+        if msg.content == '1':
+            await m1.delete()
+            await msg.delete()
+            embed = discord.Embed(title='Enter the Message Type:',
+                                  description='Enter how many roles you want to add in 1 single message. (Recommended: Maximum 10)',
+                                  color=16776704)
+            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            m1 = await ctx.send(embed=embed)
+
+            while True:
+                msg = await bot.wait_for("message", check=check, timeout=120)
+
+                try:
+                    mesg = int(msg.content)
+                    await m1.delete()
+                    await msg.delete()
+                except ValueError:
+                    embed = discord.Embed(title='Enter the Message Type:',
+                                          description='Incorrect Input. Please try again.',
+                                          color=16776704)
+                    embed.set_footer(text='Bot by: AwesomeSam#0001')
+                    await ctx.send(embed=embed)
+                else:
+                    break
+
+            while True:
+                messages = {ctx.channel.id:[]}
+                temp = []
+                desc = ''
+                for i in range(1, mesg+1):
+                    embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
+                                          description='__Step I:__ Enter the Message (Exact will be displayed after creation beside the Emoji)',
+                                          color=16776704)
+                    embed.set_footer(text='Bot by: AwesomeSam#0001')
+                    m1 = await ctx.send(embed=embed)
+
+                    message_to_display = await bot.wait_for("message", check=check, timeout=120)
+
+                    embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
+                                          description='__Step II:__ Enter the Emoji (The emoji should be default/from this server only!)',
+                                          color=16776704)
+                    embed.set_footer(text='Bot by: AwesomeSam#0001')
+                    m2 = await ctx.send(embed=embed)
+
+                    emoji_to_display = await bot.wait_for("message", check=check, timeout=120)
+
+                    embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
+                                          description='__Step III:__ **Tag** the role you want to give',
+                                          color=16776704)
+                    embed.set_footer(text='Bot by: AwesomeSam#0001')
+                    m3 = await ctx.send(embed=embed)
+
+                    role_to_give = await bot.wait_for("message", check=check, timeout=120)
+
+                    roleid = role_to_give.content.split('&')
+                    roleid = roleid[1]
+                    roleid = list(roleid)
+                    roleid.pop(-1)
+                    roleid = ''.join(roleid)
+
+                    fakedict = {emoji_to_display.content:roleid}
+                    mydict = messages.get(ctx.channel.id)
+                    mydict.append(fakedict)
+                    mainfake = {ctx.channel.id:mydict}
+                    messages.update(mainfake)
+
+                    temp.append(emoji_to_display.content)
+                    desc += '{} --> {}\n'.format(emoji_to_display.content, message_to_display.content)
+
+                    await m1.delete()
+                    await message_to_display.delete()
+                    await m2.delete()
+                    await emoji_to_display.delete()
+                    await m3.delete()
+                    await role_to_give.delete()
+                break
+
+            embed = discord.Embed(title='React here to Add/Remove your role:',
+                                  description=desc,
+                                  color=16776704)
+            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            m = await ctx.send(embed=embed)
+
+            for i in temp:
+                await m.add_reaction(i)
+
+            to_translate = messages.get(ctx.channel.id)
+            messages.pop(ctx.channel.id)
+            finaldict = {str(m.id):to_translate}
+            messages.update(finaldict)
+            rr_data.update(messages)
+
+            file = open('rr.txt', 'w', encoding='utf8', errors='ignore')
+            file.write(str(rr_data))
+            file.close()
+            print(messages)
+
+    except TimeoutError:
+        embed = discord.Embed(title='Times Up',
+                              description='Sorry, you didn\'t reply in time.',
+                              color=16776704)
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        await ctx.send(embed=embed)
+        return
+
+
 
 @bot.command()
 async def addrr(ctx, msgid: int):
@@ -265,44 +392,40 @@ role_mm = 803852707261710376
 
 @bot.event
 async def on_raw_reaction_add(payload):
+    try:
+        roledata = rr_data.get(str(payload.message_id))
+    except:
+        return
+
+    for i in roledata:
+        role_id = i.get(payload.emoji.name)
+        if role_id is not None:
+            break
     guild_id = payload.guild_id
     myguild = discord.utils.find(lambda g: g.id == guild_id, bot.guilds)
-    giv = discord.utils.get(myguild.roles, id=role_giveaways)
-    sug = discord.utils.get(myguild.roles, id=role_sugg)
-    ann = discord.utils.get(myguild.roles, id=role_ann)
-    mm = discord.utils.get(myguild.roles, id=role_mm)
-    msg_id = payload.message_id
+    role = discord.utils.get(myguild.roles, id=int(role_id))
     member = discord.utils.find(lambda m: m.id == payload.user_id, myguild.members)
-    if msg_id == 805756745896296458:
-        if payload.emoji.name == '🎉':
-            await member.add_roles(giv)
-        elif payload.emoji.name == '📢':
-            await member.remove_roles(ann)
-        elif payload.emoji.name == '🗣️':
-            await member.add_roles(sug)
-        elif payload.emoji.name == '🔑':
-            await member.add_roles(mm)
+
+    await member.add_roles(role)
 
 
 @bot.event
 async def on_raw_reaction_remove(payload):
+    try:
+        roledata = rr_data.get(str(payload.message_id))
+    except:
+        return
+
+    for i in roledata:
+        role_id = i.get(payload.emoji.name)
+        if role_id is not None:
+            break
     guild_id = payload.guild_id
     myguild = discord.utils.find(lambda g: g.id == guild_id, bot.guilds)
-    giv = discord.utils.get(myguild.roles, id=role_giveaways)
-    sug = discord.utils.get(myguild.roles, id=role_sugg)
-    ann = discord.utils.get(myguild.roles, id=role_ann)
-    mm = discord.utils.get(myguild.roles, id=role_mm)
-    msg_id = payload.message_id
+    role = discord.utils.get(myguild.roles, id=int(role_id))
     member = discord.utils.find(lambda m: m.id == payload.user_id, myguild.members)
-    if msg_id == 805756745896296458:
-        if payload.emoji.name == '🎉':
-            await member.remove_roles(giv)
-        elif payload.emoji.name == '📢':
-            await member.add_roles(ann)
-        elif payload.emoji.name == '🗣️':
-            await member.remove_roles(sug)
-        elif payload.emoji.name == '🔑':
-            await member.remove_roles(mm)
+
+    await member.remove_roles(role)
 
 
 @bot.command()
@@ -759,8 +882,13 @@ links_file = open('allowed_links.txt', 'r')
 links_data = dict(eval(str(links_file.read())))
 links_file.close()
 
-print(links_data, type(links_data))
+import json
+reactionrole = open('rr.txt', 'r', encoding='utf8', errors='ignore')
+rr_data = ast.literal_eval(reactionrole.read())
+reactionrole.close()
 
+print(rr_data, type(rr_data))
+bot.run(TOKEN)
 
 dikemod = 799521293673168898
 '''my = open('arcade_bal.txt', 'r')
@@ -773,7 +901,6 @@ data2 = my2.read()
 items = eval(data2)
 items = dict(items)'''
 
-bot.run(TOKEN)
 '''@bot.command()
 async def apply(ctx, job_id=None):
     if ctx.channel.id in [795906303884525569, 796686187254513665]:
