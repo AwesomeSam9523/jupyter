@@ -25,22 +25,37 @@ async def my_loop():
     file.write(str(msgs_data))
     file.close()
 
+from datetime import date
 import random
 @bot.event
 async def on_message(message):
+    guildid = message.guild.id
     channel = message.channel.id
-    a = msgs_data.get(channel)
+    b = msgs_data.get(guildid)
+    if b is None:
+        g = {guildid: {}}
+        msgs_data.update(g)
+        await my_loop()
+    b = msgs_data.get(guildid)
+    print(msgs_data, b)
+    c = b.get(channel)
+    print(c)
+    today = date.today()
+    d = today.strftime('%d-%m-%Y')
+    a = c.get(d)
+
+    print(b, c)
     if a is None:
-        fake = {channel:1}
-        msgs_data.update(fake)
+        a = 1
     else:
         a += 1
-        fake = {channel:a}
-        msgs_data.update(fake)
-
+    fake = {channel:{d:a}}
+    g = {guildid:fake}
+    msgs_data.update(g)
 
     if message.author == bot.user:
         return
+
     global sendbot
     mentionlist = [
         'Yes I am alive! Say?',
@@ -163,13 +178,30 @@ async def ping(ctx):
 @bot.command()
 async def stats(ctx, channel:str = None):
     if channel is None:
-        channel = ctx.channel.id
+        chlid = ctx.channel.id
+    else:
+        chl = channel.split('#')
+        chl = chl[1]
+        chl = list(chl)
+        chl.pop(-1)
+        chlid = ''.join(chl)
+    guildid = ctx.guild.id
+    g = msgs_data.get(guildid)
+    mesg_count = g.get(int(chlid))
+
+    embed = discord.Embed(title='Stats',
+                          description='Here are the stats for <#{}>:'.format(chlid),
+                          color=3407822)
+    embed.add_field(name='Total Number of Messages', value=mesg_count)
+    embed.set_footer(text='Bot by: AwesomeSam#0001')
+    await ctx.send(embed=embed)
+
 
 @bot.command()
 async def info(ctx):
     embed = discord.Embed(title='Invite Me!',
                           description='Here is the url to invite me: [Link](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)',
-                          color=16776704)
+                          color=3407822)
     await ctx.send(embed=embed)
 
 @bot.command()
@@ -186,7 +218,7 @@ async def rule(ctx):
         embed = discord.Embed(title='Server Rules',
                               description='Here are the mandatory rules:\n'
                                           'If you witness someone breaking ANY of these rules please contact any active Moderator/Admib immediately with proof!',
-                              color=16776704)
+                              color=3407822)
         embed.add_field(
             name='[1] Discord Terms of Service and Community Guidelines, as well Krunker\'s Terms & Conditions apply to this server',
             value='You must follow both of these in order to stay in the server! If you\'re caught breaking them you will be removed')
@@ -238,18 +270,23 @@ async def rule(ctx):
 async def links(ctx):
     thisguild = links_data.get(ctx.message.guild.id)
     file2 = thisguild.get('allowed')
+    if file2 is None:
+        embed = discord.Embed(title='Whoops!',
+                              description='Links are not configured for this server!',
+                              color=3407822)
+        await ctx.send(embed=embed)
+        return
     main = ''
     for i in range(len(file2)):
         main = main + '<#' + str(file2[i]) + '>\n'
     embed = discord.Embed(title='List of channel with links **allowed**:',
                           description=main,
-                          color=16776704)
+                          color=3407822)
     await ctx.send(embed=embed)
 
 
 import time
 from aiohttp import ClientSession
-from discord_webhook import DiscordWebhook, DiscordEmbed
 
 @bot.command()
 @commands.has_permissions(administrator=True)
@@ -257,39 +294,13 @@ async def p(ctx, *, toprint : str):
     await ctx.send('Done! Check terminal for output')
     print(toprint)
 
-@bot.command()
-async def rr_(ctx):
-    if ctx.author.id == 771601176155783198:
-        ava = await bot.fetch_user(795334771718226010)
-        avaurl = ava.avatar_url
-        web = await ctx.channel.create_webhook(name='DIKE Official')
-        WEBHOOK_URL = web.url
-        clog = '🎉 --> Giveaways\n' \
-               '🗣️ --> Suggestions\n' \
-               '🔑 --> Map Making\n' \
-               '📢 --> **Remove** Announcements role\n'
-
-        embed = DiscordEmbed(title='React Below to Add/Remove Roles',
-                             description=clog,
-                             color=16776704)
-        async with ClientSession() as session:
-            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
-            embed = discord.Embed(title='React Below to Add/Remove Roles',
-                                  description=clog,
-                                  color=16776704)
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
-            await web.delete()
-            return
-    else:
-        await ctx.send('Forbidden: You dont have permissions to use this command!')
 
 @bot.command()
 async def rrsetup(ctx):
     embed = discord.Embed(title='Enter the Message Type:',
                           description='`1- Group Roles`\n'
                                       '`2- Single Role`',
-                          color=16776704)
+                          color=3407822)
     embed.set_footer(text='Bot by: AwesomeSam#0001')
     m1 = await ctx.send(embed=embed)
 
@@ -304,7 +315,7 @@ async def rrsetup(ctx):
             await msg.delete()
             embed = discord.Embed(title='Enter the Message Type:',
                                   description='Enter how many roles you want to add in 1 single message. (Recommended: Maximum 10)',
-                                  color=16776704)
+                                  color=3407822)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
             m1 = await ctx.send(embed=embed)
 
@@ -318,7 +329,7 @@ async def rrsetup(ctx):
                 except ValueError:
                     embed = discord.Embed(title='Enter the Message Type:',
                                           description='Incorrect Input. Please try again.',
-                                          color=16776704)
+                                          color=3407822)
                     embed.set_footer(text='Bot by: AwesomeSam#0001')
                     await ctx.send(embed=embed)
                 else:
@@ -331,7 +342,7 @@ async def rrsetup(ctx):
                 for i in range(1, mesg+1):
                     embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
                                           description='__Step I:__ Enter the Message (Exact will be displayed after creation beside the Emoji)',
-                                          color=16776704)
+                                          color=3407822)
                     embed.set_footer(text='Bot by: AwesomeSam#0001')
                     m1 = await ctx.send(embed=embed)
 
@@ -339,7 +350,7 @@ async def rrsetup(ctx):
 
                     embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
                                           description='__Step II:__ Enter the Emoji (The emoji should be default/from this server only!)',
-                                          color=16776704)
+                                          color=3407822)
                     embed.set_footer(text='Bot by: AwesomeSam#0001')
                     m2 = await ctx.send(embed=embed)
 
@@ -347,7 +358,7 @@ async def rrsetup(ctx):
 
                     embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
                                           description='__Step III:__ **Tag** the role you want to give',
-                                          color=16776704)
+                                          color=3407822)
                     embed.set_footer(text='Bot by: AwesomeSam#0001')
                     m3 = await ctx.send(embed=embed)
 
@@ -378,7 +389,7 @@ async def rrsetup(ctx):
 
             embed = discord.Embed(title='React here to Add/Remove your role:',
                                   description=desc,
-                                  color=16776704)
+                                  color=3407822)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
             m = await ctx.send(embed=embed)
 
@@ -399,27 +410,10 @@ async def rrsetup(ctx):
     except TimeoutError:
         embed = discord.Embed(title='Times Up',
                               description='Sorry, you didn\'t reply in time.',
-                              color=16776704)
+                              color=3407822)
         embed.set_footer(text='Bot by: AwesomeSam#0001')
         await ctx.send(embed=embed)
         return
-
-
-
-@bot.command()
-async def addrr(ctx, msgid: int):
-    if ctx.author.id == 771601176155783198:
-        msg = await ctx.fetch_message(msgid)
-        await msg.add_reaction('🎉')
-        await msg.add_reaction('🗣️')
-        await msg.add_reaction('🔑')
-        await msg.add_reaction('📢')
-
-
-role_giveaways = 805739667408420894
-role_ann = 795888028396290089
-role_sugg = 805752064067633203
-role_mm = 803852707261710376
 
 
 @bot.event
@@ -429,16 +423,28 @@ async def on_raw_reaction_add(payload):
     except:
         return
 
-    for i in roledata:
-        role_id = i.get(payload.emoji.name)
-        if role_id is not None:
-            break
+    try:
+        for i in roledata:
+            role_id = i.get(payload.emoji.name)
+            if role_id is not None:
+                break
+    except TypeError:
+        return
     guild_id = payload.guild_id
     myguild = discord.utils.find(lambda g: g.id == guild_id, bot.guilds)
     role = discord.utils.get(myguild.roles, id=int(role_id))
     member = discord.utils.find(lambda m: m.id == payload.user_id, myguild.members)
 
-    await member.add_roles(role)
+    try:
+        await member.add_roles(role)
+    except PermissionError:
+        embed = discord.Embed(title='Whoops!',
+                              description='Looks like I am missing permissions. Try:\n'
+                                          '1. Granting me required permissions\n'
+                                          '2. Making sure that my role is above the reaction role.',
+                              color=3407822)
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        await payload.channel.send(embed=embed)
 
 
 @bot.event
@@ -448,16 +454,28 @@ async def on_raw_reaction_remove(payload):
     except:
         return
 
-    for i in roledata:
-        role_id = i.get(payload.emoji.name)
-        if role_id is not None:
-            break
+    try:
+        for i in roledata:
+            role_id = i.get(payload.emoji.name)
+            if role_id is not None:
+                break
+    except TypeError:
+        return
     guild_id = payload.guild_id
     myguild = discord.utils.find(lambda g: g.id == guild_id, bot.guilds)
     role = discord.utils.get(myguild.roles, id=int(role_id))
     member = discord.utils.find(lambda m: m.id == payload.user_id, myguild.members)
 
-    await member.remove_roles(role)
+    try:
+        await member.remove_roles(role)
+    except PermissionError:
+        embed = discord.Embed(title='Whoops!',
+                              description='Looks like I am missing permissions. Try:\n'
+                                          '1. Granting me required permissions\n'
+                                          '2. Making sure that my role is above the reaction role.',
+                              color=3407822)
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        await payload.channel.send(embed=embed)
 
 
 @bot.command()
@@ -474,14 +492,11 @@ async def help(ctx, help_id=None):
                'Note: If you have any suggestion, type !suggest in any channel and the bot will reply back with instructions.\n\n' \
                '**Type `!help <number>` to get info**'
 
-        embed = DiscordEmbed(title='DIKE Official Bot Help:',
-                             description=clog,
-                             color=16776704)
         async with ClientSession() as session:
             webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
             embed = discord.Embed(title='DIKE Official Bot Help:',
                                   description=clog,
-                                  color=16776704)
+                                  color=3407822)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
             await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
         await web.delete()
@@ -496,14 +511,12 @@ async def help(ctx, help_id=None):
                '"--> KPG:       10"\n' \
                '"--> Nukes:     5"```\n\n' \
                'Type **g.apply <your-ign>** in <#795293822224695297> to apply.'
-        embed = DiscordEmbed(title='DIKE Official Bot Help:',
-                             description=clog,
-                             color=16776704)
+
         async with ClientSession() as session:
             webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
             embed = discord.Embed(title='DIKE Official Bot Help:',
                                   description=clog,
-                                  color=16776704)
+                                  color=3407822)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
             await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
     elif help_id == 2:
@@ -549,15 +562,12 @@ async def help(ctx, help_id=None):
                'Eg: !help 2' \
                '```' '''
         clog = 'DIKE Arcade is discontinued...'
-        embed = DiscordEmbed(title='DIKE Official Bot Help:',
-                             description=clog,
-                             color=16776704)
 
         async with ClientSession() as session:
             webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
             embed = discord.Embed(title='DIKE Official Bot Help:',
                                   description=clog,
-                                  color=16776704)
+                                  color=3407822)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
             await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
     elif help_id == 3:
@@ -574,14 +584,12 @@ async def help(ctx, help_id=None):
                '"--> !warn              - Warns the user"\n' \
                'Syntax: !warn @AwesomeSam <Reason Here>\n' \
                '```'
-        embed = DiscordEmbed(title='DIKE Official Bot Help:',
-                             description=clog,
-                             color=16776704)
+
         async with ClientSession() as session:
             webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
             embed = discord.Embed(title='DIKE Official Bot Help:',
                                   description=clog,
-                                  color=16776704)
+                                  color=3407822)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
             await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
     await web.delete()
@@ -1511,7 +1519,7 @@ async def config(ctx):
 async def rich(ctx):
     sorted_d = dict(sorted(config_dict.items(), key=operator.itemgetter(1), reverse=True))
     mylist = list(sorted_d.items())[:5]
-    embed = discord.Embed(title="Riches of the Rich", description="", color=16776704)
+    embed = discord.Embed(title="Riches of the Rich", description="", color=3407822)
     for char in mylist:
         userid = char[0]
         amt = char[1]
@@ -1527,20 +1535,20 @@ async def shop(ctx, shop_page: int = None):
     if shop_page is None:
         shoplist = '|   __Generals__   |    Hacker    |     Wars     | Bank Robbery |\n'
         desc = '\n\n                         **Coming Soon!**'
-        embed = discord.Embed(title=shoplist, description=desc, color=16776704)
+        embed = discord.Embed(title=shoplist, description=desc, color=3407822)
         embed.set_footer(text='Bot by: AwesomeSam#0001')
         await ctx.send(embed=embed)
     elif shop_page == 1:
         shoplist = '|   __Generals__   |    Hacker    |     Wars     | Bank Robbery |\n'
         desc = '\n\n                         **Coming Soon!**'
-        embed = discord.Embed(title=shoplist, description=desc, color=16776704)
+        embed = discord.Embed(title=shoplist, description=desc, color=3407822)
         embed.set_footer(text='Bot by: AwesomeSam#0001')
         await ctx.send(embed=embed)
     elif shop_page == 2:
         shoplist = '|   Generals   |    __Hacker__    |     Wars     | Bank Robbery |\n'
         embed = discord.Embed(title=shoplist,
                               description='Buy useful stuff here to help you in a tricky hacking situation',
-                              color=16776704)
+                              color=3407822)
         embed.add_field(name='💻 Computer', value='Essential to start Hacking\nItem Code: `comp`\nPrice: `5000 Ð`\n',
                         inline=False)
         embed.add_field(name='🖥️ Assistant PC',
@@ -1563,13 +1571,13 @@ async def shop(ctx, shop_page: int = None):
     elif shop_page == 3:
         shoplist = '|   Generals   |    Hacker    |     __Wars__     | Bank Robbery |\n'
         desc = '\n\n                         **Coming Soon!**'
-        embed = discord.Embed(title=shoplist, description=desc, color=16776704)
+        embed = discord.Embed(title=shoplist, description=desc, color=3407822)
         embed.set_footer(text='Bot by: AwesomeSam#0001')
         await ctx.send(embed=embed)
     elif shop_page == 4:
         shoplist = '|   Generals   |    Hacker    |     Wars     | __Bank Robbery__ |\n'
         desc = '\n\n                         **Coming Soon!**'
-        embed = discord.Embed(title=shoplist, description=desc, color=16776704)
+        embed = discord.Embed(title=shoplist, description=desc, color=3407822)
         embed.set_footer(text='Bot by: AwesomeSam#0001')
         await ctx.send(embed=embed)
 
