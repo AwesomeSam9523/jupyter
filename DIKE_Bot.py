@@ -187,8 +187,8 @@ async def on_message_delete(message):
 
     mem = bot.fetch_user(id_finder[0])
     if mem is not None and int(id_finder[0]) != message.author.id:
-        embed = discord.Embed(title='Oops!',
-                              description='🚨 <@!{}> just ghost pinged {}!'.format(message.author.id, ghost_ping[0]),
+        embed = discord.Embed(title='🚨 Oops!',
+                              description='<@!{}> just ghost pinged {}!'.format(message.author.id, ghost_ping[0]),
                               color=16724787)
         await message.channel.send(embed=embed)
 
