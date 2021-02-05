@@ -643,7 +643,7 @@ async def purge(ctx, limit: int):
 
 
 @bot.command()
-async def help(ctx, help_id=None):
+async def help(ctx, help_id : str=None):
     ava = await bot.fetch_user(795334771718226010)
     avaurl = ava.avatar_url
     name = ava.display_name
@@ -656,32 +656,52 @@ async def help(ctx, help_id=None):
 
     WEBHOOK_URL = web.url
     if help_id is None:
-        clog = '`1` --> `Apply to DIKE`\n' \
-               '`2` --> `Arcade Commands`\n' \
-               '`3` --> `Moderator Commands`\n' \
-               '\n' \
-               'Note: If you have any suggestion, type !suggest in any channel and the bot will reply back with instructions.\n\n' \
-               '**Type `!help <number>` to get info**'
+        clog = '[Join Support Server](https://discord.gg/SeebXPzHKp) | ' \
+               '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
 
         async with ClientSession() as session:
             webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
             embed = discord.Embed(title='DIKE Official Bot Help:',
                                   description=clog,
                                   color=3407822)
+            chelp = help_data.get(ctx.guild.id)
+            if chelp is not None:
+                embed.add_field(name='`apply`', value='Minimum Requirements to join clan')
+            embed.add_field(name='`stats`', value='Show stats related to server or channel')
+            embed.add_field(name='`mod`', value='Moderation Commands')
             embed.set_footer(text='Bot by: AwesomeSam#0001')
             await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
         await web.delete()
         return
-    help_id = int(help_id)
-    if help_id == 1:
-        clog = 'Here are the minimum requirements:\n' \
-               '```python\n' \
-               '"--> Level:     30"\n' \
-               '"--> KDR:       1.5"\n' \
-               '"--> SPK:       100"\n' \
-               '"--> KPG:       10"\n' \
-               '"--> Nukes:     5"```\n\n' \
-               'Type **g.apply <your-ign>** in <#795293822224695297> to apply.'
+
+    if help_id == 'apply':
+        chelp = help_data.get(ctx.guild.id)
+        if chelp is None:
+            return
+        level = chelp.get('level')
+        kpg = chelp.get('kpg')
+        kdr = chelp.get('kdr')
+        nukes = chelp.get('nukes')
+        spk = chelp.get('spk')
+        add = chelp.get('additional')
+        if add is not None:
+            clog = 'Here are the minimum requirements:\n' \
+                   '```python\n' \
+                   '"--> Level:     {}"\n' \
+                   '"--> KDR:       {}"\n' \
+                   '"--> SPK:       {}"\n' \
+                   '"--> KPG:       {}"\n' \
+                   '"--> Nukes:     {}"```\n\n' \
+                   '{}'.format(level, kdr, spk, kpg, nukes, add)
+        else:
+            clog = 'Here are the minimum requirements:\n' \
+                   '```python\n' \
+                   '"--> Level:     {}"\n' \
+                   '"--> KDR:       {}"\n' \
+                   '"--> SPK:       {}"\n' \
+                   '"--> KPG:       {}"\n' \
+                   '"--> Nukes:     {}"```\n\n'.format(level, kdr, spk, kpg, nukes)
+
 
         async with ClientSession() as session:
             webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
@@ -741,26 +761,21 @@ async def help(ctx, help_id=None):
                                   color=3407822)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
             await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
-    elif help_id == 3:
-        clog = 'Here are all the Moderator Commands!\n' \
-               '```python\n' \
-               '"--> !slowmode/!sm      - Puts the channel in slowmode"\n' \
-               'Syntax: !sm <time: int>\n' \
-               'Eg: !sm 10 will do a 10 sec slowmode\n' \
-               '\n' \
-               '"--> !mute              - Mute the user"\n' \
-               'Syntax: !mute @AwesomeSam 1d\n\n' \
-               '"--> !unmute            - Unmutes the user"\n' \
-               'Syntax: !unmute @AwesomeSam\n\n' \
-               '"--> !warn              - Warns the user"\n' \
-               'Syntax: !warn @AwesomeSam <Reason Here>\n' \
-               '```'
+    elif help_id == 'mod':
+        clog = '[Join Support Server](https://discord.gg/SeebXPzHKp) | ' \
+               '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
 
         async with ClientSession() as session:
             webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
             embed = discord.Embed(title='DIKE Official Bot Help:',
                                   description=clog,
                                   color=3407822)
+            embed.add_field(name='`warn`', value='Warns the user\n   Syntax: `!warn <user> <reason>`', inline=False)
+            embed.add_field(name='`mute`', value='Mutes the user\n   Syntax: `!mute <user> [time]`', inline=False)
+            embed.add_field(name='`unmute`', value='Unmutes the user\n   Syntax: `!unmute <user>`', inline=False)
+            embed.add_field(name='`slowmode`', value='Puts the current channel in slowmode\n   Syntax: `!sm <time>`', inline=False)
+            embed.add_field(name='`clean`', value='Cleans certain number of messages\n   Syntax: `!clean <number>`', inline=False)
+            embed.add_field(name='Note:', value='<> = Required | [ ] = Optional', inline=False)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
             await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
     await web.delete()
@@ -1149,6 +1164,10 @@ messages.close()
 
 autor = open('autoroles.txt', 'r')
 ar_data = dict(eval(str(autor.read())))
+autor.close()
+
+autor = open('customhelp.txt', 'r')
+help_data = dict(eval(str(autor.read())))
 autor.close()
 
 my_loop.start()
