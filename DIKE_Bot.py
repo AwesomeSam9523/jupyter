@@ -18,9 +18,27 @@ bot.remove_command('help')
 
 print('Starting...')
 
+from discord.ext import tasks
+@tasks.loop(seconds=60)
+async def my_loop():
+    file = open('messages.txt', 'w')
+    file.write(str(msgs_data))
+    file.close()
+
 import random
 @bot.event
 async def on_message(message):
+    channel = message.channel.id
+    a = msgs_data.get(channel)
+    if a is None:
+        fake = {channel:1}
+        msgs_data.update(fake)
+    else:
+        a += 1
+        fake = {channel:a}
+        msgs_data.update(fake)
+
+
     if message.author == bot.user:
         return
     global sendbot
@@ -120,18 +138,21 @@ async def on_message(message):
 
     guildid = message.guild.id
     links_file = links_data.get(guildid)
-    allowed_links = links_file.get('allowed')
-    send_links = links_file.get('actual')
+    if links_file is None:
+        pass
+    else:
+        allowed_links = links_file.get('allowed')
+        send_links = links_file.get('actual')
 
-    if message.channel.id not in allowed_links:
-        urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
-                          message.content.lower())
-        if owner in [y.id for y in message.author.roles] or mod in [y.id for y in message.author.roles]:
-            pass
-        elif urls:
-            await message.delete()
-            await message.channel.send('<@{}> Links not allowed in this channel!\n'
-                                       'Use <#{}> to send links.'.format(message.author.id, send_links))
+        if message.channel.id not in allowed_links:
+            urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
+                              message.content.lower())
+            if owner in [y.id for y in message.author.roles] or mod in [y.id for y in message.author.roles]:
+                pass
+            elif urls:
+                await message.delete()
+                await message.channel.send('<@{}> Links not allowed in this channel!\n'
+                                           'Use <#{}> to send links.'.format(message.author.id, send_links))
     await bot.process_commands(message)
 
 
@@ -139,6 +160,17 @@ async def on_message(message):
 async def ping(ctx):
     await ctx.send('Pong! `{} ms`'.format(int(bot.latency * 1000)))
 
+@bot.command()
+async def stats(ctx, channel:str = None):
+    if channel is None:
+        channel = ctx.channel.id
+
+@bot.command()
+async def info(ctx):
+    embed = discord.Embed(title='Invite Me!',
+                          description='Here is the url to invite me: [Link](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)',
+                          color=16776704)
+    await ctx.send(embed=embed)
 
 @bot.command()
 async def rule(ctx):
@@ -726,22 +758,15 @@ async def id(ctx):
 @bot.command()
 @commands.has_permissions(manage_channels=True)
 async def addlink(ctx):
-    print(ctx.message.guild.id)
     myguild = dict(eval(str(links_data.get(ctx.message.guild.id))))
     allowed_links = myguild.get('allowed')
-    print(allowed_links, type(allowed_links))
     if ctx.channel.id in allowed_links:
         await ctx.send('☑️ <#{}> already in in allowed links.'.format(ctx.channel.id))
         return
     allowed_links.append(ctx.channel.id)
-    print(allowed_links)
     fakedict = {"allowed":allowed_links}
-    print(fakedict)
-    print('myguild', myguild)
-    print('links_data', links_data)
     fakemain = {ctx.message.guild.id:myguild}
     links_data.update(fakemain)
-    print(links_data)
 
     links_file = open('allowed_links.txt', 'w')
     links_file.write(str(links_data))
@@ -887,7 +912,11 @@ reactionrole = open('rr.txt', 'r', encoding='utf8', errors='ignore')
 rr_data = ast.literal_eval(reactionrole.read())
 reactionrole.close()
 
-print(rr_data, type(rr_data))
+messages = open('messages.txt', 'r')
+msgs_data = dict(eval(str(messages.read())))
+messages.close()
+
+my_loop.start()
 bot.run(TOKEN)
 
 dikemod = 799521293673168898
