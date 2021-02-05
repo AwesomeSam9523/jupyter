@@ -80,7 +80,7 @@ async def on_message(message):
         'Present Sir!',
         'What can I do for you sir?'
     ]
-    mention = f'<@!{bot.user.id}>'
+    mention = '<@!{}>'.format(bot.user.id)
     if mention in message.content:
         if message.author.id != 771601176155783198:
             await message.reply(random.choice(mentionlist))
@@ -178,6 +178,19 @@ async def on_message(message):
                 await message.channel.send('<@{}> Links not allowed in this channel!\n'
                                            'Use <#{}> to send links.'.format(message.author.id, send_links))
     await bot.process_commands(message)
+
+@bot.event
+async def on_message_delete(message):
+    msg = message.content
+    ghost_ping = re.findall('<@!(?<!\d)\d{18}(?!\d)>+', msg)
+    id_finder =  re.findall('(?<!\d)\d{18}(?!\d)+', msg)
+
+    mem = bot.fetch_user(id_finder[0])
+    if mem is not None and int(id_finder[0]) != message.author.id:
+        embed = discord.Embed(title='Oops!',
+                              description='🚨 <@!{}> just ghost pinged {}!'.format(message.author.id, ghost_ping[0]),
+                              color=16724787)
+        await message.channel.send(embed=embed)
 
 
 @bot.command()
