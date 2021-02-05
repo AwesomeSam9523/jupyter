@@ -5,8 +5,6 @@ from discord.ext import commands
 from dotenv import load_dotenv
 import os
 import re
-# importing the required module
-import matplotlib.pyplot as plt
 
 intents = discord.Intents.default()
 intents.members = True
@@ -188,55 +186,166 @@ async def ping(ctx):
 
 @bot.command()
 async def stats(ctx, channel:str = None):
+    import matplotlib.pyplot as plt
     if channel is None:
-        chlid = ctx.channel.id
+        guildid = ctx.guild.id
+        g = msgs_data.get(guildid)
+
+        overall = 0
+        keys = []
+        msgs_rec = {}
+        for i in g.values():
+            for j in i.values():
+                overall += j
+            for k in i.keys():
+                if k not in keys:
+                    keys.append(k)
+            for char in keys:
+                number = i.get(char)
+                if number is None:
+                    continue
+                r = msgs_rec.get(char)
+                if r is None:
+                    msgs_rec.update({char:number})
+                    continue
+                r += number
+                msgs_rec.update({char:r})
+        months = {1:'Jan',
+                  2:'Feb',
+                  3:'Mar',
+                  4:'Apr',
+                  5:'May',
+                  6:'Jun',
+                  7:'Jul',
+                  8:'Aug',
+                  9:'Sep',
+                  10:'Oct',
+                  11:'Nov',
+                  12:'Dec'}
+        days = []
+        msgs = []
+        for char in keys:
+            char = str(char)
+            conv = char.split('-')
+            day = conv[0]
+            mon = months.get(int(conv[1]))
+
+            final = day + '-' + mon
+            days.append(final)
+            msgs.append(msgs_rec.get(char))
+
+        today = date.today()
+        d = today.strftime('%d-%m-%Y')
+
+        graphchl = bot.get_channel(807168077174538240)
+        x = days
+        y = msgs
+        COLOR = 'yellow'
+        plt.rcParams['text.color'] = COLOR
+        plt.rcParams['axes.labelcolor'] = COLOR
+        plt.rcParams['xtick.color'] = COLOR
+        plt.rcParams['ytick.color'] = COLOR
+        plt.plot(x, y)
+        plt.xlabel('Day')
+        plt.ylabel('Messages')
+        plt.rc('grid', linestyle="-", color='white')
+        plt.scatter(x, y)
+        plt.grid(True)
+
+        plt.savefig('graph.png', transparent=True)
+        file = discord.File("graph.png", filename="graph.png")
+        msg = await graphchl.send(file=file)
+        for attachment in msg.attachments:
+            a = attachment.url
+        os.remove('graph.png')
+
+        embed = discord.Embed(title='Stats',
+                              description='Here are the stats for `{}`:'.format(ctx.guild.name),
+                              color=3407822)
+        embed.add_field(name='Total Messages', value=str(overall))
+        embed.add_field(name='Messages sent today', value=str(msgs_rec.get(d)))
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_image(url=a)
     else:
         chl = channel.split('#')
         chl = chl[1]
         chl = list(chl)
         chl.pop(-1)
         chlid = ''.join(chl)
-    guildid = ctx.guild.id
-    g = msgs_data.get(guildid)
-    chan = g.get(int(chlid))
+        guildid = ctx.guild.id
+        g = msgs_data.get(guildid)
+        chan = g.get(int(chlid))
 
-    today = date.today()
-    d = today.strftime('%d-%m-%Y')
+        overall = 0
+        keys = []
+        msgs_rec = {}
+        for i in chan.values():
+            overall += i
+        for j in chan.keys():
+            if j not in keys:
+                keys.append(j)
+        for char in keys:
+            number = chan.get(char)
+            msgs_rec.update({char: number})
+        months = {1: 'Jan',
+                  2: 'Feb',
+                  3: 'Mar',
+                  4: 'Apr',
+                  5: 'May',
+                  6: 'Jun',
+                  7: 'Jul',
+                  8: 'Aug',
+                  9: 'Sep',
+                  10: 'Oct',
+                  11: 'Nov',
+                  12: 'Dec'}
+        days = []
+        msgs = []
+        for char in keys:
+            char = str(char)
+            conv = char.split('-')
+            day = conv[0]
+            mon = months.get(int(conv[1]))
 
-    today_count = chan.get(d)
-    all_val = chan.values()
-    all_count = 0
-    for i in all_val:
-        all_count += i
+            final = day + '-' + mon
+            days.append(final)
+            msgs.append(msgs_rec.get(char))
 
-    embed = discord.Embed(title='Stats',
-                          description='Here are the stats for <#{}>:'.format(chlid),
-                          color=3407822)
-    embed.add_field(name='Total Messages', value=str(all_count))
-    embed.add_field(name='Messages sent Today', value=str(today_count))
-    embed.set_footer(text='Bot by: AwesomeSam#0001')
+        today = date.today()
+        d = today.strftime('%d-%m-%Y')
+
+        graphchl = bot.get_channel(807168077174538240)
+        x = days
+        y = msgs
+        COLOR = 'yellow'
+        plt.rcParams['text.color'] = COLOR
+        plt.rcParams['axes.labelcolor'] = COLOR
+        plt.rcParams['xtick.color'] = COLOR
+        plt.rcParams['ytick.color'] = COLOR
+        plt.plot(x, y)
+        plt.xlabel('Day')
+        plt.ylabel('Messages')
+        plt.title('')
+        plt.rc('grid', linestyle="-", color='white')
+        plt.scatter(x, y)
+        plt.grid(True)
+
+        plt.savefig('graph.png', transparent=True)
+        file = discord.File("graph.png", filename="graph.png")
+        msg = await graphchl.send(file=file)
+        for attachment in msg.attachments:
+            a = attachment.url
+        os.remove('graph.png')
+
+        embed = discord.Embed(title='Stats',
+                              description='Here are the stats for <#{}>:'.format(chlid),
+                              color=3407822)
+        embed.add_field(name='Total Messages', value=str(overall))
+        embed.add_field(name='Messages sent today', value=str(msgs_rec.get(d)))
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_image(url=a)
     await ctx.send(embed=embed)
-
-@bot.command()
-async def graph(ctx):
-    graphchl = bot.get_channel(807168077174538240)
-    x = [1, 2, 3]
-    y = [2, 4, 1]
-    plt.plot(x, y)
-    plt.xlabel('x - axis')
-    plt.ylabel('y - axis')
-    plt.title('My first graph!')
-    plt.savefig('graph.png')
-    file = discord.File("graph.png", filename="graph.png")
-    msg = await graphchl.send(file=file)
-    embed = discord.Embed(title='Graph',
-                          color=3407822)
-    for attachment in msg.attachments:
-        a = attachment.url
-        print(a)
-    embed.set_image(url = a)
-    await ctx.send(embed=embed)
-    os.remove('graph.png')
+    plt.close()
 
 @bot.command()
 async def save(ctx):
@@ -255,7 +364,12 @@ async def rule(ctx):
         return
     ava = await bot.fetch_user(795334771718226010)
     avaurl = ava.avatar_url
-    web = await ctx.channel.create_webhook(name='DIKE Official')
+
+    myguild = bot.get_guild(ctx.guild.id)
+    a = myguild.get_member(795334771718226010)
+    dname = a.display_name
+    print(dname)
+    web = await ctx.channel.create_webhook(name=dname)
     WEBHOOK_URL = web.url
 
     async with ClientSession() as session:
@@ -305,7 +419,7 @@ async def rule(ctx):
             value='Thank You')
         embed.set_footer(text='Bot by: AwesomeSam#0001')
 
-        await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+        await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
         await web.delete()
         return
 
@@ -522,12 +636,24 @@ async def on_raw_reaction_remove(payload):
         embed.set_footer(text='Bot by: AwesomeSam#0001')
         await payload.channel.send(embed=embed)
 
+@bot.command(pass_context=True, aliases=['clean'])
+@commands.has_permissions(administrator=True)
+async def purge(ctx, limit: int):
+        await ctx.channel.purge(limit=limit)
+
 
 @bot.command()
 async def help(ctx, help_id=None):
     ava = await bot.fetch_user(795334771718226010)
     avaurl = ava.avatar_url
-    web = await ctx.channel.create_webhook(name='DIKE Official')
+    name = ava.display_name
+
+    myguild = bot.get_guild(ctx.guild.id)
+    a = myguild.get_member(795334771718226010)
+    dname = a.display_name
+    print(dname)
+    web = await ctx.channel.create_webhook(name=dname)
+
     WEBHOOK_URL = web.url
     if help_id is None:
         clog = '`1` --> `Apply to DIKE`\n' \
@@ -543,7 +669,7 @@ async def help(ctx, help_id=None):
                                   description=clog,
                                   color=3407822)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+            await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
         await web.delete()
         return
     help_id = int(help_id)
@@ -563,7 +689,7 @@ async def help(ctx, help_id=None):
                                   description=clog,
                                   color=3407822)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+            await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
     elif help_id == 2:
         '''clog = 'Here are all the Arcade Commands!\n' \
                '```python\n' \
@@ -614,7 +740,7 @@ async def help(ctx, help_id=None):
                                   description=clog,
                                   color=3407822)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+            await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
     elif help_id == 3:
         clog = 'Here are all the Moderator Commands!\n' \
                '```python\n' \
@@ -636,7 +762,7 @@ async def help(ctx, help_id=None):
                                   description=clog,
                                   color=3407822)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed=embed, username='DIKE Official', avatar_url=avaurl)
+            await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
     await web.delete()
 
 
@@ -804,9 +930,11 @@ async def mute(ctx, member: discord.Member, mtime=None):
     else:
         await member.add_roles(discord.utils.get(ctx.guild.roles, id=mutes.get('m1')))
 
+
 @bot.command()
 async def id(ctx):
     await ctx.send(ctx.channel.id)
+
 
 @bot.command()
 @commands.has_permissions(manage_channels=True)
@@ -849,6 +977,58 @@ async def removelink(ctx):
 
 
 @bot.command()
+@commands.has_permissions(administrator=True)
+async def autoroles(ctx):
+    embed = discord.Embed(title='Auto Roles Setup',
+                          description='__Step I:__ Enter how many roles you want to give',
+                          color=3407822)
+    m1 = await ctx.send(embed=embed)
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel
+
+    try:
+        msg = await bot.wait_for("message", check=check, timeout=120)
+
+        number = int(msg.content)
+
+        await msg.delete()
+        await m1.delete()
+
+        roles = []
+        for i in range(1, number+1):
+            embed = discord.Embed(title='Tag Role ({}/{})'.format(i, number+1),
+                                  color=3407822)
+            m1 = await ctx.send(embed=embed)
+            msg = await bot.wait_for("message", check=check, timeout=120)
+
+            chl = msg.content.split('&')
+            chl = chl[1]
+            chl = list(chl)
+            chl.pop(-1)
+            chlid = ''.join(chl)
+
+            roles.append(int(chlid))
+            await msg.delete()
+            await m1.delete()
+
+        mydict = {ctx.guild.id:roles}
+        ar_data.update(mydict)
+        file = open('autoroles.txt', 'w')
+        file.write(str(ar_data))
+        file.close()
+
+        embed = discord.Embed(title='☑️ Done',
+                              color=3407822)
+        m1 = await ctx.send(embed=embed)
+
+    except TimeoutError:
+        embed = discord.Embed(title='Whoops! Times Up.',
+                              description='Sorry, you ran out of time.',
+                              color=3407822)
+        await ctx.send(embed=embed)
+
+
+@bot.command()
 @commands.has_permissions(ban_members=True, kick_members=True)
 async def unmute(ctx, member: discord.Member):
     muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
@@ -858,51 +1038,48 @@ async def unmute(ctx, member: discord.Member):
 
 @bot.event
 async def on_member_join(member):
-    welcom_chl = bot.get_channel(773401123389440011)
-    welmsg = '<a:hello:786862994381471766> Hyy <@{user}> Welcome to Official DIKE Clan <a:hello:786862994381471766> **Type `!help` to get help**\n' \
-             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
-             '<a:ARR:786863234736455680> MUST READ AND FOLLOW <#773626644324810762>  <a:ARR:786863090670239744>\n' \
-             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
-             '<a:ARR:786863234736455680> CHECK <#773404953377112104> TO KNOW HOW TO GET ROLES <a:ARR:786863090670239744>\n' \
-             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
-             '<a:ARR:786863234736455680> MUST BE UPDATED AND READ DAILY <#773876008725905420> <a:ARR:786863090670239744>\n' \
-             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
-             '<a:ARR:786863234736455680> MUST BE ACTIVE IN CHAT <#766875360595410946>  AND UNLOCK LEVEL AND ROLES <a:blueflame:786863090670239744>\n' \
-             '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
-             '<a:yldz:786863153454645269> <:line:798799010088747008> <:line:798799010088747008> HOPE YOU WILL ENJOY <:line:798799010088747008> <:line:798799010088747008> <a:yldz:786863153454645269>'.format(
-        user=member.id)
-    await welcom_chl.send(welmsg)
-    role1 = discord.utils.get(member.guild.roles, id=795570028585287690)
-    role2 = discord.utils.get(member.guild.roles, id=795567863003480064)
-    role3 = discord.utils.get(member.guild.roles, id=795572264283799582)
-    role4 = discord.utils.get(member.guild.roles, id=796248941620494346)
-    memrole = discord.utils.get(member.guild.roles, id=775363088719413278)
-    await member.add_roles(role1)
-    await member.add_roles(role2)
-    await member.add_roles(role3)
-    await member.add_roles(role4)
-    await member.add_roles(memrole)
-    myguild = bot.get_guild(766875360126042113)
-
     allusers = 0
     for guild in bot.guilds:
         allusers += len(guild.members)
     await bot.change_presence(
         activity=discord.Activity(type=discord.ActivityType.playing, name="!help with {} people".format(allusers)))
-    member_count = 0
-    for member in myguild.members:
-        member_count += 1
-    true_member_count = len([m for m in myguild.members if not m.bot])
-    bot_count = len([m for m in myguild.members if m.bot])
+    if member.guild.id == 766875360126042113:
+        welcom_chl = bot.get_channel(773401123389440011)
+        welmsg = '<a:hello:786862994381471766> Hyy <@{user}> Welcome to Official DIKE Clan <a:hello:786862994381471766> **Type `!help` to get help**\n' \
+                 '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
+                 '<a:ARR:786863234736455680> MUST READ AND FOLLOW <#773626644324810762>  <a:ARR:786863090670239744>\n' \
+                 '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
+                 '<a:ARR:786863234736455680> CHECK <#773404953377112104> TO KNOW HOW TO GET ROLES <a:ARR:786863090670239744>\n' \
+                 '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
+                 '<a:ARR:786863234736455680> MUST BE UPDATED AND READ DAILY <#773876008725905420> <a:ARR:786863090670239744>\n' \
+                 '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
+                 '<a:ARR:786863234736455680> MUST BE ACTIVE IN CHAT <#766875360595410946>  AND UNLOCK LEVEL AND ROLES <a:blueflame:786863090670239744>\n' \
+                 '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
+                 '<a:yldz:786863153454645269> <:line:798799010088747008> <:line:798799010088747008> HOPE YOU WILL ENJOY <:line:798799010088747008> <:line:798799010088747008> <a:yldz:786863153454645269>'.format(
+            user=member.id)
+        await welcom_chl.send(welmsg)
+        myguild = bot.get_guild(766875360126042113)
 
-    total = bot.get_channel(798053370925023282)
-    mem = bot.get_channel(798053462281420870)
-    bots = bot.get_channel(798053532477161532)
+        member_count = 0
+        for member in myguild.members:
+            member_count += 1
+        true_member_count = len([m for m in myguild.members if not m.bot])
+        bot_count = len([m for m in myguild.members if m.bot])
 
-    await total.edit(name='All Members: {}'.format(member_count))
-    await mem.edit(name='Members: {}'.format(true_member_count))
-    await bots.edit(name='Bots: {}'.format(bot_count))
+        total = bot.get_channel(798053370925023282)
+        mem = bot.get_channel(798053462281420870)
+        bots = bot.get_channel(798053532477161532)
 
+        await total.edit(name='All Members: {}'.format(member_count))
+        await mem.edit(name='Members: {}'.format(true_member_count))
+        await bots.edit(name='Bots: {}'.format(bot_count))
+
+    roles_to_give = ar_data.get(member.guild.id)
+    if roles_to_give is None:
+        return
+    for i in roles_to_give:
+        get_role = discord.utils.get(member.guild.roles, id=i)
+        await member.add_roles(get_role)
 
 @bot.event
 async def on_member_leave(member):
@@ -911,6 +1088,7 @@ async def on_member_leave(member):
         allusers += len(guild.members)
     await bot.change_presence(
         activity=discord.Activity(type=discord.ActivityType.playing, name="!help with {} people".format(allusers)))
+
     leaving_chl = bot.get_channel(800683977207840798)
     leave_msg = '{} just left the server.'.format(member.name)
     print(leave_msg)
@@ -968,6 +1146,10 @@ reactionrole.close()
 messages = open('messages.txt', 'r')
 msgs_data = dict(eval(str(messages.read())))
 messages.close()
+
+autor = open('autoroles.txt', 'r')
+ar_data = dict(eval(str(autor.read())))
+autor.close()
 
 my_loop.start()
 bot.run(TOKEN)
