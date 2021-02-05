@@ -5,6 +5,8 @@ from discord.ext import commands
 from dotenv import load_dotenv
 import os
 import re
+# importing the required module
+import matplotlib.pyplot as plt
 
 intents = discord.Intents.default()
 intents.members = True
@@ -29,29 +31,38 @@ from datetime import date
 import random
 @bot.event
 async def on_message(message):
+    if message.author == bot.user:
+        return
     guildid = message.guild.id
     channel = message.channel.id
-    b = msgs_data.get(guildid)
-    if b is None:
-        g = {guildid: {}}
-        msgs_data.update(g)
+    guild = msgs_data.get(guildid)
+
+    if guild is None:
+        g_add = {guildid:{}}
+        msgs_data.update(g_add)
+        guild = msgs_data.get(guildid)
         await my_loop()
-    b = msgs_data.get(guildid)
-    print(msgs_data, b)
-    c = b.get(channel)
-    print(c)
+
+    chl = guild.get(channel)
+
     today = date.today()
     d = today.strftime('%d-%m-%Y')
-    a = c.get(d)
+    if chl is None:
+        chl_add = {channel:{d:0}}
+        guild.update(chl_add)
+        g_upd = {guildid:guild}
+        msgs_data.update(g_upd)
+        await my_loop()
 
-    print(b, c)
-    if a is None:
-        a = 1
-    else:
-        a += 1
-    fake = {channel:{d:a}}
-    g = {guildid:fake}
-    msgs_data.update(g)
+        chl = guild.get(channel)
+
+    today_count = chl.get(d)
+
+    pre_upd = msgs_data.get(guildid)
+    dic = {channel:{d:today_count+1}}
+    pre_upd.update(dic)
+    upd = {guildid:pre_upd}
+    msgs_data.update(upd)
 
     if message.author == bot.user:
         return
@@ -187,15 +198,49 @@ async def stats(ctx, channel:str = None):
         chlid = ''.join(chl)
     guildid = ctx.guild.id
     g = msgs_data.get(guildid)
-    mesg_count = g.get(int(chlid))
+    chan = g.get(int(chlid))
+
+    today = date.today()
+    d = today.strftime('%d-%m-%Y')
+
+    today_count = chan.get(d)
+    all_val = chan.values()
+    all_count = 0
+    for i in all_val:
+        all_count += i
 
     embed = discord.Embed(title='Stats',
                           description='Here are the stats for <#{}>:'.format(chlid),
                           color=3407822)
-    embed.add_field(name='Total Number of Messages', value=mesg_count)
+    embed.add_field(name='Total Messages', value=str(all_count))
+    embed.add_field(name='Messages sent Today', value=str(today_count))
     embed.set_footer(text='Bot by: AwesomeSam#0001')
     await ctx.send(embed=embed)
 
+@bot.command()
+async def graph(ctx):
+    graphchl = bot.get_channel(807168077174538240)
+    x = [1, 2, 3]
+    y = [2, 4, 1]
+    plt.plot(x, y)
+    plt.xlabel('x - axis')
+    plt.ylabel('y - axis')
+    plt.title('My first graph!')
+    plt.savefig('graph.png')
+    file = discord.File("graph.png", filename="graph.png")
+    msg = await graphchl.send(file=file)
+    embed = discord.Embed(title='Graph',
+                          color=3407822)
+    for attachment in msg.attachments:
+        a = attachment.url
+        print(a)
+    embed.set_image(url = a)
+    await ctx.send(embed=embed)
+    os.remove('graph.png')
+
+@bot.command()
+async def save(ctx):
+    await my_loop()
 
 @bot.command()
 async def info(ctx):

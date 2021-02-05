@@ -2,4 +2,4 @@ discord.py
 dnspython
 async-timeout
 python-dotenv
-discord-webhook
+matplotlib
