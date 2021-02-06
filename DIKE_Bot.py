@@ -29,7 +29,7 @@ from datetime import date
 import random
 @bot.event
 async def on_message(message):
-    if message.author == bot.user:
+    if message.author == bot.user or message.author.id != 771601176155783198:
         return
     guildid = message.guild.id
     channel = message.channel.id
