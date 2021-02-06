@@ -208,11 +208,6 @@ async def ping(ctx):
     await ctx.send('Pong! `{} ms`'.format(int(bot.latency * 1000)))
 
 
-import requests  # to get image from the web
-import shutil  # to save it locally
-import apnggif
-
-
 @bot.command()
 async def stats(ctx, channel:str = None):
     embed = discord.Embed(description='<a:final:807615211716214794>  Loading...', color=embedcolor)
