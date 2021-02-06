@@ -25,7 +25,7 @@ from datetime import date
 import random
 @bot.event
 async def on_message(message):
-    if message.author == bot.user or message.author.id != 771601176155783198:
+    if message.author == bot.user:
         return
     guildid = message.guild.id
     channel = message.channel.id
@@ -206,6 +206,59 @@ async def on_message_delete(message):
 @bot.command()
 async def ping(ctx):
     await ctx.send('Pong! `{} ms`'.format(int(bot.latency * 1000)))
+
+
+import requests  # to get image from the web
+import shutil  # to save it locally
+@bot.command()
+async def map(ctx):
+    try:
+        os.remove('thumb.gif')
+        os.remove('thumb.png')
+    except:
+        pass
+    image_url = "https://user-assets.krunker.io/m119179/thumb.png"
+    filename = image_url.split("/")[-1]
+    r = requests.get(image_url, stream=True)
+
+    if r.status_code == 200:
+        r.raw.decode_content = True
+        with open(filename, 'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+
+        print('Image sucessfully Downloaded: ', filename)
+    else:
+        print('Image Couldn\'t be retreived')
+
+    from PIL import Image
+    import glob
+
+    # Create the frames
+    frames = []
+    imgs = glob.glob("*.png")
+    for i in imgs:
+        new_frame = Image.open(i)
+        frames.append(new_frame)
+
+    graphchl = bot.get_channel(807168077174538240)
+    # Save into a GIF file that loops forever
+
+    frames[0].save('thumb.gif', format='GIF',
+                   append_images=frames[1:],
+                   save_all=True,
+                   duration=300, loop=0)
+    file = discord.File("thumb.gif", filename="thumb.gif")
+    msg = await graphchl.send(file=file)
+    for attachment in msg.attachments:
+        a = attachment.url
+
+    embed = discord.Embed(description='Test')
+    embed.set_image(url=a)
+    await ctx.send(embed=embed)
+    await ctx.send(file='thumb.gif')
+    os.remove('thumb.gif')
+    os.remove('thumb.png')
+
 
 @bot.command()
 async def stats(ctx, channel:str = None):
