@@ -210,60 +210,12 @@ async def ping(ctx):
 
 import requests  # to get image from the web
 import shutil  # to save it locally
-@bot.command()
-async def map(ctx):
-    try:
-        os.remove('thumb.gif')
-        os.remove('thumb.png')
-    except:
-        pass
-    image_url = "https://user-assets.krunker.io/m119179/thumb.png"
-    filename = image_url.split("/")[-1]
-    r = requests.get(image_url, stream=True)
-
-    if r.status_code == 200:
-        r.raw.decode_content = True
-        with open(filename, 'wb') as f:
-            shutil.copyfileobj(r.raw, f)
-
-        print('Image sucessfully Downloaded: ', filename)
-    else:
-        print('Image Couldn\'t be retreived')
-
-    from PIL import Image
-    import glob
-
-    # Create the frames
-    frames = []
-    imgs = glob.glob("*.png")
-    for i in imgs:
-        new_frame = Image.open(i)
-        frames.append(new_frame)
-
-    graphchl = bot.get_channel(807168077174538240)
-    # Save into a GIF file that loops forever
-
-    frames[0].save('thumb.gif', format='GIF',
-                   append_images=frames[1:],
-                   save_all=True,
-                   duration=300, loop=0)
-    file = discord.File("thumb.gif", filename="thumb.gif")
-    msg = await graphchl.send(file=file)
-    for attachment in msg.attachments:
-        a = attachment.url
-
-    embed = discord.Embed(description='Test')
-    embed.set_image(url=a)
-    await ctx.send(embed=embed)
-    await ctx.send(file='thumb.gif')
-    os.remove('thumb.gif')
-    os.remove('thumb.png')
+import apnggif
 
 
 @bot.command()
 async def stats(ctx, channel:str = None):
-    embed = discord.Embed(description='<a:final:807615211716214794>  Loading...',
-                          color=embedcolor)
+    embed = discord.Embed(description='<a:final:807615211716214794>  Loading...', color=embedcolor)
     loading = await ctx.send(embed=embed)
 
     import matplotlib.pyplot as plt
