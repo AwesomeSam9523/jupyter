@@ -55,6 +55,15 @@ async def on_message(message):
         chl = guild.get(channel)
 
     today_count = chl.get(d)
+    if today_count is None:
+        date_add = {d:1}
+        chl.update(date_add)
+        chla = {channel:chl}
+        guild.update(chla)
+        g_upd = {guildid: guild}
+        msgs_data.update(g_upd)
+        await my_loop()
+        today_count = chl.get(d)
 
     pre_upd = msgs_data.get(guildid)
     dic = {channel:{d:today_count+1}}
