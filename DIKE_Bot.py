@@ -19,11 +19,6 @@ bot.remove_command('help')
 print('Starting...')
 
 from discord.ext import tasks
-@tasks.loop(seconds=60)
-async def my_loop():
-    file = open('messages.txt', 'w')
-    file.write(str(msgs_data))
-    file.close()
 
 from datetime import date
 import random
@@ -39,7 +34,6 @@ async def on_message(message):
         g_add = {guildid:{}}
         msgs_data.update(g_add)
         guild = msgs_data.get(guildid)
-        await my_loop()
 
     chl = guild.get(channel)
 
@@ -50,7 +44,6 @@ async def on_message(message):
         guild.update(chl_add)
         g_upd = {guildid:guild}
         msgs_data.update(g_upd)
-        await my_loop()
 
         chl = guild.get(channel)
 
@@ -62,7 +55,6 @@ async def on_message(message):
         guild.update(chla)
         g_upd = {guildid: guild}
         msgs_data.update(g_upd)
-        await my_loop()
         today_count = chl.get(d)
 
     pre_upd = msgs_data.get(guildid)
@@ -70,6 +62,11 @@ async def on_message(message):
     pre_upd.update(dic)
     upd = {guildid:pre_upd}
     msgs_data.update(upd)
+
+    temp_dict = msgs_data
+    file = open('messages.txt', 'w')
+    file.write(str(temp_dict))
+    file.close()
 
     if message.author == bot.user:
         return
@@ -371,7 +368,10 @@ async def stats(ctx, channel:str = None):
 
 @bot.command()
 async def save(ctx):
-    await my_loop()
+    temp_dict = msgs_data
+    file = open('messages.txt', 'w')
+    file.write(str(temp_dict))
+    file.close()
 
 @bot.command()
 async def info(ctx):
@@ -1192,7 +1192,6 @@ autor = open('customhelp.txt', 'r')
 help_data = dict(eval(str(autor.read())))
 autor.close()
 
-my_loop.start()
 bot.run(TOKEN)
 
 dikemod = 799521293673168898
