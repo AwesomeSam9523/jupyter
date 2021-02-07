@@ -1199,6 +1199,13 @@ async def on_member_leave(member):
     await mem.edit(name='Members: {}'.format(true_member_count))
     await bots.edit(name='Bots: {}'.format(bot_count))
 
+@bot.event
+async def on_server_join(ctx):
+    allusers = 0
+    for guild in bot.guilds:
+        allusers += len(guild.members)
+    await bot.change_presence(
+        activity=discord.Activity(type=discord.ActivityType.playing, name="!help with {} people".format(allusers)))
 
 @bot.event
 async def on_ready():
