@@ -25,6 +25,8 @@ from datetime import date
 import random
 @bot.event
 async def on_message(message):
+    if message.channel.id == 807878090889363526:
+        return
     if message.author == bot.user:
         return
     guildid = message.guild.id
