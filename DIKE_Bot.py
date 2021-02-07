@@ -215,6 +215,13 @@ async def on_message_delete(message):
 
 
 @bot.command()
+async def changelogs(ctx):
+    if ctx.author.id != 771601176155783198:
+        return
+    embed = discord.Embed(title='DIKE Bot v1.0.0')
+
+
+@bot.command()
 async def ping(ctx):
     await ctx.send('Pong! `{} ms`'.format(int(bot.latency * 1000)))
 
@@ -300,6 +307,7 @@ async def stats(ctx, channel: str = None):
         plt.grid(True)
 
         plt.savefig('graph.png', transparent=True)
+        plt.close()
         file = discord.File("graph.png", filename="graph.png")
         msg = await graphchl.send(file=file)
         for attachment in msg.attachments:
