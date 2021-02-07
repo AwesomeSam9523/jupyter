@@ -264,7 +264,7 @@ async def stats(ctx, channel:str = None):
         today = date.today()
         d = today.strftime('%d-%m-%Y')
 
-        graphchl = bot.get_channel(807168077174538240)
+        graphchl = bot.get_channel(807881486807334913)
         x = days
         y = msgs
         COLOR = 'yellow'
