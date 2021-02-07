@@ -12,7 +12,6 @@ intents.members = True
 embedcolor = 3407822
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-GUILD = os.getenv('DISCORD_GUILD')
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 bot.remove_command('help')
@@ -20,13 +19,14 @@ bot.remove_command('help')
 print('Starting...')
 
 from discord.ext import tasks
-
+import requests
+import shutil
 from datetime import date
 import random
+
+
 @bot.event
 async def on_message(message):
-    if message.channel.id == 807878090889363526:
-        return
     if message.author == bot.user:
         return
     guildid = message.guild.id
@@ -34,7 +34,7 @@ async def on_message(message):
     guild = msgs_data.get(guildid)
 
     if guild is None:
-        g_add = {guildid:{}}
+        g_add = {guildid: {}}
         msgs_data.update(g_add)
         guild = msgs_data.get(guildid)
 
@@ -43,27 +43,27 @@ async def on_message(message):
     today = date.today()
     d = today.strftime('%d-%m-%Y')
     if chl is None:
-        chl_add = {channel:{d:0}}
+        chl_add = {channel: {d: 0}}
         guild.update(chl_add)
-        g_upd = {guildid:guild}
+        g_upd = {guildid: guild}
         msgs_data.update(g_upd)
 
         chl = guild.get(channel)
 
     today_count = chl.get(d)
     if today_count is None:
-        date_add = {d:1}
+        date_add = {d: 1}
         chl.update(date_add)
-        chla = {channel:chl}
+        chla = {channel: chl}
         guild.update(chla)
         g_upd = {guildid: guild}
         msgs_data.update(g_upd)
         today_count = chl.get(d)
 
     pre_upd = msgs_data.get(guildid)
-    dic = {channel:{d:today_count+1}}
-    pre_upd.update(dic)
-    upd = {guildid:pre_upd}
+    dic = {d: today_count + 1}
+    chl.update(dic)
+    upd = {guildid: pre_upd}
     msgs_data.update(upd)
 
     temp_dict = msgs_data
@@ -95,105 +95,114 @@ async def on_message(message):
             await message.reply(random.choice(mentionlist))
         else:
             await message.reply(random.choice(devlist))
+    if message.guild.id == 766875360126042113:
+        if message.channel.id == 795293822224695297:
+            if message.content.startswith('g.apply'):
+                actualid = message.author.id
+                sendbot = True
+                mychnl = bot.get_channel(795302460272279552)
+                userid = message.author.name
+                actualid = message.author.id
+                if userid != 'GameBot':
+                    time.sleep(5)
+                    await message.channel.send('<@{}> Request recieved!'.format(actualid))
+                    time.sleep(15)
+                    await mychnl.send(
+                        '@here\n**Sent by:** {}\n**Orignal Message by user:** {}'.format(message.author.mention,
+                                                                                         message.content))
 
-    if message.channel.id == 795293822224695297:
-        if message.content.startswith('g.apply'):
-            actualid = message.author.id
-            sendbot = True
-            mychnl = bot.get_channel(795302460272279552)
-            userid = message.author.name
-            actualid = message.author.id
-            if userid != 'GameBot':
-                time.sleep(5)
-                await message.channel.send('<@{}> Request recieved!'.format(actualid))
-                time.sleep(15)
-                await mychnl.send(
-                    '@here\n**Sent by:** {}\n**Orignal Message by user:** {}'.format(message.author.mention,
-                                                                                     message.content))
+                if message.author == bot.user:
+                    return
+            else:
+                if message.author.name != 'GameBot':
+                    await message.delete()
 
-            if message.author == bot.user:
-                return
-        else:
-            if message.author.name != 'GameBot':
-                await message.delete()
+            if message.author.name == 'GameBot':
+                mychnl = bot.get_channel(795302460272279552)
+                try:
+                    image_url = message.attachments[0].url
+                    filename = 'profile.png'
+                    r = requests.get(image_url, stream=True)
 
-        if message.author.name == 'GameBot':
-            mychnl = bot.get_channel(795302460272279552)
-            try:
-                print(message.id)
-                time.sleep(30)
-                await mychnl.send(message.attachments[0].url)
-            except IndexError:
+                    if r.status_code == 200:
+                        r.raw.decode_content = True
+                        with open(filename, 'wb') as f:
+                            shutil.copyfileobj(r.raw, f)
+
+                    file = discord.File("profile.png", filename="profile.png")
+                    msg = await mychnl.send(file=file)
+                except:
+                    pass
+            await message.delete()
+        if message.channel.id == 795302460272279552:
+            if message.content.startswith('@here') or message.author.id != 795334771718226010:
                 pass
-        await message.delete()
-    if message.channel.id == 795302460272279552:
-        if message.content.startswith('@here') or message.author.id != 795334771718226010:
+            else:
+                thup = '\N{THUMBS UP SIGN}'
+                thdown = '\N{THUMBS DOWN SIGN}'
+                await message.add_reaction(emoji=thup)
+                await message.add_reaction(emoji=thdown)
+        if message.channel.id == 798091588676747285:
+            if message.author.id == 795334771718226010:
+                thup = '\N{THUMBS UP SIGN}'
+                thdown = '\N{THUMBS DOWN SIGN}'
+                await message.add_reaction(emoji=thup)
+                await message.add_reaction(emoji=thdown)
+
+        myguild = bot.get_guild(766875360126042113)
+        novice = discord.utils.get(myguild.roles, id=798215857096491068)
+        active = discord.utils.get(myguild.roles, id=798215989450768394)
+        devoted = discord.utils.get(myguild.roles, id=798216133605720114)
+        legendary = discord.utils.get(myguild.roles, id=798216189167271986)
+        nolife = discord.utils.get(myguild.roles, id=798216359057424394)
+
+        if message.channel.id == 798225149019029524:
+            msg = str(message.content)
+            msg = msg.split(' ')
+            _id = int(msg[0])
+            level = int(msg[1])
+            member_to_give = myguild.get_member(_id)
+            print('id: {}, level: {}'.format(id, level))
+
+            if level < 5:
+                pass
+            elif level < 10 and level >= 5:
+                await member_to_give.add_roles(novice)
+            elif level < 15 and level >= 10:
+                await member_to_give.add_roles(active)
+            elif level < 20 and level >= 15:
+                await member_to_give.add_roles(devoted)
+            elif level < 25 and level >= 20:
+                await member_to_give.add_roles(legendary)
+            elif level >= 25:
+                await member_to_give.add_roles(nolife)
+
+        guildid = message.guild.id
+        links_file = links_data.get(guildid)
+        if links_file is None:
             pass
         else:
-            thup = '\N{THUMBS UP SIGN}'
-            thdown = '\N{THUMBS DOWN SIGN}'
-            await message.add_reaction(emoji=thup)
-            await message.add_reaction(emoji=thdown)
-    if message.channel.id == 798091588676747285:
-        if message.author.id == 795334771718226010:
-            thup = '\N{THUMBS UP SIGN}'
-            thdown = '\N{THUMBS DOWN SIGN}'
-            await message.add_reaction(emoji=thup)
-            await message.add_reaction(emoji=thdown)
+            allowed_links = links_file.get('allowed')
+            send_links = links_file.get('actual')
 
-    myguild = bot.get_guild(766875360126042113)
-    novice = discord.utils.get(myguild.roles, id=798215857096491068)
-    active = discord.utils.get(myguild.roles, id=798215989450768394)
-    devoted = discord.utils.get(myguild.roles, id=798216133605720114)
-    legendary = discord.utils.get(myguild.roles, id=798216189167271986)
-    nolife = discord.utils.get(myguild.roles, id=798216359057424394)
-
-    if message.channel.id == 798225149019029524:
-        msg = str(message.content)
-        msg = msg.split(' ')
-        _id = int(msg[0])
-        level = int(msg[1])
-        member_to_give = myguild.get_member(_id)
-        print('id: {}, level: {}'.format(id, level))
-
-        if level < 5:
-            pass
-        elif level < 10 and level >= 5:
-            await member_to_give.add_roles(novice)
-        elif level < 15 and level >= 10:
-            await member_to_give.add_roles(active)
-        elif level < 20 and level >= 15:
-            await member_to_give.add_roles(devoted)
-        elif level < 25 and level >= 20:
-            await member_to_give.add_roles(legendary)
-        elif level >= 25:
-            await member_to_give.add_roles(nolife)
-
-    guildid = message.guild.id
-    links_file = links_data.get(guildid)
-    if links_file is None:
-        pass
-    else:
-        allowed_links = links_file.get('allowed')
-        send_links = links_file.get('actual')
-
-        if message.channel.id not in allowed_links:
-            urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
-                              message.content.lower())
-            if owner in [y.id for y in message.author.roles] or mod in [y.id for y in message.author.roles]:
-                pass
-            elif urls:
-                await message.delete()
-                await message.channel.send('<@{}> Links not allowed in this channel!\n'
-                                           'Use <#{}> to send links.'.format(message.author.id, send_links))
+            if message.channel.id not in allowed_links:
+                urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
+                                  message.content.lower())
+                if owner in [y.id for y in message.author.roles] or mod in [y.id for y in message.author.roles]:
+                    pass
+                elif urls:
+                    await message.delete()
+                    await message.channel.send('<@{}> Links not allowed in this channel!\n'
+                                               'Use <#{}> to send links.'.format(message.author.id, send_links))
     await bot.process_commands(message)
+
 
 @bot.event
 async def on_message_delete(message):
     msg = message.content
     ghost_ping = re.findall('<@!(?<!\d)\d{18}(?!\d)>+', msg)
-    id_finder =  re.findall('(?<!\d)\d{18}(?!\d)+', msg)
-    
+    id_finder = re.findall('(?<!\d)\d{18}(?!\d)+', msg)
+
     try:
         mem = bot.fetch_user(id_finder[0])
     except IndexError:
@@ -210,9 +219,12 @@ async def ping(ctx):
     await ctx.send('Pong! `{} ms`'.format(int(bot.latency * 1000)))
 
 
+from matplotlib.patches import Rectangle
+
+
 @bot.command()
-async def stats(ctx, channel:str = None):
-    embed = discord.Embed(description='<a:final:807615211716214794>  Loading...', color=embedcolor)
+async def stats(ctx, channel: str = None):
+    embed = discord.Embed(description='<a:loading:807883748791156737>  Loading...', color=embedcolor)
     loading = await ctx.send(embed=embed)
 
     import matplotlib.pyplot as plt
@@ -222,35 +234,27 @@ async def stats(ctx, channel:str = None):
 
         overall = 0
         keys = []
-        msgs_rec = {}
         for i in g.values():
             for j in i.values():
                 overall += j
             for k in i.keys():
                 if k not in keys:
                     keys.append(k)
-            for char in keys:
-                number = i.get(char)
-                if number is None:
-                    continue
-                r = msgs_rec.get(char)
-                if r is None:
-                    msgs_rec.update({char:number})
-                    continue
-                r += number
-                msgs_rec.update({char:r})
-        months = {1:'Jan',
-                  2:'Feb',
-                  3:'Mar',
-                  4:'Apr',
-                  5:'May',
-                  6:'Jun',
-                  7:'Jul',
-                  8:'Aug',
-                  9:'Sep',
-                  10:'Oct',
-                  11:'Nov',
-                  12:'Dec'}
+            print('keys=', keys)
+            keys.sort()
+            print(keys)
+        months = {1: 'Jan',
+                  2: 'Feb',
+                  3: 'Mar',
+                  4: 'Apr',
+                  5: 'May',
+                  6: 'Jun',
+                  7: 'Jul',
+                  8: 'Aug',
+                  9: 'Sep',
+                  10: 'Oct',
+                  11: 'Nov',
+                  12: 'Dec'}
         days = []
         msgs = []
         for char in keys:
@@ -261,8 +265,22 @@ async def stats(ctx, channel:str = None):
 
             final = day + '-' + mon
             days.append(final)
-            msgs.append(msgs_rec.get(char))
 
+        msgs_rec = {}
+        for i in g.values():
+            for char in keys:
+                a = i.get(char)
+                b = msgs_rec.get(char)
+                if b is None:
+                    b = 0
+                if a is None:
+                    a = 0
+                msgs_rec.update({char: a + b})
+                print(msgs_rec)
+        for i in msgs_rec.values():
+            msgs.append(i)
+        print(days)
+        print(msgs)
         today = date.today()
         d = today.strftime('%d-%m-%Y')
 
@@ -301,81 +319,95 @@ async def stats(ctx, channel:str = None):
         chl = list(chl)
         chl.pop(-1)
         chlid = ''.join(chl)
+
         guildid = ctx.guild.id
         g = msgs_data.get(guildid)
         chan = g.get(int(chlid))
 
-        overall = 0
-        keys = []
-        msgs_rec = {}
-        for i in chan.values():
-            overall += i
-        for j in chan.keys():
-            if j not in keys:
-                keys.append(j)
-        for char in keys:
-            number = chan.get(char)
-            msgs_rec.update({char: number})
-        months = {1: 'Jan',
-                  2: 'Feb',
-                  3: 'Mar',
-                  4: 'Apr',
-                  5: 'May',
-                  6: 'Jun',
-                  7: 'Jul',
-                  8: 'Aug',
-                  9: 'Sep',
-                  10: 'Oct',
-                  11: 'Nov',
-                  12: 'Dec'}
-        days = []
-        msgs = []
-        for char in keys:
-            char = str(char)
-            conv = char.split('-')
-            day = conv[0]
-            mon = months.get(int(conv[1]))
+        if chan is not None:
+            overall = 0
+            keys = []
+            msgs_rec = {}
+            for i in chan.values():
+                overall += i
+            for j in chan.keys():
+                if j not in keys:
+                    keys.append(j)
 
-            final = day + '-' + mon
-            days.append(final)
-            msgs.append(msgs_rec.get(char))
+            for char in keys:
+                number = chan.get(char)
+                msgs_rec.update({char: number})
+            months = {1: 'Jan',
+                      2: 'Feb',
+                      3: 'Mar',
+                      4: 'Apr',
+                      5: 'May',
+                      6: 'Jun',
+                      7: 'Jul',
+                      8: 'Aug',
+                      9: 'Sep',
+                      10: 'Oct',
+                      11: 'Nov',
+                      12: 'Dec'}
+            days = []
+            msgs = []
+            for char in keys:
+                char = str(char)
+                conv = char.split('-')
+                day = conv[0]
+                mon = months.get(int(conv[1]))
 
-        today = date.today()
-        d = today.strftime('%d-%m-%Y')
+                final = day + '-' + mon
+                days.append(final)
+                msgs.append(msgs_rec.get(char))
 
-        graphchl = bot.get_channel(807168077174538240)
-        x = days
-        y = msgs
-        COLOR = 'yellow'
-        plt.rcParams['text.color'] = COLOR
-        plt.rcParams['axes.labelcolor'] = COLOR
-        plt.rcParams['xtick.color'] = COLOR
-        plt.rcParams['ytick.color'] = COLOR
-        plt.plot(x, y)
-        plt.xlabel('Day')
-        plt.ylabel('Messages')
-        plt.title('')
-        plt.rc('grid', linestyle="-", color='white')
-        plt.scatter(x, y)
-        plt.grid(True)
+            today = date.today()
+            d = today.strftime('%d-%m-%Y')
 
-        plt.savefig('graph.png', transparent=True)
-        file = discord.File("graph.png", filename="graph.png")
-        msg = await graphchl.send(file=file)
-        for attachment in msg.attachments:
-            a = attachment.url
-        os.remove('graph.png')
+            graphchl = bot.get_channel(807881486807334913)
+            x = days
+            y = msgs
+            COLOR = 'yellow'
+            plt.rcParams['text.color'] = COLOR
+            plt.rcParams['axes.labelcolor'] = COLOR
+            plt.rcParams['xtick.color'] = COLOR
+            plt.rcParams['ytick.color'] = COLOR
+            plt.plot(x, y)
+            plt.xlabel('Day')
+            plt.ylabel('Messages')
+            plt.title('')
+            plt.rc('grid', linestyle="-", color='white')
+            plt.scatter(x, y)
+            plt.grid(True)
 
-        embed = discord.Embed(title='Stats',
-                              description='Here are the stats for <#{}>:'.format(chlid),
-                              color=embedcolor)
-        embed.add_field(name='Total Messages', value=str(overall))
-        embed.add_field(name='Messages sent today', value=str(msgs_rec.get(d)))
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
-        embed.set_image(url=a)
+            plt.savefig('graph.png', transparent=True)
+            plt.close()
+            file = discord.File("graph.png", filename="graph.png")
+            msg = await graphchl.send(file=file)
+            for attachment in msg.attachments:
+                a = attachment.url
+            os.remove('graph.png')
+
+            embed = discord.Embed(title='Stats',
+                                  description='Here are the stats for <#{}>:'.format(chlid),
+                                  color=embedcolor)
+            embed.add_field(name='Total Messages', value=str(overall))
+            embed.add_field(name='Messages sent today', value=str(msgs_rec.get(d)))
+            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            embed.set_image(url=a)
+        else:
+            embed = discord.Embed(title='Stats',
+                                  description='Here are the stats for <#{}>:'.format(chlid),
+                                  color=embedcolor)
+            embed.add_field(name='Total Messages', value=str(0))
+            embed.add_field(name='Messages sent today', value=str(0))
+            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            embed.set_image(
+                url='https://media.discordapp.net/attachments/807969244200304643/807969327579660288/go_chat.jpeg')
+
     await loading.delete()
     await ctx.send(embed=embed)
-    plt.close()
+
 
 @bot.command()
 async def save(ctx):
@@ -384,12 +416,15 @@ async def save(ctx):
     file.write(str(temp_dict))
     file.close()
 
+
 @bot.command()
 async def info(ctx):
-    embed = discord.Embed(title='Invite Me!',
-                          description='Here is the url to invite me: [Link](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)',
+    embed = discord.Embed(title='Info..?',
+                          description='Here is the url to invite me: [Link](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
+                                      'Join official discord: [Join](https://discord.gg/C3XVJk7H8k)',
                           color=embedcolor)
     await ctx.send(embed=embed)
+
 
 @bot.command()
 async def rule(ctx):
@@ -443,9 +478,9 @@ async def rule(ctx):
         embed.add_field(inline=False, name='[11] No hackusating',
                         value='DM a staff member with adequate proof\n'
                               'Don\'t accuse another person of hacks in public chats')
-        embed.add_field(inline=False, name='[13] Don\'t disobey staff',
+        embed.add_field(inline=False, name='[12] Don\'t disobey staff',
                         value='When asked to stop, stop!')
-        embed.add_field(inline=False, name='[14] Do Not DM any Staff Members until asked',
+        embed.add_field(inline=False, name='[13] Do Not DM any Staff Members until asked',
                         value='Do not DM any Admin/Mod for any reason whatsoever, until asked, even if they are active in chat')
         embed.add_field(
             name='Violation of this rule will lead to a irrevocable mute of 12 hours which will be incremented to kick/ban if you are found guilty again.',
@@ -480,132 +515,154 @@ async def links(ctx):
 import time
 from aiohttp import ClientSession
 
+
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def p(ctx, *, toprint : str):
-    await ctx.send('Done! Check terminal for output')
+async def p(ctx, *, toprint: str):
     print(toprint)
 
 
 @bot.command()
-async def rrsetup(ctx):
-    embed = discord.Embed(title='Enter the Message Type:',
-                          description='`1- Group Roles`\n'
-                                      '`2- Single Role`',
-                          color=embedcolor)
-    embed.set_footer(text='Bot by: AwesomeSam#0001')
-    m1 = await ctx.send(embed=embed)
-
-    def check(msg):
-        return msg.author == ctx.author and msg.channel == ctx.channel
-
-    try:
-        msg = await bot.wait_for("message", check=check, timeout=120)
-
-        if msg.content == '1':
-            await m1.delete()
-            await msg.delete()
-            embed = discord.Embed(title='Enter the Message Type:',
-                                  description='Enter how many roles you want to add in 1 single message. (Recommended: Maximum 10)',
-                                  color=embedcolor)
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
-            m1 = await ctx.send(embed=embed)
-
-            while True:
-                msg = await bot.wait_for("message", check=check, timeout=120)
-
-                try:
-                    mesg = int(msg.content)
-                    await m1.delete()
-                    await msg.delete()
-                except ValueError:
-                    embed = discord.Embed(title='Enter the Message Type:',
-                                          description='Incorrect Input. Please try again.',
-                                          color=embedcolor)
-                    embed.set_footer(text='Bot by: AwesomeSam#0001')
-                    await ctx.send(embed=embed)
-                else:
-                    break
-
-            while True:
-                messages = {ctx.channel.id:[]}
-                temp = []
-                desc = ''
-                for i in range(1, mesg+1):
-                    embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
-                                          description='__Step I:__ Enter the Message (Exact will be displayed after creation beside the Emoji)',
-                                          color=embedcolor)
-                    embed.set_footer(text='Bot by: AwesomeSam#0001')
-                    m1 = await ctx.send(embed=embed)
-
-                    message_to_display = await bot.wait_for("message", check=check, timeout=120)
-
-                    embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
-                                          description='__Step II:__ Enter the Emoji (The emoji should be default/from this server only!)',
-                                          color=embedcolor)
-                    embed.set_footer(text='Bot by: AwesomeSam#0001')
-                    m2 = await ctx.send(embed=embed)
-
-                    emoji_to_display = await bot.wait_for("message", check=check, timeout=120)
-
-                    embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
-                                          description='__Step III:__ **Tag** the role you want to give',
-                                          color=embedcolor)
-                    embed.set_footer(text='Bot by: AwesomeSam#0001')
-                    m3 = await ctx.send(embed=embed)
-
-                    role_to_give = await bot.wait_for("message", check=check, timeout=120)
-
-                    roleid = role_to_give.content.split('&')
-                    roleid = roleid[1]
-                    roleid = list(roleid)
-                    roleid.pop(-1)
-                    roleid = ''.join(roleid)
-
-                    fakedict = {emoji_to_display.content:roleid}
-                    mydict = messages.get(ctx.channel.id)
-                    mydict.append(fakedict)
-                    mainfake = {ctx.channel.id:mydict}
-                    messages.update(mainfake)
-
-                    temp.append(emoji_to_display.content)
-                    desc += '{} --> {}\n'.format(emoji_to_display.content, message_to_display.content)
-
-                    await m1.delete()
-                    await message_to_display.delete()
-                    await m2.delete()
-                    await emoji_to_display.delete()
-                    await m3.delete()
-                    await role_to_give.delete()
-                break
-
-            embed = discord.Embed(title='React here to Add/Remove your role:',
-                                  description=desc,
-                                  color=embedcolor)
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
-            m = await ctx.send(embed=embed)
-
-            for i in temp:
-                await m.add_reaction(i)
-
-            to_translate = messages.get(ctx.channel.id)
-            messages.pop(ctx.channel.id)
-            finaldict = {str(m.id):to_translate}
-            messages.update(finaldict)
-            rr_data.update(messages)
-
-            file = open('rr.txt', 'w', encoding='utf8', errors='ignore')
-            file.write(str(rr_data))
-            file.close()
-            print(messages)
-
-    except TimeoutError:
-        embed = discord.Embed(title='Times Up',
-                              description='Sorry, you didn\'t reply in time.',
+async def setup(ctx, *, setupid: str = None):
+    if setupid is None:
+        embed = discord.Embed(title='Features Setup',
+                              description='You can setup the following:',
                               color=embedcolor)
+        embed.add_field(name='`rr`', value='Reaction Roles')
+        embed.add_field(name='`applications`', value='Krunker applications extended support')
+        embed.add_field(name='`arcade`', value='DIKE Arcade- Play fun games with your friends!')
         embed.set_footer(text='Bot by: AwesomeSam#0001')
         await ctx.send(embed=embed)
         return
+    if setupid == 'applications':
+        embed = discord.Embed(title='Enter the Message Type:',
+                              description='`1- Group Roles`\n'
+                                          '`2- Single Role`',
+                              color=embedcolor)
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        m1 = await ctx.send(embed=embed)
+    if setupid == 'rr':
+        embed = discord.Embed(title='Enter the Message Type:',
+                              description='`1- Group Roles`\n'
+                                          '`2- Single Role`',
+                              color=embedcolor)
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        m1 = await ctx.send(embed=embed)
+
+        def check(msg):
+            return msg.author == ctx.author and msg.channel == ctx.channel
+
+        try:
+            msg = await bot.wait_for("message", check=check, timeout=120)
+
+            if msg.content == '1':
+                await m1.delete()
+                await msg.delete()
+                embed = discord.Embed(title='Enter the Message Type:',
+                                      description='Enter how many roles you want to add in 1 single message. (Recommended: Maximum 10)',
+                                      color=embedcolor)
+                embed.set_footer(text='Bot by: AwesomeSam#0001')
+                m1 = await ctx.send(embed=embed)
+
+                while True:
+                    msg = await bot.wait_for("message", check=check, timeout=120)
+
+                    try:
+                        mesg = int(msg.content)
+                        await m1.delete()
+                        await msg.delete()
+                    except ValueError:
+                        embed = discord.Embed(title='Enter the Message Type:',
+                                              description='Incorrect Input. Please try again.',
+                                              color=embedcolor)
+                        embed.set_footer(text='Bot by: AwesomeSam#0001')
+                        await ctx.send(embed=embed)
+                    else:
+                        break
+
+                while True:
+                    messages = {ctx.channel.id: []}
+                    temp = []
+                    desc = ''
+                    for i in range(1, mesg + 1):
+                        embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
+                                              description='__Step I:__ Enter the Message (Exact will be displayed after creation beside the Emoji)',
+                                              color=embedcolor)
+                        embed.set_footer(text='Bot by: AwesomeSam#0001')
+                        m1 = await ctx.send(embed=embed)
+
+                        message_to_display = await bot.wait_for("message", check=check, timeout=120)
+
+                        embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
+                                              description='__Step II:__ Enter the Emoji (The emoji should be default/from this server only!)',
+                                              color=embedcolor)
+                        embed.set_footer(text='Bot by: AwesomeSam#0001')
+                        m2 = await ctx.send(embed=embed)
+
+                        emoji_to_display = await bot.wait_for("message", check=check, timeout=120)
+
+                        embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
+                                              description='__Step III:__ **Tag** the role you want to give',
+                                              color=embedcolor)
+                        embed.set_footer(text='Bot by: AwesomeSam#0001')
+                        m3 = await ctx.send(embed=embed)
+
+                        role_to_give = await bot.wait_for("message", check=check, timeout=120)
+
+                        roleid = role_to_give.content.split('&')
+                        roleid = roleid[1]
+                        roleid = list(roleid)
+                        roleid.pop(-1)
+                        roleid = ''.join(roleid)
+
+                        fakedict = {emoji_to_display.content: roleid}
+                        mydict = messages.get(ctx.channel.id)
+                        mydict.append(fakedict)
+                        mainfake = {ctx.channel.id: mydict}
+                        messages.update(mainfake)
+
+                        temp.append(emoji_to_display.content)
+                        desc += '{} --> {}\n'.format(emoji_to_display.content, message_to_display.content)
+
+                        await m1.delete()
+                        await message_to_display.delete()
+                        await m2.delete()
+                        await emoji_to_display.delete()
+                        await m3.delete()
+                        await role_to_give.delete()
+                    break
+
+                embed = discord.Embed(title='React here to Add/Remove your role:',
+                                      description=desc,
+                                      color=embedcolor)
+                embed.set_footer(text='Bot by: AwesomeSam#0001')
+                m = await ctx.send(embed=embed)
+
+                for i in temp:
+                    await m.add_reaction(i)
+
+                to_translate = messages.get(ctx.channel.id)
+                messages.pop(ctx.channel.id)
+                finaldict = {str(m.id): to_translate}
+                messages.update(finaldict)
+                rr_data.update(messages)
+
+                file = open('rr.txt', 'w', encoding='utf8', errors='ignore')
+                file.write(str(rr_data))
+                file.close()
+                print(messages)
+
+        except TimeoutError:
+            embed = discord.Embed(title='Times Up',
+                                  description='Sorry, you didn\'t reply in time.',
+                                  color=embedcolor)
+            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            await ctx.send(embed=embed)
+            return
+    else:
+        embed = discord.Embed(description='**Coming Soon...**',
+                              color=embedcolor)
+        await ctx.send(embed=embed)
 
 
 @bot.event
@@ -669,14 +726,15 @@ async def on_raw_reaction_remove(payload):
         embed.set_footer(text='Bot by: AwesomeSam#0001')
         await payload.channel.send(embed=embed)
 
+
 @bot.command(pass_context=True, aliases=['clean'])
 @commands.has_permissions(administrator=True)
 async def purge(ctx, limit: int):
-        await ctx.channel.purge(limit=limit)
+    await ctx.channel.purge(limit=limit)
 
 
 @bot.command()
-async def help(ctx, help_id : str=None):
+async def help(ctx, *, help_id: str = None):
     ava = await bot.fetch_user(795334771718226010)
     avaurl = ava.avatar_url
     name = ava.display_name
@@ -689,21 +747,20 @@ async def help(ctx, help_id : str=None):
 
     WEBHOOK_URL = web.url
     if help_id is None:
-        clog = '[Join Support Server](https://discord.gg/SeebXPzHKp) | ' \
+        clog = '[Join Support Server](https://discord.gg/C3XVJk7H8k) | ' \
                '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
 
-        async with ClientSession() as session:
-            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
-            embed = discord.Embed(title='DIKE Official Bot Help:',
-                                  description=clog,
-                                  color=embedcolor)
-            chelp = help_data.get(ctx.guild.id)
-            if chelp is not None:
-                embed.add_field(name='`apply`', value='Minimum Requirements to join clan')
-            embed.add_field(name='`stats`', value='Show stats related to server or channel')
-            embed.add_field(name='`mod`', value='Moderation Commands')
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
+        embed = discord.Embed(title='DIKE Official Bot Help:',
+                              description=clog,
+                              color=embedcolor)
+        chelp = help_data.get(ctx.guild.id)
+        if chelp is not None:
+            embed.add_field(name='`apply`', value='Minimum Requirements to join clan')
+        embed.add_field(name='`stats`', value='Show stats related to server or channel')
+        embed.add_field(name='`mod`', value='Moderation Commands')
+        embed.add_field(name='`arcade`', value='Have fun with others in DIKE Arcade!')
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        await ctx.send(embed=embed)
         await web.delete()
         return
 
@@ -735,67 +792,38 @@ async def help(ctx, help_id : str=None):
                    '"--> KPG:       {}"\n' \
                    '"--> Nukes:     {}"```\n\n'.format(level, kdr, spk, kpg, nukes)
 
-
-        async with ClientSession() as session:
-            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
-            embed = discord.Embed(title='DIKE Official Bot Help:',
-                                  description=clog,
-                                  color=embedcolor)
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
-    elif help_id == 2:
-        '''clog = 'Here are all the Arcade Commands!\n' \
-               '```python\n' \
-               '"--> !balance/!bal       View Balance"\n' \
-               'Use: !bal\n' \
-               '\n' \
-               '"--> !gamble/!g          Gamble to gain (or lose?) 50-50 Chances"\n' \
-               'Use: !g <amount>\n' \
-               'Eg: !g 100\n' \
-               '\n' \
-               '"--> !job                Take up small tasks to gain Dikers!"\n' \
-               'Use: !job\n' \
-               '\n' \
-               '"--> !apply              Apply for a particular job"\n' \
-               'Use: !apply >job-id>\n' \
-               'Eg: !apply 1\n' \
-               '\n' \
-               '"--> !rich               Shows the top 5 richest people in the server"\n' \
-               'Use: !rich\n' \
-               '\n' \
-               '"--> !shop               Displays the shop where you can purchase items"\n' \
-               'Use: !shop <page-no.>\n' \
-               'Eg: !shop 2\n' \
-               '\n' \
-               '"--> !buy                Purchases an item from the shop"\n' \
-               'Use: !buy <item-code>\n' \
-               'Eg: !buy vpn\n' \
-               '\n' \
-               '"--> !inv                Shows your inventory"\n' \
-               'Use: !inv\n' \
-               '\n' \
-               '"--> !give               Transfers Dikers from your account to your friend"\n' \
-               'Use: !give <@-tag-here> <amount>\n' \
-               'Eg: !give @AwesomeSam 1000\n' \
-               '\n' \
-               '"--> !wipe               Resets your Account (Non-reversible!)"\n' \
-               'Use: !wipe\n' \
-               '\n' \
-               '"--> !help               View help"\n' \
-               'Use: !help <help-id>\n' \
-               'Eg: !help 2' \
-               '```' '''
-        clog = 'DIKE Arcade is discontinued...'
-
-        async with ClientSession() as session:
-            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
-            embed = discord.Embed(title='DIKE Official Bot Help:',
-                                  description=clog,
-                                  color=embedcolor)
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
-            await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
+        embed = discord.Embed(title='DIKE Official Bot Help:',
+                              description=clog,
+                              color=embedcolor)
+        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        await ctx.send(embed=embed)
+    elif help_id == 'arcade' or help_id == 'arcade 1':
+        clog = '[Join Support Server](https://discord.gg/C3XVJk7H8k) | ' \
+               '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
+        embed = discord.Embed(title='DIKE Official Bot Help:',
+                              description=clog,
+                              color=embedcolor)
+        embed.add_field(name='`!balance`', value='View your balance', inline=False)
+        embed.add_field(name='`!inventory`', value='View your inventory', inline=False)
+        embed.add_field(name='`!gamble`', value='Gamble your coins for a 50-50 win/lose chance', inline=False)
+        embed.add_field(name='`!rich`', value='See the richest people in your server!', inline=False)
+        embed.add_field(name='`!give`', value='Donate some of your coins to your friend', inline=False)
+        embed.set_footer(text='Page 1 out of 2')
+        await ctx.send(embed=embed)
+    elif help_id == 'arcade 2':
+        clog = '[Join Support Server](https://discord.gg/C3XVJk7H8k) | ' \
+               '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
+        embed = discord.Embed(title='DIKE Official Bot Help:',
+                              description=clog,
+                              color=embedcolor)
+        embed.add_field(name='`!shop`', value='View all the items in the shop', inline=False)
+        embed.add_field(name='`!buy`', value='Buy some stuff from the shop', inline=False)
+        embed.add_field(name='`!job`', value='View all available jobs', inline=False)
+        embed.add_field(name='`!apply`', value='Apply for a job to earn coins', inline=False)
+        embed.set_footer(text='Page 2 out of 2')
+        await ctx.send(embed=embed)
     elif help_id == 'mod':
-        clog = '[Join Support Server](https://discord.gg/SeebXPzHKp) | ' \
+        clog = '[Join Support Server](https://discord.gg/C3XVJk7H8k) | ' \
                '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
 
         async with ClientSession() as session:
@@ -806,8 +834,10 @@ async def help(ctx, help_id : str=None):
             embed.add_field(name='`warn`', value='Warns the user\n   Syntax: `!warn <user> <reason>`', inline=False)
             embed.add_field(name='`mute`', value='Mutes the user\n   Syntax: `!mute <user> [time]`', inline=False)
             embed.add_field(name='`unmute`', value='Unmutes the user\n   Syntax: `!unmute <user>`', inline=False)
-            embed.add_field(name='`slowmode`', value='Puts the current channel in slowmode\n   Syntax: `!sm <time>`', inline=False)
-            embed.add_field(name='`clean`', value='Cleans certain number of messages\n   Syntax: `!clean <number>`', inline=False)
+            embed.add_field(name='`slowmode`', value='Puts the current channel in slowmode\n   Syntax: `!sm <time>`',
+                            inline=False)
+            embed.add_field(name='`clean`', value='Cleans certain number of messages\n   Syntax: `!clean <number>`',
+                            inline=False)
             embed.add_field(name='Note:', value='<> = Required | [ ] = Optional', inline=False)
             embed.set_footer(text='Bot by: AwesomeSam#0001')
             await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
@@ -846,9 +876,10 @@ async def slowmode(ctx, seconds: int):
             "<#{}> is in `s l o w m o d e`.\nUsers will be able to post every {} seconds!".format(ctx.channel.id,
                                                                                                   seconds))
 
+
 @bot.command()
 @commands.has_permissions(manage_channels=True)
-async def say(ctx, channel : str, *, tosay : str):
+async def say(ctx, channel: str, *, tosay: str):
     chlid = channel.split('#')
     chlid = chlid[1]
     chlid = list(chlid)
@@ -857,6 +888,7 @@ async def say(ctx, channel : str, *, tosay : str):
 
     chl = bot.get_channel(int(chlid))
     await chl.send(tosay)
+
 
 @bot.command()
 @commands.has_permissions(ban_members=True, kick_members=True)
@@ -872,7 +904,6 @@ async def warn(ctx, user: discord.Member, *, reason=None):
                 'war9': 796249425965350913,
                 'war10': 796249447255900171,
                 'war11': 796249469041508393}
-
 
     if user is None or reason is None:
         await ctx.send('<@{}>. The syntax for warn is: `!warn <user> <reason>`'.format(ctx.author.id))
@@ -914,6 +945,7 @@ async def warn(ctx, user: discord.Member, *, reason=None):
             await user.remove_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war10')))
         else:
             await user.add_roles(discord.utils.get(ctx.guild.roles, id=warnings.get('war1')))
+
 
 @bot.command()
 @commands.has_permissions(ban_members=True, kick_members=True)
@@ -993,8 +1025,8 @@ async def addlink(ctx):
         await ctx.send('☑️ <#{}> already in in allowed links.'.format(ctx.channel.id))
         return
     allowed_links.append(ctx.channel.id)
-    fakedict = {"allowed":allowed_links}
-    fakemain = {ctx.message.guild.id:myguild}
+    fakedict = {"allowed": allowed_links}
+    fakemain = {ctx.message.guild.id: myguild}
     links_data.update(fakemain)
 
     links_file = open('allowed_links.txt', 'w')
@@ -1013,7 +1045,7 @@ async def removelink(ctx):
     if ctx.channel.id in allowed_links:
         allowed_links.remove(ctx.channel.id)
         fakedict = {"allowed": allowed_links}
-        fakemain = {ctx.message.guild.id:myguild}
+        fakemain = {ctx.message.guild.id: myguild}
         links_data.update(fakemain)
 
         links_file = open('allowed_links.txt', 'w')
@@ -1031,6 +1063,7 @@ async def autoroles(ctx):
                           description='__Step I:__ Enter how many roles you want to give',
                           color=embedcolor)
     m1 = await ctx.send(embed=embed)
+
     def check(msg):
         return msg.author == ctx.author and msg.channel == ctx.channel
 
@@ -1043,8 +1076,8 @@ async def autoroles(ctx):
         await m1.delete()
 
         roles = []
-        for i in range(1, number+1):
-            embed = discord.Embed(title='Tag Role ({}/{})'.format(i, number+1),
+        for i in range(1, number + 1):
+            embed = discord.Embed(title='Tag Role ({}/{})'.format(i, number + 1),
                                   color=embedcolor)
             m1 = await ctx.send(embed=embed)
             msg = await bot.wait_for("message", check=check, timeout=120)
@@ -1059,7 +1092,7 @@ async def autoroles(ctx):
             await msg.delete()
             await m1.delete()
 
-        mydict = {ctx.guild.id:roles}
+        mydict = {ctx.guild.id: roles}
         ar_data.update(mydict)
         file = open('autoroles.txt', 'w')
         file.write(str(ar_data))
@@ -1129,6 +1162,7 @@ async def on_member_join(member):
         get_role = discord.utils.get(member.guild.roles, id=i)
         await member.add_roles(get_role)
 
+
 @bot.event
 async def on_member_leave(member):
     allusers = 0
@@ -1166,7 +1200,9 @@ async def on_ready():
     await bot.change_presence(
         activity=discord.Activity(type=discord.ActivityType.playing, name="!help with {} people".format(allusers)))
     myguild = bot.get_guild(766875360126042113)
-
+    if myguild is None:
+        print('Ready!')
+        return
     member_count = 0
     for member in myguild.members:
         member_count += 1
@@ -1182,11 +1218,13 @@ async def on_ready():
     await bots.edit(name='Bots: {}'.format(bot_count))
     print('Ready!')
 
+
 links_file = open('allowed_links.txt', 'r')
 links_data = dict(eval(str(links_file.read())))
 links_file.close()
 
 import json
+
 reactionrole = open('rr.txt', 'r', encoding='utf8', errors='ignore')
 rr_data = ast.literal_eval(reactionrole.read())
 reactionrole.close()
@@ -1985,8 +2023,23 @@ async def logs(ctx):
 import job_print_bot
 @bot.command()
 async def job(ctx):
-    if ctx.channel.id == 795906303884525569:
-        job_print_bot.job_list()
+    clog='🟢  `1`- `Jumbled Words` 🔠\n' \
+         '    Pay: `20 Ð`\n\n' \
+         '🟢  `2`- `Memory Game` 🧠\n' \
+         '    Pay: `50 Ð`\n\n' \
+         '🔴  `3`- `Salesman` 🙋‍♂️\n' \
+         '    Pay: `100 Ð` \n\n' \
+         '🟢  `4`- `Hacking` 🕵️‍♂️\n' \
+         '    Pay: `250 Ð`\n\n' \
+         '🔴  `5`- `Bank Robbery` 🏦\n' \
+         '    Pay: `25% of money + 1000 Ð`\n\n' \
+         'The Jobs with 🟢 are available for now'
+
+    embed = discord.Embed(title='Jobs Available:',
+                         description=clog,
+                         color=embedcolor)
+    embed.set_footer(text='Reply with !apply <job number> to opt for a job')
+    await ctx.send(embed=embed)
 
 
 @bot.command()

@@ -3,3 +3,4 @@ dnspython
 async-timeout
 python-dotenv
 matplotlib
+requests
