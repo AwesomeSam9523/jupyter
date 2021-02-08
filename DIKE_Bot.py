@@ -1130,8 +1130,7 @@ async def on_member_join(member):
     allusers = 0
     for guild in bot.guilds:
         allusers += len(guild.members)
-    await bot.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.playing, name="!help with {} people".format(allusers)))
+    bot_p(allusers)
     if member.guild.id == 766875360126042113:
         welcom_chl = bot.get_channel(773401123389440011)
         welmsg = '<a:hello:786862994381471766> Hyy <@{user}> Welcome to Official DIKE Clan <a:hello:786862994381471766> **Type `!help` to get help**\n' \
@@ -1204,16 +1203,14 @@ async def on_server_join(ctx):
     allusers = 0
     for guild in bot.guilds:
         allusers += len(guild.members)
-    await bot.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.playing, name="!help with {} people".format(allusers)))
+    bot_p()
 
 @bot.event
 async def on_ready():
     allusers = 0
     for guild in bot.guilds:
         allusers += len(guild.members)
-    await bot.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.playing, name="!help with {} people in {} servers".format(allusers, len(bot.guilds))))
+    bot_p(allusers)
     myguild = bot.get_guild(766875360126042113)
     if myguild is None:
         print('Ready!')
@@ -1233,6 +1230,10 @@ async def on_ready():
     await bots.edit(name='Bots: {}'.format(bot_count))
     print('Ready!')
 
+def bot_p(allusers):
+    await bot.change_presence(
+        activity=discord.Activity(type=discord.ActivityType.playing,
+                                  name="!help with {} people in {} servers".format(allusers, len(bot.guilds))))
 
 links_file = open('allowed_links.txt', 'r')
 links_data = dict(eval(str(links_file.read())))
