@@ -1205,7 +1205,9 @@ async def on_server_join(ctx):
     allusers = 0
     for guild in bot.guilds:
         allusers += len(guild.members)
-    bot_p()
+    await bot.change_presence(
+        activity=discord.Activity(type=discord.ActivityType.playing,
+                                  name="!help with {} people in {} servers".format(allusers, len(bot.guilds))))
 
 @bot.event
 async def on_ready():
@@ -1234,10 +1236,6 @@ async def on_ready():
     await bots.edit(name='Bots: {}'.format(bot_count))
     print('Ready!')
 
-def bot_p(allusers):
-    await bot.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.playing,
-                                  name="!help with {} people in {} servers".format(allusers, len(bot.guilds))))
 
 links_file = open('allowed_links.txt', 'r')
 links_data = dict(eval(str(links_file.read())))
