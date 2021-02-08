@@ -1130,7 +1130,9 @@ async def on_member_join(member):
     allusers = 0
     for guild in bot.guilds:
         allusers += len(guild.members)
-    bot_p(allusers)
+    await bot.change_presence(
+        activity=discord.Activity(type=discord.ActivityType.playing,
+                                  name="!help with {} people in {} servers".format(allusers, len(bot.guilds))))
     if member.guild.id == 766875360126042113:
         welcom_chl = bot.get_channel(773401123389440011)
         welmsg = '<a:hello:786862994381471766> Hyy <@{user}> Welcome to Official DIKE Clan <a:hello:786862994381471766> **Type `!help` to get help**\n' \
@@ -1210,7 +1212,9 @@ async def on_ready():
     allusers = 0
     for guild in bot.guilds:
         allusers += len(guild.members)
-    bot_p(allusers)
+    await bot.change_presence(
+        activity=discord.Activity(type=discord.ActivityType.playing,
+                                  name="!help with {} people in {} servers".format(allusers, len(bot.guilds))))
     myguild = bot.get_guild(766875360126042113)
     if myguild is None:
         print('Ready!')
