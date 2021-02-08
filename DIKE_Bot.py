@@ -1213,7 +1213,7 @@ async def on_ready():
     for guild in bot.guilds:
         allusers += len(guild.members)
     await bot.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.playing, name="!help with {} people".format(allusers)))
+        activity=discord.Activity(type=discord.ActivityType.playing, name="!help with {} people in {} servers".format(allusers, len(bot.guilds))))
     myguild = bot.get_guild(766875360126042113)
     if myguild is None:
         print('Ready!')
