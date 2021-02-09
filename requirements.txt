@@ -1,8 +1,9 @@
 discord.py
 dnspython
 async-timeout
-python-dotenv
-matplotlib
-requests
-pillow
+python-dotenv~=0.15.0
+matplotlib~=3.3.4
+requests~=2.25.1
+pillow~=8.1.0
 apnggif
+aiohttp~=3.6.3
