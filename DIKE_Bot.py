@@ -73,6 +73,10 @@ async def on_message(message):
     if message.author.id not in noadds:
         xp = random.randint(15, 25)
         msgs = level_data.get(guildid)
+        if msgs is None:
+            gadd = {message.guild.id:{}}
+            level_data.update(gadd)
+            msgs = level_data.get(guildid)
         old_xp = msgs.get(message.author.id)
         if old_xp is None:
             add_per = {message.author.id: xp}
