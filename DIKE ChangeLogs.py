@@ -16,7 +16,7 @@ webhook = DiscordWebhook(url='https://discord.com/api/webhooks/79565362201598366
 embed = DiscordEmbed(title='DIKE Bot had an upgrade! v1.0.2',
                      description=clog,
                      color=16776704)
-embed.set_footer(text='Bot by: AwesomeSam#0001')
+embed.set_footer(text='Bot by: AwesomeSam#7985')
 webhook.add_embed(embed)
 
 response = webhook.execute()

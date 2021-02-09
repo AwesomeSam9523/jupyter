@@ -659,7 +659,7 @@ async def stats(ctx, channel: str = None):
                               color=embedcolor)
         embed.add_field(name='Total Messages', value=str(overall))
         embed.add_field(name='Messages sent today', value=str(msgs_rec.get(d)))
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         embed.set_image(url=a)
     else:
         chl = channel.split('#')
@@ -741,7 +741,7 @@ async def stats(ctx, channel: str = None):
                                   color=embedcolor)
             embed.add_field(name='Total Messages', value=str(overall))
             embed.add_field(name='Messages sent today', value=str(msgs_rec.get(d)))
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            embed.set_footer(text='Bot by: AwesomeSam#7985')
             embed.set_image(url=a)
         else:
             embed = discord.Embed(title='Stats',
@@ -749,7 +749,7 @@ async def stats(ctx, channel: str = None):
                                   color=embedcolor)
             embed.add_field(name='Total Messages', value=str(0))
             embed.add_field(name='Messages sent today', value=str(0))
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            embed.set_footer(text='Bot by: AwesomeSam#7985')
             embed.set_image(
                 url='https://media.discordapp.net/attachments/807969244200304643/807969327579660288/go_chat.jpeg')
 
@@ -816,11 +816,12 @@ async def _import(ctx):
         msg = await bot.wait_for("message", check=check, timeout=120)
 
         if msg.content == 'cancel':
-            ctx.reply('Import Cancelled.')
+            await ctx.reply('Import Cancelled.')
         elif msg.content == 'start':
             url = 'https://mee6.xyz/api/plugins/levels/leaderboard/' + str(ctx.guild.id)
             response = requests.get(url)
             jprint(response.json(), ctx.guild.id)
+            await ctx.send('Import Complete!')
 
     except TimeoutError:
         await ctx.send('Response Timed Out..')
@@ -889,7 +890,7 @@ async def rule(ctx):
         embed.add_field(
             name='Violation of this rule will lead to a irrevocable mute of 12 hours which will be incremented to kick/ban if you are found guilty again.',
             value='Thank You')
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
 
         await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
         await web.delete()
@@ -935,7 +936,7 @@ async def setup(ctx, *, setupid: str = None):
         embed.add_field(name='`rr`', value='Reaction Roles')
         embed.add_field(name='`applications`', value='Krunker applications extended support')
         embed.add_field(name='`arcade`', value='DIKE Arcade- Play fun games with your friends!')
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         await ctx.send(embed=embed)
         return
     if setupid == 'applications':
@@ -943,14 +944,14 @@ async def setup(ctx, *, setupid: str = None):
                               description='`1- Group Roles`\n'
                                           '`2- Single Role`',
                               color=embedcolor)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         m1 = await ctx.send(embed=embed)
     if setupid == 'rr':
         embed = discord.Embed(title='Enter the Message Type:',
                               description='`1- Group Roles`\n'
                                           '`2- Single Role`',
                               color=embedcolor)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         m1 = await ctx.send(embed=embed)
 
         def check(msg):
@@ -965,7 +966,7 @@ async def setup(ctx, *, setupid: str = None):
                 embed = discord.Embed(title='Enter the Message Type:',
                                       description='Enter how many roles you want to add in 1 single message. (Recommended: Maximum 10)',
                                       color=embedcolor)
-                embed.set_footer(text='Bot by: AwesomeSam#0001')
+                embed.set_footer(text='Bot by: AwesomeSam#7985')
                 m1 = await ctx.send(embed=embed)
 
                 while True:
@@ -979,7 +980,7 @@ async def setup(ctx, *, setupid: str = None):
                         embed = discord.Embed(title='Enter the Message Type:',
                                               description='Incorrect Input. Please try again.',
                                               color=embedcolor)
-                        embed.set_footer(text='Bot by: AwesomeSam#0001')
+                        embed.set_footer(text='Bot by: AwesomeSam#7985')
                         await ctx.send(embed=embed)
                     else:
                         break
@@ -992,7 +993,7 @@ async def setup(ctx, *, setupid: str = None):
                         embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
                                               description='__Step I:__ Enter the Message (Exact will be displayed after creation beside the Emoji)',
                                               color=embedcolor)
-                        embed.set_footer(text='Bot by: AwesomeSam#0001')
+                        embed.set_footer(text='Bot by: AwesomeSam#7985')
                         m1 = await ctx.send(embed=embed)
 
                         message_to_display = await bot.wait_for("message", check=check, timeout=120)
@@ -1000,7 +1001,7 @@ async def setup(ctx, *, setupid: str = None):
                         embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
                                               description='__Step II:__ Enter the Emoji (The emoji should be default/from this server only!)',
                                               color=embedcolor)
-                        embed.set_footer(text='Bot by: AwesomeSam#0001')
+                        embed.set_footer(text='Bot by: AwesomeSam#7985')
                         m2 = await ctx.send(embed=embed)
 
                         emoji_to_display = await bot.wait_for("message", check=check, timeout=120)
@@ -1008,7 +1009,7 @@ async def setup(ctx, *, setupid: str = None):
                         embed = discord.Embed(title='Role ({}/{})'.format(i, mesg),
                                               description='__Step III:__ **Tag** the role you want to give',
                                               color=embedcolor)
-                        embed.set_footer(text='Bot by: AwesomeSam#0001')
+                        embed.set_footer(text='Bot by: AwesomeSam#7985')
                         m3 = await ctx.send(embed=embed)
 
                         role_to_give = await bot.wait_for("message", check=check, timeout=120)
@@ -1039,7 +1040,7 @@ async def setup(ctx, *, setupid: str = None):
                 embed = discord.Embed(title='React here to Add/Remove your role:',
                                       description=desc,
                                       color=embedcolor)
-                embed.set_footer(text='Bot by: AwesomeSam#0001')
+                embed.set_footer(text='Bot by: AwesomeSam#7985')
                 m = await ctx.send(embed=embed)
 
                 for i in temp:
@@ -1060,7 +1061,7 @@ async def setup(ctx, *, setupid: str = None):
             embed = discord.Embed(title='Times Up',
                                   description='Sorry, you didn\'t reply in time.',
                                   color=embedcolor)
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            embed.set_footer(text='Bot by: AwesomeSam#7985')
             await ctx.send(embed=embed)
             return
     else:
@@ -1096,7 +1097,7 @@ async def on_raw_reaction_add(payload):
                                           '1. Granting me required permissions\n'
                                           '2. Making sure that my role is above the reaction role.',
                               color=embedcolor)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         await payload.channel.send(embed=embed)
 
 
@@ -1127,7 +1128,7 @@ async def on_raw_reaction_remove(payload):
                                           '1. Granting me required permissions\n'
                                           '2. Making sure that my role is above the reaction role.',
                               color=embedcolor)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         await payload.channel.send(embed=embed)
 
 
@@ -1163,7 +1164,7 @@ async def help(ctx, *, help_id: str = None):
         embed.add_field(name='`stats`', value='Show stats related to server or channel')
         embed.add_field(name='`mod`', value='Moderation Commands')
         embed.add_field(name='`arcade`', value='Have fun with others in DIKE Arcade!')
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         await ctx.send(embed=embed)
         await web.delete()
         return
@@ -1199,7 +1200,7 @@ async def help(ctx, *, help_id: str = None):
         embed = discord.Embed(title='DIKE Official Bot Help:',
                               description=clog,
                               color=embedcolor)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         await ctx.send(embed=embed)
     elif help_id == 'arcade' or help_id == 'arcade 1':
         clog = '[Join Support Server](https://discord.gg/C3XVJk7H8k) | ' \
@@ -1243,7 +1244,7 @@ async def help(ctx, *, help_id: str = None):
             embed.add_field(name='`clean`', value='Cleans certain number of messages\n   Syntax: `!clean <number>`',
                             inline=False)
             embed.add_field(name='Note:', value='<> = Required | [ ] = Optional', inline=False)
-            embed.set_footer(text='Bot by: AwesomeSam#0001')
+            embed.set_footer(text='Bot by: AwesomeSam#7985')
             await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
     await web.delete()
 
@@ -2263,13 +2264,13 @@ async def shop(ctx, shop_page: int = None):
         shoplist = '|   __Generals__   |    Hacker    |     Wars     | Bank Robbery |\n'
         desc = '\n\n                         **Coming Soon!**'
         embed = discord.Embed(title=shoplist, description=desc, color=embedcolor)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         await ctx.send(embed=embed)
     elif shop_page == 1:
         shoplist = '|   __Generals__   |    Hacker    |     Wars     | Bank Robbery |\n'
         desc = '\n\n                         **Coming Soon!**'
         embed = discord.Embed(title=shoplist, description=desc, color=embedcolor)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         await ctx.send(embed=embed)
     elif shop_page == 2:
         shoplist = '|   Generals   |    __Hacker__    |     Wars     | Bank Robbery |\n'
@@ -2293,19 +2294,19 @@ async def shop(ctx, shop_page: int = None):
                         inline=False)
         embed.add_field(name='\n\nType !buy <item-code> to purchase the item', value='Have Fun Hacking 😉',
                         inline=False)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         await ctx.send(embed=embed)
     elif shop_page == 3:
         shoplist = '|   Generals   |    Hacker    |     __Wars__     | Bank Robbery |\n'
         desc = '\n\n                         **Coming Soon!**'
         embed = discord.Embed(title=shoplist, description=desc, color=embedcolor)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         await ctx.send(embed=embed)
     elif shop_page == 4:
         shoplist = '|   Generals   |    Hacker    |     Wars     | __Bank Robbery__ |\n'
         desc = '\n\n                         **Coming Soon!**'
         embed = discord.Embed(title=shoplist, description=desc, color=embedcolor)
-        embed.set_footer(text='Bot by: AwesomeSam#0001')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         await ctx.send(embed=embed)
 
 
@@ -2472,3 +2473,4 @@ async def setuphack(ctx):
         lol = ctx.author.id
         await ctx.send('<@{}> You ain\'t my master!'.format(lol))
         '''
+r
