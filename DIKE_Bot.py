@@ -27,7 +27,6 @@ import random
 
 async def wait_and_remove(_id):
     await asyncio.sleep(60)
-    await asyncio.sleep(60)
     noadds.remove(_id)
 
 
