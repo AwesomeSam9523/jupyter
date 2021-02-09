@@ -1148,9 +1148,6 @@ async def help(ctx, *, help_id: str = None):
     a = myguild.get_member(795334771718226010)
     dname = a.display_name
     print(dname)
-    web = await ctx.channel.create_webhook(name=dname)
-
-    WEBHOOK_URL = web.url
     if help_id is None:
         clog = '[Join Support Server](https://discord.gg/C3XVJk7H8k) | ' \
                '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
@@ -1166,7 +1163,6 @@ async def help(ctx, *, help_id: str = None):
         embed.add_field(name='`arcade`', value='Have fun with others in DIKE Arcade!')
         embed.set_footer(text='Bot by: AwesomeSam#7985')
         await ctx.send(embed=embed)
-        await web.delete()
         return
 
     if help_id == 'apply':
@@ -1227,26 +1223,35 @@ async def help(ctx, *, help_id: str = None):
         embed.add_field(name='`!apply`', value='Apply for a job to earn coins', inline=False)
         embed.set_footer(text='Page 2 out of 2')
         await ctx.send(embed=embed)
-    elif help_id == 'mod':
+    elif help_id == 'mod' or help_id=='mod 1':
         clog = '[Join Support Server](https://discord.gg/C3XVJk7H8k) | ' \
                '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
 
-        async with ClientSession() as session:
-            webhook = discord.Webhook.from_url(WEBHOOK_URL, adapter=discord.AsyncWebhookAdapter(session))
-            embed = discord.Embed(title='DIKE Official Bot Help:',
-                                  description=clog,
-                                  color=embedcolor)
-            embed.add_field(name='`warn`', value='Warns the user\n   Syntax: `!warn <user> <reason>`', inline=False)
-            embed.add_field(name='`mute`', value='Mutes the user\n   Syntax: `!mute <user> [time]`', inline=False)
-            embed.add_field(name='`unmute`', value='Unmutes the user\n   Syntax: `!unmute <user>`', inline=False)
-            embed.add_field(name='`slowmode`', value='Puts the current channel in slowmode\n   Syntax: `!sm <time>`',
-                            inline=False)
-            embed.add_field(name='`clean`', value='Cleans certain number of messages\n   Syntax: `!clean <number>`',
-                            inline=False)
-            embed.add_field(name='Note:', value='<> = Required | [ ] = Optional', inline=False)
-            embed.set_footer(text='Bot by: AwesomeSam#7985')
-            await webhook.send(embed=embed, username=dname, avatar_url=avaurl)
-    await web.delete()
+        embed = discord.Embed(title='DIKE Official Bot Help:',
+                              description=clog,
+                              color=embedcolor)
+        embed.add_field(name='`warn`', value='Warns the user\nSyntax: `!warn <user> <reason>`', inline=False)
+        embed.add_field(name='`mute`', value='Mutes the user\nSyntax: `!mute <user> [time]`', inline=False)
+        embed.add_field(name='`unmute`', value='Unmutes the user\nSyntax: `!unmute <user>`', inline=False)
+        embed.add_field(name='`slowmode`', value='Puts the current channel in slowmode\nSyntax: `!sm <time>`', inline=False)
+        embed.add_field(name='`clean`', value='Cleans certain number of messages\nSyntax: `!clean <number>`', inline=False)
+        embed.add_field(name='Note:', value='<> = Required | [ ] = Optional', inline=False)
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
+        await ctx.send(embed=embed)
+
+    elif help_id == 'mod 2':
+        clog = '[Join Support Server](https://discord.gg/C3XVJk7H8k) | ' \
+               '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
+
+        embed = discord.Embed(title='DIKE Official Bot Help:',
+                              description=clog,
+                              color=embedcolor)
+        embed.add_field(name='`givexp`', value='Gives user xp\nSyntax: `!givexp @user <xp>`',
+                        inline=False)
+        embed.add_field(name='`removexp`', value='Removes user xp\nSyntax: `!removexp @user <xp>`',
+                        inline=False)
+        embed.add_field(name='`resetxp`', value='Resets user xp to 0\nSyntax: `!resetxp @user`',
+                        inline=False)
 
 
 @bot.command(aliases=['feedback'])
