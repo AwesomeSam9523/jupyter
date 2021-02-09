@@ -8,7 +8,7 @@ import re
 
 intents = discord.Intents.default()
 intents.members = True
-
+noadds = []
 embedcolor = 3407822
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -17,12 +17,22 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 bot.remove_command('help')
 
 print('Starting...')
-
+c = 0
 from discord.ext import tasks
 import requests
 import shutil
 from datetime import date
 import random
+
+
+async def wait_and_remove(_id):
+    await asyncio.sleep(60)
+    noadds.remove(_id)
+
+
+async def bot_status(allusers, allguilds):
+    await bot.change_presence(
+        activity=discord.Activity(type=discord.ActivityType.listening, name="!rank | All MEE6 Features for free!"))
 
 
 @bot.event
@@ -60,19 +70,36 @@ async def on_message(message):
         msgs_data.update(g_upd)
         today_count = chl.get(d)
 
+    if message.author.id not in noadds:
+        xp = random.randint(15, 25)
+        msgs = level_data.get(guildid)
+        old_xp = msgs.get(message.author.id)
+        if old_xp is None:
+            add_per = {message.author.id: xp}
+            msgs.update(add_per)
+        else:
+            new_xp = old_xp + xp
+            add_per = {message.author.id: new_xp}
+            msgs.update(add_per)
+
+        final = {guildid: msgs}
+        level_data.update(final)
+        noadds.append(message.author.id)
+        fake1 = level_data
+
+        level_data_f = open('level_data.txt', 'w')
+        level_data_f.write(str(fake1))
+        level_data_f.close()
+
+        asyncio.create_task(wait_and_remove(message.author.id))
+    else:
+        pass
+
     pre_upd = msgs_data.get(guildid)
     dic = {d: today_count + 1}
     chl.update(dic)
     upd = {guildid: pre_upd}
     msgs_data.update(upd)
-
-    temp_dict = msgs_data
-    file = open('messages.txt', 'w')
-    file.write(str(temp_dict))
-    file.close()
-
-    if message.author == bot.user:
-        return
 
     global sendbot
     mentionlist = [
@@ -197,6 +224,320 @@ async def on_message(message):
     await bot.process_commands(message)
 
 
+from PIL import Image, ImageDraw, ImageFont
+
+fnt = ImageFont.truetype('./fonts/Acme-Regular.ttf', 25)
+fnt2 = ImageFont.truetype('./fonts/Acme-Regular.ttf', 12)
+fnt3 = ImageFont.truetype('./fonts/Acme-Regular.ttf', 16)
+
+
+@bot.command()
+async def rankbg(ctx, link: str):
+    if link == 'reset':
+        custom_bg.pop(ctx.author.id)
+        cbg2 = open('./rank_cards/custombg.txt', 'w')
+        cbg2.write(str(custom_bg))
+        cbg2.close()
+
+        await ctx.reply('Background Removed')
+        return
+
+    filename = str(ctx.author.id) + '.png'
+    try:
+        r = requests.get(link, stream=True)
+    except:
+        await ctx.reply('Error! Join Support Server for help.')
+        return
+
+    if r.status_code == 200:
+        r.raw.decode_content = True
+        with open(filename, 'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+        shutil.move(filename, './rank_cards/' + filename)
+        image = Image.open('./rank_cards/' + filename)
+        w, h = image.size
+        if w < 400 or h < 85:
+            await ctx.reply('The image should be minimum 400x85.')
+            os.remove('/rank_cards/' + filename)
+            return
+        myd = {ctx.author.id: link}
+        custom_bg.update(myd)
+        cbg2 = open('./rank_cards/custombg.txt', 'w')
+        cbg2.write(str(custom_bg))
+        cbg2.close()
+
+        await ctx.reply('Done')
+    else:
+        await ctx.reply('Error! Join Support Server for help.')
+
+
+@bot.command()
+async def rank(ctx, member: discord.Member = None):
+    embed = discord.Embed(description='<a:loading:807883748791156737>  Loading...', color=embedcolor)
+    loading = await ctx.send(embed=embed)
+    if member is None:
+        memid = ctx.author.id
+    else:
+        memid = member.id
+    guildid = ctx.guild.id
+    g = level_data.get(guildid)
+    user_xp = g.get(memid)
+    all_xps = []
+    for i in g.values():
+        all_xps.append(i)
+
+    all_xps.sort(reverse=True)
+
+    for j in range(len(all_xps)):
+        if user_xp == all_xps[j]:
+            userrank = j + 1
+            break
+
+    if user_xp is None:
+        user_xp = 0
+    ava = await bot.fetch_user(memid)
+    avaurl = ava.avatar_url
+
+    image_url = avaurl
+    filename = 'avatar.png'
+    r = requests.get(image_url, stream=True)
+
+    r.raw.decode_content = True
+    with open(filename, 'wb') as f:
+        shutil.copyfileobj(r.raw, f)
+
+    file_name = custom_bg.get(memid)
+    if file_name is None:
+        images = ['1.jpg', '2.jpg']
+        filepath = './rank_cards/' + random.choice(images)
+    else:
+        file = 'custom.png'
+        r = requests.get(file_name, stream=True)
+        r.raw.decode_content = True
+        with open(file, 'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+        filepath = file
+    card = Image.open(filepath)
+    w, h = card.size
+    if w / h == 400 / 85:
+        card = card.resize((400, 85), resample=0)
+    else:
+        a = 400
+        b = int(a / w * h)
+        card = card.resize((a, b), 0)
+        card = card.crop((0, 0, 400, 85))
+    avatar = Image.open('avatar.png')
+    avatar = avatar.resize((75, 75), resample=0)
+
+    person = bot.get_guild(ctx.guild.id)
+    member_ = person.get_member(memid)
+    username = member_.name
+    tag = member_.discriminator
+
+    img = Image.new('RGB', (250, 16))
+    draw = ImageDraw.Draw(img)
+    draw.rectangle([(0, 0), (0, 0)], fill="black", outline="black")
+
+    avatar_pos = 10, 5
+    card.paste(avatar, avatar_pos)
+    card.paste(img, (100, 50))
+
+    xp_pos = 100, 50
+
+    leveltext = username
+    draw = ImageDraw.Draw(card)
+    nw, nh = draw.textsize(leveltext, font=fnt)
+    draw.text((100, 17), leveltext, font=fnt, fill="black")
+
+    msg = '#' + str(tag)
+    draw = ImageDraw.Draw(card)
+    draw.text((nw + 100, 25), msg, fill="black", font=fnt3)
+    xp = user_xp
+
+    if xp is not None:
+        level = 1
+        for i in levels.keys():
+            if xp < i:
+                break
+            level += 1
+        if xp < 1000:
+            _xp = str(xp) + '.0'
+        elif 1000 <= xp < 10000:
+            _xp = str(xp)
+            _xp = _xp[0:3]
+            _xp = float(_xp)
+            _xp = str(_xp / 100) + 'K'
+        elif 10000 <= xp < 100000:
+            _xp = str(xp)
+            _xp = _xp[0:3]
+            _xp = float(_xp)
+            _xp = str(_xp / 10) + 'K'
+        elif xp >= 100000:
+            _xp = str(xp)
+            _xp = _xp[0:3]
+            _xp = float(_xp)
+            _xp = str(_xp) + 'K'
+
+        totalxp = (list(levels.keys())[list(levels.values()).index(level)])
+
+        if totalxp < 1000:
+            l = str(totalxp) + '.0'
+        elif 1000 <= totalxp < 10000:
+            l = str(totalxp)
+            l = l[0:3]
+            l = float(l)
+            l = str(l / 100) + 'K'
+        elif 10000 <= totalxp < 100000:
+            l = str(totalxp)
+            l = l[0:3]
+            l = float(l)
+            l = str(l / 10) + 'K'
+        elif totalxp >= 100000:
+            l = str(totalxp)
+            l = l[0:3]
+            l = float(l)
+            l = str(l) + 'K'
+    else:
+        _xp = 0
+        l = 0
+        totalxp = 100
+        xp = 0
+        level = 1
+
+    x = int((xp / totalxp) * 250)
+
+    msg = '{}/{}'.format(_xp, l)
+    draw = ImageDraw.Draw(card)
+    draw.text((290, 65), msg, fill="black", font=fnt2)
+    xp_bar = Image.new('RGB', (250, 16))
+    draw = ImageDraw.Draw(xp_bar)
+    draw.rectangle([(x, 0), (0, 16)], fill="#0000ff", outline="#0000ff")
+
+    leveltext = 'Level: {}\nRank: #{}'.format(level, userrank)
+    draw = ImageDraw.Draw(card)
+    w, h = draw.textsize(leveltext, font=fnt3)
+    draw.text(((395 - w), 2), leveltext, font=fnt3, fill="black")
+
+    card.paste(xp_bar, (100, 50))
+
+    card.save('rank_card.png')
+
+    file = discord.File("rank_card.png", filename="rank_card.png")
+    await loading.delete()
+    msg = await ctx.send(file=file)
+
+    os.remove('rank_card.png')
+    os.remove('avatar.png')
+
+
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def givexp(ctx, mem: str, xp: int = None):
+    if xp is None:
+        await ctx.reply('The syntax for the command is: `!givexp @user xp`')
+        return
+    chl = mem.split('!')
+    chl = chl[1]
+    chl = list(chl)
+    chl.pop(-1)
+    member = ''.join(chl)
+    global level_data
+    member = int(member)
+    guildid = ctx.guild.id
+    g = level_data.get(guildid)
+    old_xp = g.get(member)
+    if old_xp is None:
+        add_per = {member: xp}
+        g.update(add_per)
+        final = {guildid: g}
+        level_data.update(final)
+    else:
+        new_xp = old_xp + xp
+        add_per = {member: new_xp}
+        g.update(add_per)
+        final = {guildid: g}
+        level_data.update(final)
+
+    fake1 = level_data
+    level_data_f = open('level_data.txt', 'w')
+    level_data_f.write(str(fake1))
+    level_data_f.close()
+
+    await ctx.reply('Done')
+
+
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def removexp(ctx, mem: str, xp: int = None):
+    if xp is None:
+        await ctx.reply('The syntax for the command is: `!removexp @user xp`')
+        return
+    chl = mem.split('!')
+    chl = chl[1]
+    chl = list(chl)
+    chl.pop(-1)
+    member = ''.join(chl)
+    global level_data
+    member = int(member)
+    guildid = ctx.guild.id
+    g = level_data.get(guildid)
+    old_xp = g.get(member)
+    if old_xp is None:
+        add_per = {member: xp}
+        g.update(add_per)
+        final = {guildid: g}
+        level_data.update(final)
+    else:
+        new_xp = old_xp - xp
+        if new_xp < 0:
+            new_xp = 0
+        add_per = {member: new_xp}
+        g.update(add_per)
+        final = {guildid: g}
+        level_data.update(final)
+
+    fake1 = level_data
+    level_data_f = open('level_data.txt', 'w')
+    level_data_f.write(str(fake1))
+    level_data_f.close()
+
+    await ctx.reply('Done')
+
+
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def resetxp(ctx, mem: str = None):
+    if mem is None:
+        await ctx.reply('The syntax for the command is: `!resetxp @user`')
+        return
+    chl = mem.split('!')
+    chl = chl[1]
+    chl = list(chl)
+    chl.pop(-1)
+    member = ''.join(chl)
+    global level_data
+    member = int(member)
+    guildid = ctx.guild.id
+    g = level_data.get(guildid)
+    old_xp = g.get(member)
+
+    if old_xp is None:
+        pass
+    else:
+        new_xp = 0
+        add_per = {member: new_xp}
+        g.update(add_per)
+        final = {guildid: g}
+        level_data.update(final)
+
+    fake1 = level_data
+    level_data_f = open('level_data.txt', 'w')
+    level_data_f.write(str(fake1))
+    level_data_f.close()
+
+    await ctx.reply('Done')
+
+
 @bot.event
 async def on_message_delete(message):
     msg = message.content
@@ -247,9 +588,7 @@ async def stats(ctx, channel: str = None):
             for k in i.keys():
                 if k not in keys:
                     keys.append(k)
-            print('keys=', keys)
             keys.sort()
-            print(keys)
         months = {1: 'Jan',
                   2: 'Feb',
                   3: 'Mar',
@@ -283,11 +622,8 @@ async def stats(ctx, channel: str = None):
                 if a is None:
                     a = 0
                 msgs_rec.update({char: a + b})
-                print(msgs_rec)
         for i in msgs_rec.values():
             msgs.append(i)
-        print(days)
-        print(msgs)
         today = date.today()
         d = today.strftime('%d-%m-%Y')
 
@@ -432,6 +768,62 @@ async def info(ctx):
                                       'Join official discord: [Join](https://discord.gg/C3XVJk7H8k)',
                           color=embedcolor)
     await ctx.send(embed=embed)
+
+
+@bot.command()
+async def server(ctx):
+    embed = discord.Embed(description='[Join Official Server](https://discord.gg/C3XVJk7H8k)',
+                          color=embedcolor)
+    await ctx.send(embed=embed)
+
+
+def jprint(obj, gid):
+    text = json.dumps(obj, sort_keys=True, indent=4)
+    mee6_data = json.loads(text)
+    users = mee6_data.get("players")
+
+    importdict = {}
+    for dicts in users:
+        userid = int(dicts.get('id'))
+        userxp = int(dicts.get('xp'))
+        importdict.update({userid: userxp})
+    mydict = {gid: importdict}
+    level_data.update(mydict)
+
+    fake1 = level_data
+    level_data_f = open('level_data.txt', 'w')
+    level_data_f.write(str(fake1))
+    level_data_f.close()
+
+
+@bot.command(aliases=['import'])
+@commands.has_permissions(administrator=True)
+async def _import(ctx):
+    embed = discord.Embed(title='Note!',
+                          description='This will replace all data with MEE6 rank data. This process is **irreversible**.\n'
+                                      'Type `start` to start import or `cancel` to cancel.',
+                          color=embedcolor)
+    await ctx.send(embed=embed)
+
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel
+
+    try:
+        msg = await bot.wait_for("message", check=check, timeout=120)
+
+        if msg.content == 'cancel':
+            ctx.reply('Import Cancelled.')
+        elif msg.content == 'start':
+            url = 'https://mee6.xyz/api/plugins/levels/leaderboard/' + str(ctx.guild.id)
+            response = requests.get(url)
+            jprint(response.json(), ctx.guild.id)
+
+    except TimeoutError:
+        await ctx.send('Response Timed Out..')
+    except:
+        await ctx.send('Error Importing data.\n'
+                       'Please ensure MEE6 is setup in the server.\n\n'
+                       'Join Official Server for more help (Note: `!server` for link)')
 
 
 @bot.command()
@@ -1130,9 +1522,6 @@ async def on_member_join(member):
     allusers = 0
     for guild in bot.guilds:
         allusers += len(guild.members)
-    await bot.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.playing,
-                                  name="!help with {} people in {} servers".format(allusers, len(bot.guilds))))
     if member.guild.id == 766875360126042113:
         welcom_chl = bot.get_channel(773401123389440011)
         welmsg = '<a:hello:786862994381471766> Hyy <@{user}> Welcome to Official DIKE Clan <a:hello:786862994381471766> **Type `!help` to get help**\n' \
@@ -1177,9 +1566,7 @@ async def on_member_leave(member):
     allusers = 0
     for guild in bot.guilds:
         allusers += len(guild.members)
-    await bot.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.playing, name="!help with {} people".format(allusers)))
-
+    asyncio.create_task(bot_status(allusers, bot.guilds))
     leaving_chl = bot.get_channel(800683977207840798)
     leave_msg = '{} just left the server.'.format(member.name)
     print(leave_msg)
@@ -1200,23 +1587,13 @@ async def on_member_leave(member):
     await mem.edit(name='Members: {}'.format(true_member_count))
     await bots.edit(name='Bots: {}'.format(bot_count))
 
-@bot.event
-async def on_server_join(ctx):
-    allusers = 0
-    for guild in bot.guilds:
-        allusers += len(guild.members)
-    await bot.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.playing,
-                                  name="!help with {} people in {} servers".format(allusers, len(bot.guilds))))
 
 @bot.event
 async def on_ready():
     allusers = 0
     for guild in bot.guilds:
         allusers += len(guild.members)
-    await bot.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.playing,
-                                  name="!help with {} people in {} servers".format(allusers, len(bot.guilds))))
+    asyncio.create_task(bot_status(allusers, bot.guilds))
     myguild = bot.get_guild(766875360126042113)
     if myguild is None:
         print('Ready!')
@@ -1258,6 +1635,18 @@ autor.close()
 autor = open('customhelp.txt', 'r')
 help_data = dict(eval(str(autor.read())))
 autor.close()
+
+level_data_f = open('level_data.txt', 'r')
+level_data = dict(eval(str(level_data_f.read())))
+level_data_f.close()
+
+file = open('levels.txt', 'r')
+levels = dict(eval(str(file.read())))
+file.close()
+
+cbg = open('./rank_cards/custombg.txt', 'r')
+custom_bg = dict(eval(str(cbg.read())))
+cbg.close()
 
 bot.run(TOKEN)
 

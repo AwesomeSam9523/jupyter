@@ -4,3 +4,5 @@ async-timeout
 python-dotenv
 matplotlib
 requests
+pillow
+apnggif
