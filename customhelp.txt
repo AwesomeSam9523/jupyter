@@ -1,1 +1,0 @@
-{766875360126042113:{'kdr':'1.5', 'kpg':'10','spk':'100', 'nukes':'5', 'level':'30', 'additional':'Type **g.apply <your-ign>** in <#795293822224695297> to apply.'}}

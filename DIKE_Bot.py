@@ -91,7 +91,7 @@ async def on_message(message):
         noadds.append(message.author.id)
         fake1 = level_data
 
-        level_data_f = open('level_data.txt', 'w')
+        level_data_f = open('files/level_data.txt', 'w')
         level_data_f.write(str(fake1))
         level_data_f.close()
 
@@ -463,7 +463,7 @@ async def givexp(ctx, mem: str, xp: int = None):
         level_data.update(final)
 
     fake1 = level_data
-    level_data_f = open('level_data.txt', 'w')
+    level_data_f = open('files/level_data.txt', 'w')
     level_data_f.write(str(fake1))
     level_data_f.close()
 
@@ -501,7 +501,7 @@ async def removexp(ctx, mem: str, xp: int = None):
         level_data.update(final)
 
     fake1 = level_data
-    level_data_f = open('level_data.txt', 'w')
+    level_data_f = open('files/level_data.txt', 'w')
     level_data_f.write(str(fake1))
     level_data_f.close()
 
@@ -535,7 +535,7 @@ async def resetxp(ctx, mem: str = None):
         level_data.update(final)
 
     fake1 = level_data
-    level_data_f = open('level_data.txt', 'w')
+    level_data_f = open('files/level_data.txt', 'w')
     level_data_f.write(str(fake1))
     level_data_f.close()
 
@@ -760,7 +760,7 @@ async def stats(ctx, channel: str = None):
 @bot.command()
 async def save(ctx):
     temp_dict = msgs_data
-    file = open('messages.txt', 'w')
+    file = open('files/messages.txt', 'w')
     file.write(str(temp_dict))
     file.close()
 
@@ -795,7 +795,7 @@ def jprint(obj, gid):
     level_data.update(mydict)
 
     fake1 = level_data
-    level_data_f = open('level_data.txt', 'w')
+    level_data_f = open('files/level_data.txt', 'w')
     level_data_f.write(str(fake1))
     level_data_f.close()
 
@@ -1051,7 +1051,7 @@ async def setup(ctx, *, setupid: str = None):
                 messages.update(finaldict)
                 rr_data.update(messages)
 
-                file = open('rr.txt', 'w', encoding='utf8', errors='ignore')
+                file = open('files/rr.txt', 'w', encoding='utf8', errors='ignore')
                 file.write(str(rr_data))
                 file.close()
                 print(messages)
@@ -1433,7 +1433,7 @@ async def addlink(ctx):
     fakemain = {ctx.message.guild.id: myguild}
     links_data.update(fakemain)
 
-    links_file = open('allowed_links.txt', 'w')
+    links_file = open('files/allowed_links.txt', 'w')
     links_file.write(str(links_data))
     links_file.close()
 
@@ -1452,7 +1452,7 @@ async def removelink(ctx):
         fakemain = {ctx.message.guild.id: myguild}
         links_data.update(fakemain)
 
-        links_file = open('allowed_links.txt', 'w')
+        links_file = open('files/allowed_links.txt', 'w')
         links_file.write(str(links_data))
         links_file.close()
         await ctx.send('❌ <#{}> removed from allowed links successfully!'.format(ctx.channel.id))
@@ -1498,7 +1498,7 @@ async def autoroles(ctx):
 
         mydict = {ctx.guild.id: roles}
         ar_data.update(mydict)
-        file = open('autoroles.txt', 'w')
+        file = open('files/autoroles.txt', 'w')
         file.write(str(ar_data))
         file.close()
 
@@ -1618,33 +1618,33 @@ async def on_ready():
     print('Ready!')
 
 
-links_file = open('allowed_links.txt', 'r')
+links_file = open('files/allowed_links.txt', 'r')
 links_data = dict(eval(str(links_file.read())))
 links_file.close()
 
 import json
 
-reactionrole = open('rr.txt', 'r', encoding='utf8', errors='ignore')
+reactionrole = open('files/rr.txt', 'r', encoding='utf8', errors='ignore')
 rr_data = ast.literal_eval(reactionrole.read())
 reactionrole.close()
 
-messages = open('messages.txt', 'r')
+messages = open('files/messages.txt', 'r')
 msgs_data = dict(eval(str(messages.read())))
 messages.close()
 
-autor = open('autoroles.txt', 'r')
+autor = open('files/autoroles.txt', 'r')
 ar_data = dict(eval(str(autor.read())))
 autor.close()
 
-autor = open('customhelp.txt', 'r')
+autor = open('files/customhelp.txt', 'r')
 help_data = dict(eval(str(autor.read())))
 autor.close()
 
-level_data_f = open('level_data.txt', 'r')
+level_data_f = open('files/level_data.txt', 'r')
 level_data = dict(eval(str(level_data_f.read())))
 level_data_f.close()
 
-file = open('levels.txt', 'r')
+file = open('files/levels.txt', 'r')
 levels = dict(eval(str(file.read())))
 file.close()
 
