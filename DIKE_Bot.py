@@ -2473,4 +2473,3 @@ async def setuphack(ctx):
         lol = ctx.author.id
         await ctx.send('<@{}> You ain\'t my master!'.format(lol))
         '''
-r
