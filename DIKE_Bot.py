@@ -1236,7 +1236,7 @@ async def help(ctx, *, help_id: str = None):
         embed.add_field(name='`slowmode`', value='Puts the current channel in slowmode\nSyntax: `!sm <time>`', inline=False)
         embed.add_field(name='`clean`', value='Cleans certain number of messages\nSyntax: `!clean <number>`', inline=False)
         embed.add_field(name='Note:', value='<> = Required | [ ] = Optional', inline=False)
-        embed.set_footer(text='Bot by: AwesomeSam#7985')
+        embed.set_footer(text='Page 1 out of 2')
         await ctx.send(embed=embed)
 
     elif help_id == 'mod 2':
@@ -1252,6 +1252,8 @@ async def help(ctx, *, help_id: str = None):
                         inline=False)
         embed.add_field(name='`resetxp`', value='Resets user xp to 0\nSyntax: `!resetxp @user`',
                         inline=False)
+        embed.set_footer(text='Page 2 out of 2')
+        await ctx.send(embed=embed)
 
 
 @bot.command(aliases=['feedback'])
