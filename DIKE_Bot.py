@@ -69,7 +69,7 @@ async def su(ctx, stype:str, *, status:str):
 
 @bot.event
 async def on_message(message):
-    if message.author == bot.user:
+    if message.author == bot.user or message.channel.id == 811838281028599829:
         return
     guildid = message.guild.id
     channel = message.channel.id
