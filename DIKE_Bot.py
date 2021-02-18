@@ -38,7 +38,7 @@ async def bot_status(status=None, stype=None):
         stype = stat.get('type')
         status = stat.get('status')
 
-    myd = {'type':stype, 'status':status}
+    myd = {'type': stype, 'status': status}
     f = open('status.txt', 'w')
     f.write(str(myd))
     f.close()
@@ -61,15 +61,17 @@ async def bot_status(status=None, stype=None):
         await bot.change_presence(
             activity=discord.Activity(type=discord.ActivityType.playing, name=eval(status)))
 
+
 @bot.command()
-async def su(ctx, stype:str, *, status:str):
+async def su(ctx, stype: str, *, status: str):
     if ctx.author.id != 771601176155783198:
         return
     asyncio.create_task(bot_status(status, stype))
 
+
 @bot.event
 async def on_message(message):
-    if message.author == bot.user or message.channel.id == 811838281028599829:
+    if message.author == bot.user:
         return
     guildid = message.guild.id
     channel = message.channel.id
@@ -106,7 +108,7 @@ async def on_message(message):
         xp = random.randint(15, 25)
         msgs = level_data.get(guildid)
         if msgs is None:
-            gadd = {message.guild.id:{}}
+            gadd = {message.guild.id: {}}
             level_data.update(gadd)
             msgs = level_data.get(guildid)
         old_xp = msgs.get(message.author.id)
@@ -265,6 +267,182 @@ from PIL import Image, ImageDraw, ImageFont
 fnt = ImageFont.truetype('./fonts/Acme-Regular.ttf', 25)
 fnt2 = ImageFont.truetype('./fonts/Acme-Regular.ttf', 12)
 fnt3 = ImageFont.truetype('./fonts/Acme-Regular.ttf', 16)
+
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from bs4 import BeautifulSoup
+import lxml
+
+driver = webdriver.Chrome(executable_path=r"D:\chromedriver\chromedriver.exe")
+driver.get('https://google.com')
+file = open('cookies.txt', 'r')
+cook = list(eval(file.read()))
+file.close()
+for i in cook:
+    driver.add_cookie(i)
+
+
+@bot.command()
+async def init(ctx):
+    driver = webdriver.Chrome(executable_path=r"D:\chromedriver\chromedriver.exe")
+    import time
+    driver.get("http://www.krunker.io/social.html")
+    print('Got till here.. waiting 60 secs')
+    for i in range(60):
+        print(i + 1)
+        time.sleep(1)
+    print('Sleep Over')
+    file = open('cookies.txt', 'w')
+    file.write(str(driver.get_cookies()))
+    file.close()
+    driver.quit()
+
+
+@bot.command()
+async def pf(ctx, user: str):
+    driver.get(f"http://www.krunker.io/social.html?p=profile&q={user}")
+    time.sleep(2)
+    page_source = driver.page_source
+    statHolder = {}
+
+    soup = BeautifulSoup(page_source, 'html.parser')
+
+    statss = soup.find('div', {'id': 'statHolder'})
+    mydivs = soup.find_all("div", {"class": "pSt"})
+    for data in mydivs:
+        newdata = str(data)
+        try:
+            a = newdata.split('LVL')
+            if len(a) == 1:
+                raise TypeError
+            a = newdata.split('>')
+            a = a[2]
+            a = a.split('<')
+            a = a[0]
+            statHolder['LVL'] = a
+        except:
+            newdata = newdata.split('<strong>')
+            first = newdata[0]
+            second = newdata[1]
+            first = first.replace('<div class="pSt">', '')
+            second = second.replace('</strong></div>', '')
+            statHolder[first] = second
+
+    leftp = soup.find("div", {"id": "leftProfile"})
+    print(leftp)
+    pic = leftp.find("img", {"id": "socialPic"})
+    pic = str(pic)
+    pic = pic.replace('<img class="profilePic" id="socialPic" src="', '')
+    pic = pic.replace('"/>', '')
+    print('pic=', pic)
+
+    rightp = soup.find("div", {"id": "rightProfile"})
+    rightp = rightp.text
+
+    if 'verified' in rightp:
+        partner = 'Yes'
+    else:
+        partner = 'No'
+    if 'beenhere' in rightp:
+        premium = 'Yes'
+    else:
+        premium = 'No'
+    if 'check_circle' in rightp:
+        verified = 'Yes'
+    else:
+        verified = 'No'
+
+    leftmid = soup.find("div", {"class": "leftMidHolder"})
+    since = (leftmid.text)
+    since = since.replace('Since ', '')
+
+    leftbottom = soup.find("div", {"class": "leftBottomHolder"})
+    fl = leftbottom.text
+    fl = fl.split('Followers')
+    followers = fl[0]
+    fl = fl[1]
+    following = fl.replace('following', '')
+
+    embed = discord.Embed(title=f'{user}',
+                          color=embedcolor)
+    embed.set_thumbnail(url=pic)
+    embed.add_field(name='Partner', value=partner)
+    embed.add_field(name='Verified', value=verified)
+    embed.add_field(name='Premium', value=premium)
+    embed.add_field(name='Account Age', value=since)
+    embed.add_field(name='Followers', value=followers)
+    embed.add_field(name='Following', value=following)
+
+    stat = 'LVL'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Challenge'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'KR'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Score'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'SPK'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Kills'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Deaths'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'KDR'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'KPG'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Games'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'W/L'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Wins'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Losses'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Nukes'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Melee'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Beatdowns'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Bullseyes'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Headshots'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Wallbangs'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Accuracy'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+    stat = 'Time Played'
+    embed.add_field(name=stat, value=statHolder.get(stat))
+
+    await ctx.send(embed=embed)
+
+
+@bot.command()
+async def modules(ctx):
+    embed = discord.Embed(title='Jupyter Modules',
+                          color=embedcolor)
+    guildid = ctx.guild.id
+    if guildid in ar_data:
+        autorstate = '☑️ Enabled'
+    else:
+        autorstate = '❌ Disabled'
+
+    if guildid in rr_data:
+        rrstate = '☑️ Enabled'
+    else:
+        rrstate = '❌ Disabled'
+    embed.add_field(name='Levelling System', value='☑️ Enabled')
+    embed.add_field(name='Member join roles', value=f'{autorstate}')
+    embed.add_field(name='Reaction Roles', value=f'{rrstate}')
+    embed.add_field(name='Jupyter Arcade', value='Coming Soon..')
+    embed.add_field(name='Moderation System', value='☑️ Enabled')
+    embed.add_field(name='Channel Stats', value='☑️ Enabled')
+
+    embed.set_footer(text='Type !setup to start setting up stuff..')
+
+    await ctx.send(embed=embed)
 
 
 @bot.command()
@@ -595,7 +773,7 @@ async def on_message_delete(message):
 async def changelogs(ctx):
     if ctx.author.id != 771601176155783198:
         return
-    embed = discord.Embed(title='DIKE Bot v1.0.0')
+    embed = discord.Embed(title='Jupyter Bot v1.0.0')
 
 
 @bot.command()
@@ -967,7 +1145,7 @@ async def setup(ctx, *, setupid: str = None):
                               color=embedcolor)
         embed.add_field(name='`rr`', value='Reaction Roles')
         embed.add_field(name='`applications`', value='Krunker applications extended support')
-        embed.add_field(name='`arcade`', value='DIKE Arcade- Play fun games with your friends!')
+        embed.add_field(name='`arcade`', value='Jupyter Arcade- Play fun games with your friends!')
         embed.set_footer(text='Bot by: AwesomeSam#7985')
         await ctx.send(embed=embed)
         return
@@ -1184,7 +1362,7 @@ async def help(ctx, *, help_id: str = None):
         clog = '[Join Support Server](https://discord.gg/C3XVJk7H8k) | ' \
                '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
 
-        embed = discord.Embed(title='DIKE Official Bot Help:',
+        embed = discord.Embed(title='Jupyter Official Bot Help:',
                               description=clog,
                               color=embedcolor)
         chelp = help_data.get(ctx.guild.id)
@@ -1192,7 +1370,7 @@ async def help(ctx, *, help_id: str = None):
             embed.add_field(name='`apply`', value='Minimum Requirements to join clan')
         embed.add_field(name='`stats`', value='Show stats related to server or channel')
         embed.add_field(name='`mod`', value='Moderation Commands')
-        embed.add_field(name='`arcade`', value='Have fun with others in DIKE Arcade!')
+        embed.add_field(name='`arcade`', value='Have fun with others in Jupyter Arcade!')
         embed.set_footer(text='Bot by: AwesomeSam#7985')
         await ctx.send(embed=embed)
         return
@@ -1225,7 +1403,7 @@ async def help(ctx, *, help_id: str = None):
                    '"--> KPG:       {}"\n' \
                    '"--> Nukes:     {}"```\n\n'.format(level, kdr, spk, kpg, nukes)
 
-        embed = discord.Embed(title='DIKE Official Bot Help:',
+        embed = discord.Embed(title='Jupyter Official Bot Help:',
                               description=clog,
                               color=embedcolor)
         embed.set_footer(text='Bot by: AwesomeSam#7985')
@@ -1233,7 +1411,7 @@ async def help(ctx, *, help_id: str = None):
     elif help_id == 'arcade' or help_id == 'arcade 1':
         clog = '[Join Support Server](https://discord.gg/C3XVJk7H8k) | ' \
                '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
-        embed = discord.Embed(title='DIKE Official Bot Help:',
+        embed = discord.Embed(title='Jupyter Official Bot Help:',
                               description=clog,
                               color=embedcolor)
         embed.add_field(name='`!balance`', value='View your balance', inline=False)
@@ -1246,7 +1424,7 @@ async def help(ctx, *, help_id: str = None):
     elif help_id == 'arcade 2':
         clog = '[Join Support Server](https://discord.gg/C3XVJk7H8k) | ' \
                '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
-        embed = discord.Embed(title='DIKE Official Bot Help:',
+        embed = discord.Embed(title='Jupyter Official Bot Help:',
                               description=clog,
                               color=embedcolor)
         embed.add_field(name='`!shop`', value='View all the items in the shop', inline=False)
@@ -1255,18 +1433,20 @@ async def help(ctx, *, help_id: str = None):
         embed.add_field(name='`!apply`', value='Apply for a job to earn coins', inline=False)
         embed.set_footer(text='Page 2 out of 2')
         await ctx.send(embed=embed)
-    elif help_id == 'mod' or help_id=='mod 1':
+    elif help_id == 'mod' or help_id == 'mod 1':
         clog = '[Join Support Server](https://discord.gg/C3XVJk7H8k) | ' \
                '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
 
-        embed = discord.Embed(title='DIKE Official Bot Help:',
+        embed = discord.Embed(title='Jupyter Official Bot Help:',
                               description=clog,
                               color=embedcolor)
         embed.add_field(name='`warn`', value='Warns the user\nSyntax: `!warn <user> <reason>`', inline=False)
         embed.add_field(name='`mute`', value='Mutes the user\nSyntax: `!mute <user> [time]`', inline=False)
         embed.add_field(name='`unmute`', value='Unmutes the user\nSyntax: `!unmute <user>`', inline=False)
-        embed.add_field(name='`slowmode`', value='Puts the current channel in slowmode\nSyntax: `!sm <time>`', inline=False)
-        embed.add_field(name='`clean`', value='Cleans certain number of messages\nSyntax: `!clean <number>`', inline=False)
+        embed.add_field(name='`slowmode`', value='Puts the current channel in slowmode\nSyntax: `!sm <time>`',
+                        inline=False)
+        embed.add_field(name='`clean`', value='Cleans certain number of messages\nSyntax: `!clean <number>`',
+                        inline=False)
         embed.add_field(name='Note:', value='<> = Required | [ ] = Optional', inline=False)
         embed.set_footer(text='Bot by: AwesomeSam#7985')
         await ctx.send(embed=embed)
@@ -1275,7 +1455,7 @@ async def help(ctx, *, help_id: str = None):
         clog = '[Join Support Server](https://discord.gg/C3XVJk7H8k) | ' \
                '[Invite Me](https://discord.com/api/oauth2/authorize?client_id=795334771718226010&permissions=8&scope=bot)\n'
 
-        embed = discord.Embed(title='DIKE Official Bot Help:',
+        embed = discord.Embed(title='Jupyter Official Bot Help:',
                               description=clog,
                               color=embedcolor)
         embed.add_field(name='`givexp`', value='Gives user xp\nSyntax: `!givexp @user <xp>`',
@@ -1350,7 +1530,7 @@ async def warn(ctx, user: discord.Member, *, reason=None):
     if user is None or reason is None:
         await ctx.send('<@{}>. The syntax for warn is: `!warn <user> <reason>`'.format(ctx.author.id))
     else:
-        await user.send('**You have been Warned in `✔ Official DIKE Clan` for:** {}'.format(reason))
+        await user.send('**You have been Warned in `✔ Official Jupyter Clan` for:** {}'.format(reason))
         await ctx.message.delete()
         await ctx.send('☑️ User Warned Successfully')
 
@@ -1566,7 +1746,7 @@ async def on_member_join(member):
         allusers += len(guild.members)
     if member.guild.id == 766875360126042113:
         welcom_chl = bot.get_channel(773401123389440011)
-        welmsg = '<a:hello:786862994381471766> Hyy <@{user}> Welcome to Official DIKE Clan <a:hello:786862994381471766> **Type `!help` to get help**\n' \
+        welmsg = '<a:hello:786862994381471766> Hyy <@{user}> Welcome to Official Jupyter Clan <a:hello:786862994381471766> **Type `!help` to get help**\n' \
                  '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
                  '<a:ARR:786863234736455680> MUST READ AND FOLLOW <#773626644324810762>  <a:ARR:786863090670239744>\n' \
                  '━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n' \
@@ -1690,7 +1870,7 @@ cbg.close()
 
 bot.run(TOKEN)
 
-dikemod = 799521293673168898
+Jupytermod = 799521293673168898
 '''my = open('arcade_bal.txt', 'r')
 data = my.read()
 config_dict = eval(data)
@@ -1832,7 +2012,7 @@ async def apply(ctx, job_id=None):
                                 emo_pt += 1
                     except:
                         pass
-                    dikeamt = int((emo_pt / 6) * 50)
+                    Jupyteramt = int((emo_pt / 6) * 50)
                     if dictemo == msg or dictemo == msg2:
                         await ctx.send(
                             '<@{}> Your Score: 6/6 \n**Congratulation! You got extra `10 Ð` for putting them in same order!**\n**You have been credited with `60 Ð`**'.format(
@@ -1845,9 +2025,9 @@ async def apply(ctx, job_id=None):
                     else:
                         await ctx.send(
                             '<@{}> Your Score: {}/6 \n**You have been credited with `{} Ð`. Have Fun :)**'.format(
-                                ctx.author.id, emo_pt, dikeamt))
+                                ctx.author.id, emo_pt, Jupyteramt))
                         cur_bal = config_dict.get(ctx.author.id)
-                        nbal = cur_bal + dikeamt
+                        nbal = cur_bal + Jupyteramt
                         dictt = {ctx.author.id: nbal}
                         config_dict.update(dictt)
                         update_book()
@@ -2141,7 +2321,7 @@ async def buy(ctx, code: str = None):
         cur_bal = config_dict.get(ctx.author.id)
         cur_bal = int(cur_bal)
         if cur_bal < 5000:
-            await ctx.send('<@{}> You dont have enought Dikers to purchase this item'.format(ctx.author.id))
+            await ctx.send('<@{}> You dont have enought Jupyterrs to purchase this item'.format(ctx.author.id))
         else:
             dict_to_update = items.get(ctx.author.id)
             if dict_to_update.get('comp') == 'True':
@@ -2160,7 +2340,7 @@ async def buy(ctx, code: str = None):
         cur_bal = config_dict.get(ctx.author.id)
         cur_bal = int(cur_bal)
         if cur_bal < 4500:
-            await ctx.send('<@{}> You dont have enought Dikers to purchase this item'.format(ctx.author.id))
+            await ctx.send('<@{}> You dont have enought Jupyterrs to purchase this item'.format(ctx.author.id))
         else:
             dict_to_update = items.get(ctx.author.id)
             if dict_to_update.get('pc') == 'True':
@@ -2179,7 +2359,7 @@ async def buy(ctx, code: str = None):
         cur_bal = config_dict.get(ctx.author.id)
         cur_bal = int(cur_bal)
         if cur_bal < 3000:
-            await ctx.send('<@{}> You dont have enought Dikers to purchase this item'.format(ctx.author.id))
+            await ctx.send('<@{}> You dont have enought Jupyterrs to purchase this item'.format(ctx.author.id))
         else:
             dict_to_update = items.get(ctx.author.id)
             before = dict_to_update.get('esc')
@@ -2196,7 +2376,7 @@ async def buy(ctx, code: str = None):
         cur_bal = config_dict.get(ctx.author.id)
         cur_bal = int(cur_bal)
         if cur_bal < 1000:
-            await ctx.send('<@{}> You dont have enought Dikers to purchase this item'.format(ctx.author.id))
+            await ctx.send('<@{}> You dont have enought Jupyterrs to purchase this item'.format(ctx.author.id))
         else:
             dict_to_update = items.get(ctx.author.id)
             before = dict_to_update.get('trace')
@@ -2213,7 +2393,7 @@ async def buy(ctx, code: str = None):
         cur_bal = config_dict.get(ctx.author.id)
         cur_bal = int(cur_bal)
         if cur_bal < 500:
-            await ctx.send('<@{}> You dont have enought Dikers to purchase this item'.format(ctx.author.id))
+            await ctx.send('<@{}> You dont have enought Jupyterrs to purchase this item'.format(ctx.author.id))
         else:
             dict_to_update = items.get(ctx.author.id)
             if dict_to_update.get('vpn') == 'True':
@@ -2232,7 +2412,7 @@ async def buy(ctx, code: str = None):
         cur_bal = config_dict.get(ctx.author.id)
         cur_bal = int(cur_bal)
         if cur_bal < 2000:
-            await ctx.send('<@{}> You dont have enought Dikers to purchase this item'.format(ctx.author.id))
+            await ctx.send('<@{}> You dont have enought Jupyterrs to purchase this item'.format(ctx.author.id))
         else:
             dict_to_update = items.get(ctx.author.id)
             if dict_to_update.get('qboard') == 'True':
@@ -2357,7 +2537,7 @@ async def give(ctx, give_to: discord.Member = None, amount: int = None):
         await ctx.send('Format for !give command is: `!give <person> <amount>`')
         return
     if give_to == ctx.author:
-        await ctx.send('<@{}> Sending Dikers to yourself, huh?'.format(ctx.author.id))
+        await ctx.send('<@{}> Sending Jupyterrs to yourself, huh?'.format(ctx.author.id))
         return
     if amount >= 1000:
         final_amount = int(amount * 0.9)
@@ -2444,7 +2624,7 @@ def update_book():
 from datetime import datetime
 @bot.command()
 async def add(ctx, person_id: int, amt: int):
-    if dikemod in [y.id for y in ctx.author.roles]:
+    if Jupytermod in [y.id for y in ctx.author.roles]:
         current_bal = config_dict.get(person_id)
         new_bal = current_bal + amt
         dc = {person_id: new_bal}
@@ -2462,7 +2642,7 @@ async def add(ctx, person_id: int, amt: int):
 
 @bot.command()
 async def logs(ctx):
-    if dikemod in [y.id for y in ctx.author.roles]:
+    if Jupytermod in [y.id for y in ctx.author.roles]:
         with open("modlogs.txt", "rb") as file:
             await ctx.author.send("Here is the logs file:", file=discord.File(file))
 
