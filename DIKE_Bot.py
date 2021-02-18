@@ -19,7 +19,7 @@ bot.remove_command('help')
 print('Starting...')
 c = 0
 from discord.ext import tasks
-#import requests
+import requests
 import shutil
 from datetime import date
 import random
