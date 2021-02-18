@@ -273,7 +273,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from bs4 import BeautifulSoup
 import lxml
 
-driver = webdriver.Chrome(executable_path=r"D:\chromedriver\chromedriver.exe")
+driver = webdriver.Chrome(executable_path=r"chromedriver.exe")
 driver.get('https://google.com')
 file = open('cookies.txt', 'r')
 cook = list(eval(file.read()))
@@ -284,7 +284,7 @@ for i in cook:
 
 @bot.command()
 async def init(ctx):
-    driver = webdriver.Chrome(executable_path=r"D:\chromedriver\chromedriver.exe")
+    driver = webdriver.Chrome(executable_path=r"chromedriver.exe")
     import time
     driver.get("http://www.krunker.io/social.html")
     print('Got till here.. waiting 60 secs')
