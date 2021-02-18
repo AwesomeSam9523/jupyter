@@ -33,10 +33,14 @@ async def wait_and_remove(_id):
 async def bot_status(status=None, stype=None):
     if stype is None or status is None:
         f = open('status.txt', 'r')
-        stat = dict(eval(f.read()))
-        f.close()
-        stype = stat.get('type')
-        status = stat.get('status')
+        try:
+            stat = dict(eval(f.read()))
+            f.close()
+            stype = stat.get('type')
+            status = stat.get('status')
+        except:
+            stype = 'w'
+            stafitus = 'You!'
 
     myd = {'type': stype, 'status': status}
     f = open('status.txt', 'w')
