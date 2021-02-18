@@ -19,7 +19,7 @@ bot.remove_command('help')
 print('Starting...')
 c = 0
 from discord.ext import tasks
-import requests
+#import requests
 import shutil
 from datetime import date
 import random
@@ -30,10 +30,42 @@ async def wait_and_remove(_id):
     noadds.remove(_id)
 
 
-async def bot_status(allusers, allguilds):
-    await bot.change_presence(
-        activity=discord.Activity(type=discord.ActivityType.listening, name="!rank | All MEE6 Features for free!"))
+async def bot_status(status=None, stype=None):
+    if stype is None or status is None:
+        f = open('status.txt', 'r')
+        stat = dict(eval(f.read()))
+        f.close()
+        stype = stat.get('type')
+        status = stat.get('status')
 
+    myd = {'type':stype, 'status':status}
+    f = open('status.txt', 'w')
+    f.write(str(myd))
+    f.close()
+
+    users = 0
+    for guild in bot.guilds:
+        users += len(guild.members)
+    guilds = len(bot.guilds)
+
+    if stype == 'w':
+        await bot.change_presence(
+            activity=discord.Activity(type=discord.ActivityType.watching, name=eval(status)))
+    elif stype == 'l':
+        await bot.change_presence(
+            activity=discord.Activity(type=discord.ActivityType.listening, name=eval(status)))
+    elif stype == 's':
+        await bot.change_presence(
+            activity=discord.Activity(type=discord.ActivityType.streaming, name=eval(status)))
+    elif stype == 'p':
+        await bot.change_presence(
+            activity=discord.Activity(type=discord.ActivityType.playing, name=eval(status)))
+
+@bot.command()
+async def su(ctx, stype:str, *, status:str):
+    if ctx.author.id != 771601176155783198:
+        return
+    asyncio.create_task(bot_status(status, stype))
 
 @bot.event
 async def on_message(message):
@@ -1236,7 +1268,7 @@ async def help(ctx, *, help_id: str = None):
         embed.add_field(name='`slowmode`', value='Puts the current channel in slowmode\nSyntax: `!sm <time>`', inline=False)
         embed.add_field(name='`clean`', value='Cleans certain number of messages\nSyntax: `!clean <number>`', inline=False)
         embed.add_field(name='Note:', value='<> = Required | [ ] = Optional', inline=False)
-        embed.set_footer(text='Page 1 out of 2')
+        embed.set_footer(text='Bot by: AwesomeSam#7985')
         await ctx.send(embed=embed)
 
     elif help_id == 'mod 2':
@@ -1252,8 +1284,6 @@ async def help(ctx, *, help_id: str = None):
                         inline=False)
         embed.add_field(name='`resetxp`', value='Resets user xp to 0\nSyntax: `!resetxp @user`',
                         inline=False)
-        embed.set_footer(text='Page 2 out of 2')
-        await ctx.send(embed=embed)
 
 
 @bot.command(aliases=['feedback'])
@@ -1602,10 +1632,6 @@ async def on_member_leave(member):
 
 @bot.event
 async def on_ready():
-    allusers = 0
-    for guild in bot.guilds:
-        allusers += len(guild.members)
-    asyncio.create_task(bot_status(allusers, bot.guilds))
     myguild = bot.get_guild(766875360126042113)
     if myguild is None:
         print('Ready!')
@@ -1623,6 +1649,8 @@ async def on_ready():
     await total.edit(name='All Members: {}'.format(member_count))
     await mem.edit(name='Members: {}'.format(true_member_count))
     await bots.edit(name='Bots: {}'.format(bot_count))
+
+    asyncio.create_task(bot_status())
     print('Ready!')
 
 
