@@ -8,3 +8,4 @@ apnggif
 aiohttp~=3.6.3
 requests
 selenium
+beautifulsoup4
