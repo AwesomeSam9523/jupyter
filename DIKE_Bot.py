@@ -271,7 +271,6 @@ fnt3 = ImageFont.truetype('./fonts/Acme-Regular.ttf', 16)
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from bs4 import BeautifulSoup
-import lxml
 
 driver = webdriver.Chrome(executable_path=r"chromedriver.exe")
 driver.get('https://google.com')
