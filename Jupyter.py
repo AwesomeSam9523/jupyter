@@ -7,12 +7,12 @@ import os
 import re
 
 intents = discord.Intents.default()
+
 intents.members = True
 noadds = []
 embedcolor = 3407822
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-
 bot = commands.Bot(command_prefix="!", intents=intents)
 bot.remove_command('help')
 
